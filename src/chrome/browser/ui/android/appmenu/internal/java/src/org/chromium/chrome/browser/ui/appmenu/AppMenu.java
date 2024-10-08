@@ -32,14 +32,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.os.Build;
-import android.widget.GridView;
-import androidx.annotation.NonNull;
-import android.app.Dialog;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import android.view.ViewGroup.LayoutParams;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import android.os.Bundle;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
@@ -108,32 +101,27 @@ import android.widget.HorizontalScrollView;
  *   - Only visible MenuItems are shown.
  *   - Disabled items are grayed out.
  */
-/*
- * This class has been revamped by Devendra(dkt) by adding BottomSheetDialogFragment
- * as the parent class of AppMenu which enables the use of BottomSheet directly when
- * Menu button is pressed while also implementing the exisiting interfaces.
- */
-public class AppMenu extends BottomSheetDialogFragment implements OnItemClickListener, OnKeyListener, AppMenuClickHandler {
-    private static final String TAG = "AppMenu";
+class AppMenu implements OnItemClickListener, OnKeyListener, AppMenuClickHandler {
     private static final float LAST_ITEM_SHOW_FRACTION = 0.5f;
 
     /** A means of reporting an exception/stack without crashing. */
     private static Callback<Throwable> sExceptionReporter;
 
-    private int mItemRowHeight;
-    private int mVerticalFadeDistance;
-    private int mNegativeSoftwareVerticalOffset;
-    private int mNegativeVerticalOffsetNotTopAnchored;
-    private int mChipHighlightExtension;
-    private int[] mTempLocation;
+    private final int mItemRowHeight;
+    private final int mVerticalFadeDistance;
+    private final int mNegativeSoftwareVerticalOffset;
+    private final int mNegativeVerticalOffsetNotTopAnchored;
+    private final int mChipHighlightExtension;
+    private final int[] mTempLocation;
 
-    private GridView mGridView;
-    private static final int GRID_COLUMNS = 3; // Adjust as needed
-
+    private PopupWindow mPopup;
+    private ListView mListView;
     private ModelListAdapter mAdapter;
     private AppMenuHandlerImpl mHandler;
+    private View mFooterView;
     private int mCurrentScreenRotation = -1;
     private boolean mIsByPermanentButton;
+    private AnimatorSet mMenuItemEnterAnimator;
     private long mMenuShownTimeMs;
     private boolean mSelectedItemBeforeDismiss;
     private ModelList mModelList;
@@ -152,61 +140,33 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
      * @param handler AppMenuHandlerImpl receives callbacks from AppMenu.
      * @param res Resources object used to get dimensions and style attributes.
      */
-    // By Devendra(dkt)
-    //Required empty constructor
-    public AppMenu() {
-        mVerticalFadeDistance = 0;
-        mNegativeSoftwareVerticalOffset = 0;
-        mNegativeVerticalOffsetNotTopAnchored = 0;
-        mChipHighlightExtension = 0;
-        mTempLocation = new int[2];
-        mItemRowHeight = 0;
-        mHeaderResourceId = 0;
-        mFooterResourceId = 0;
-    }
+    AppMenu(int itemRowHeight, AppMenuHandlerImpl handler, Resources res) {
+        mItemRowHeight = itemRowHeight;
+        assert mItemRowHeight > 0;
 
-    public static AppMenu newInstance(int itemRowHeight, AppMenuHandlerImpl handler, Resources res) {
-        AppMenu fragment = new AppMenu();
-        fragment.mItemRowHeight = itemRowHeight;
-        fragment.mHandler = handler;
-        fragment.initializeWithResources(res);
-        return fragment;
-    }
+        mHandler = handler;
 
-    private void initializeWithResources(Resources res) {
+        mNegativeSoftwareVerticalOffset =
+                res.getDimensionPixelSize(R.dimen.menu_negative_software_vertical_offset);
         mVerticalFadeDistance = res.getDimensionPixelSize(R.dimen.menu_vertical_fade_distance);
-        mNegativeSoftwareVerticalOffset = res.getDimensionPixelSize(R.dimen.menu_negative_software_vertical_offset);
-        mNegativeVerticalOffsetNotTopAnchored = res.getDimensionPixelSize(R.dimen.menu_negative_vertical_offset_not_top_anchored);
-        mChipHighlightExtension = res.getDimensionPixelOffset(R.dimen.menu_chip_highlight_extension);
+        mNegativeVerticalOffsetNotTopAnchored =
+                res.getDimensionPixelSize(R.dimen.menu_negative_vertical_offset_not_top_anchored);
+        mChipHighlightExtension =
+                res.getDimensionPixelOffset(R.dimen.menu_chip_highlight_extension);
+
+        mTempLocation = new int[2];
     }
-    // AppMenu(int itemRowHeight, AppMenuHandlerImpl handler, Resources res) {
-    //     Log.d(TAG, "AppMenu constructor called with itemRowHeight: " + itemRowHeight);
-    //     mItemRowHeight = itemRowHeight;
-    //     assert mItemRowHeight > 0;
-
-    //     mHandler = handler;
-
-    //     mNegativeSoftwareVerticalOffset =
-    //             res.getDimensionPixelSize(R.dimen.menu_negative_software_vertical_offset);
-    //     mVerticalFadeDistance = res.getDimensionPixelSize(R.dimen.menu_vertical_fade_distance);
-    //     mNegativeVerticalOffsetNotTopAnchored =
-    //             res.getDimensionPixelSize(R.dimen.menu_negative_vertical_offset_not_top_anchored);
-    //     mChipHighlightExtension =
-    //             res.getDimensionPixelOffset(R.dimen.menu_chip_highlight_extension);
-
-    //     mTempLocation = new int[2];
-    // }
 
     /**
      * Notifies the menu that the contents of the menu item specified by {@code menuRowId} have
      * changed.  This should be called if icons, titles, etc. are changing for a particular menu
      * item while the menu is open.
      * @param menuRowId The id of the menu item to change.  This must be a row id and not a child
-     *                  id.crollView = new NestedScrollView(getContext());
+     *                  id.
      */
     public void menuItemContentChanged(int menuRowId) {
         // Make sure we have all the valid state objects we need.
-        if (mAdapter == null || mModelList == null || mGridView == null) {
+        if (mAdapter == null || mModelList == null || mPopup == null || mListView == null) {
             return;
         }
 
@@ -222,55 +182,95 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         if (index == -1) return;
 
         // Check if the item is visible.
-        int startIndex = mGridView.getFirstVisiblePosition();
-        int endIndex = mGridView.getLastVisiblePosition();
+        int startIndex = mListView.getFirstVisiblePosition();
+        int endIndex = mListView.getLastVisiblePosition();
         if (index < startIndex || index > endIndex) return;
 
         // Grab the correct View.
-        View view = mGridView.getChildAt(index - startIndex);
+        View view = mListView.getChildAt(index - startIndex);
         if (view == null) return;
 
         // Cause the Adapter to re-populate the View.
-        mAdapter.getView(index, view, mGridView);
+        mAdapter.getView(index, view, mListView);
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // the next 4 lines should not be removed as it is part of working code
-        // BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-        // View contentView = createContentView();
-        // dialog.setContentView(contentView);
-        // return dialog;
+    /**
+     * Creates and shows the app menu anchored to the specified view.
+     *
+     * @param context               The context of the AppMenu (ensure the proper theme is set on
+     *                              this context).
+     * @param anchorView            The anchor {@link View} of the {@link PopupWindow}.
+     * @param isByPermanentButton   Whether or not permanent hardware button triggered it. (oppose
+     *                              to software button or keyboard).
+     * @param screenRotation        Current device screen rotation.
+     * @param visibleDisplayFrame   The display area rect in which AppMenu is supposed to fit in.
+     * @param footerResourceId      The resource id for a view to add as a fixed view at the bottom
+     *                              of the menu.  Can be 0 if no such view is required.  The footer
+     *                              is always visible and overlays other app menu items if
+     *                              necessary.
+     * @param headerResourceId      The resource id for a view to add as the first item in menu
+     *                              list. Can be null if no such view is required. See
+     *                              {@link ListView#addHeaderView(View)}.
+     * @param highlightedItemId     The resource id of the menu item that should be highlighted.
+     *                              Can be {@code null} if no item should be highlighted.  Note that
+     *                              {@code 0} is dedicated to custom menu items and can be declared
+     *                              by external apps.
+     * @param groupDividerResourceId     The resource id of divider menu items. This will be used to
+     *         determine the number of dividers that appear in the menu.
+     * @param customViewBinders     See {@link AppMenuPropertiesDelegate#getCustomViewBinders()}.
+     * @param isMenuIconAtStart     Whether the menu is being shown from a menu icon positioned at
+     *                              the start.
+     */
+    void show(
+            Context context,
+            final View anchorView,
+            boolean isByPermanentButton,
+            int screenRotation,
+            Rect visibleDisplayFrame,
+            @IdRes int footerResourceId,
+            @IdRes int headerResourceId,
+            @IdRes int groupDividerResourceId,
+            Integer highlightedItemId,
+            @Nullable List<CustomViewBinder> customViewBinders,
+            boolean isMenuIconAtStart) {
+        mPopup = new PopupWindow(context);
+        mPopup.setFocusable(true);
+        mPopup.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
 
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
         View view = createContentView(true);
         dialog.setContentView(view);
 
-        // Log.d(TAG,"mBottomSheet : " + view.getParent().toString()); 
+        mPopup.setOnDismissListener(
+                () -> {
+                    recordTimeToTakeActionHistogram();
+                    if (anchorView instanceof ImageButton) {
+                        ((ImageButton) anchorView).setSelected(false);
+                    }
 
-        // this code removes the dark scrim behind the menu
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        } 
+                    if (mMenuItemEnterAnimator != null) mMenuItemEnterAnimator.cancel();
 
-        mBehavior = BottomSheetBehavior.from((View) view.getParent());
-        mBehavior.setSkipCollapsed(true);
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    mHandler.appMenuDismissed();
+                    mHandler.onMenuVisibilityChanged(false);
 
-        // Disable dragging on the BottomSheetBehavior
-        mBehavior.setDraggable(false);/*pass true for draggable behaviour */
+                    mPopup = null;
+                    mAdapter = null;
+                    mListView = null;
+                    mFooterView = null;
+                    mMenuItemEnterAnimator = null;
+                });
 
-        return dialog;
-    }
+        // Some OEMs don't actually let us change the background... but they still return the
+        // padding of the new background, which breaks the menu height.  If we still have a
+        // drawable here even though our style says @null we should use this padding instead...
+        Drawable originalBgDrawable = mPopup.getBackground();
 
-    // this function below is not really used right now but should not be deleted
-    // private void setupTouchListener() {
-    //     mScrollView.setOnTouchListener(new View.OnTouchListener() {
-    //         private float startY;
-    //         private float startX;
-    //         private static final int CLICK_ACTION_THRESHOLD = 5;
+        // Setting this to a transparent ColorDrawable instead of null because setting it to null
+        // prevents the menu from being dismissed by tapping outside or pressing the back button on
+        // Android L.
+        mPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        // Make sure that the popup window will be closed when touch outside of it.
+        mPopup.setOutsideTouchable(true);
 
     //         @Override
     //         public boolean onTouch(View v, MotionEvent event) {
@@ -590,7 +590,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                 }
             });
         }
-        parent.setLayoutParams(layoutParams);
 
         View gridView = parent.findViewById(R.id.app_menu_grid);
         gridView.setVisibility(View.VISIBLE);
@@ -612,12 +611,12 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                     bottomSheet.setPadding(0, 0, 0, 0);
                 }
             }
+            ViewHighlighter.turnOnHighlight(viewToHighlight, highlightParams);
+        }
 
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                // Not needed for this implementation
-            }
-        });
+        // Set the adapter after the header is added to avoid crashes on JellyBean.
+        // See crbug.com/761726.
+        mListView.setAdapter(mAdapter);
 
         // super.onActivityCreated(savedInstanceState);
     
@@ -765,40 +764,110 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
 
         Log.d(TAG, "show called with tag: " + tag);
         try {
-            super.show(manager, tag);
-            mMenuShownTimeMs = SystemClock.elapsedRealtime();
-            if (mHandler != null) {
-                mHandler.onMenuVisibilityChanged(true);
-            }
-            Log.d(TAG, "AppMenu shown successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Error showing AppMenu", e);
+            mPopup.showAtLocation(
+                    anchorView.getRootView(),
+                    Gravity.NO_GRAVITY,
+                    popupPosition[0],
+                    popupPosition[1]);
+        } catch (WindowManager.BadTokenException e) {
+            // Intentionally ignore BadTokenException. This can happen in a real edge case where
+            // parent.getWindowToken is not valid. See http://crbug.com/826052 &
+            // https://crbug.com/1105831.
+            return;
+        }
+
+        mSelectedItemBeforeDismiss = false;
+        mMenuShownTimeMs = SystemClock.elapsedRealtime();
+
+        mListView.setOnItemClickListener(this);
+        mListView.setItemsCanFocus(true);
+        mListView.setOnKeyListener(this);
+
+        mHandler.onMenuVisibilityChanged(true);
+
+        if (mVerticalFadeDistance > 0) {
+            mListView.setVerticalFadingEdgeEnabled(true);
+            mListView.setFadingEdgeLength(mVerticalFadeDistance);
+        }
+
+        // Don't animate the menu items for low end devices.
+        if (!SysUtils.isLowEndDevice()) {
+            mListView.addOnLayoutChangeListener(
+                    new View.OnLayoutChangeListener() {
+                        @Override
+                        public void onLayoutChange(
+                                View v,
+                                int left,
+                                int top,
+                                int right,
+                                int bottom,
+                                int oldLeft,
+                                int oldTop,
+                                int oldRight,
+                                int oldBottom) {
+                            mListView.removeOnLayoutChangeListener(this);
+                            runMenuItemEnterAnimations();
+                        }
+                    });
         }
     }
 
-    @Override
-    public void dismiss() {
-        Log.d(TAG, "dismiss called");
-        try {
-            super.dismiss();
-            recordTimeToTakeActionHistogram();
-            if (mHandler != null) {
-                mHandler.appMenuDismissed();
-                mHandler.onMenuVisibilityChanged(false);
+    @VisibleForTesting
+    static int[] getPopupPosition(
+            int[] tempLocation,
+            boolean isByPermanentButton,
+            int negativeSoftwareVerticalOffset,
+            int screenRotation,
+            Rect appRect,
+            Rect padding,
+            View anchorView,
+            int popupWidth,
+            int viewLayoutDirection,
+            int popupHeight) {
+        anchorView.getLocationInWindow(tempLocation);
+        int anchorViewX = tempLocation[0];
+        int anchorViewY = tempLocation[1];
+        if (ChromeFeatureList.sMoveTopToolbarToBottom.isEnabled()) {
+            // moves the view offset up by the height of the popup
+            anchorViewY -= popupHeight;
+            // fix it if it goes offscreen
+            if (anchorViewY <= negativeSoftwareVerticalOffset)
+                anchorViewY = negativeSoftwareVerticalOffset;
+        }
+        int[] offsets = new int[2];
+        // If we have a hardware menu button, locate the app menu closer to the estimated
+        // hardware menu button location.
+        if (isByPermanentButton) {
+            int horizontalOffset = -anchorViewX;
+            switch (screenRotation) {
+                case Surface.ROTATION_0:
+                case Surface.ROTATION_180:
+                    horizontalOffset += (appRect.width() - popupWidth) / 2;
+                    break;
+                case Surface.ROTATION_90:
+                    horizontalOffset += appRect.width() - popupWidth;
+                    break;
+                case Surface.ROTATION_270:
+                    break;
+                default:
+                    assert false;
+                    break;
             }
-            Log.d(TAG, "AppMenu dismissed successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Error dismissing AppMenu", e);
+            offsets[0] = horizontalOffset;
+            // The menu is displayed above the anchored view, so shift the menu up by the bottom
+            // padding of the background.
+            offsets[1] = -padding.bottom;
+        } else {
+            offsets[1] = -negativeSoftwareVerticalOffset;
+            if (viewLayoutDirection != View.LAYOUT_DIRECTION_RTL) {
+                offsets[0] = anchorView.getWidth() - popupWidth;
+            }
         }
-    }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        int originalPosition = (int) id;
-        PropertyModel model = mModelList.get(originalPosition).model;
-        if (model != null && model.get(AppMenuItemProperties.ENABLED)) {
-            onItemClick(model);
-        }
+        int xPos = anchorViewX + offsets[0];
+        int yPos = anchorViewY + offsets[1];
+        int[] position = {xPos, yPos};
+        return position;
     }
 
     @Override
@@ -807,21 +876,14 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
 
         int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
         mSelectedItemBeforeDismiss = true;
-        // dismiss();
-        if (mHandler != null) {
-            Log.d(TAG,"Entering the onItemClick for " + id);
-            mHandler.onOptionsItemSelected(id);
-            Log.d(TAG,"Exiting the onItemClick for " + id);
-        }
-        // this dismiss is added after the option is selected
         dismiss();
+        mHandler.onOptionsItemSelected(id);
     }
 
     @Override
     public boolean onItemLongClick(PropertyModel model, View view) {
-        Log.d(TAG,"Enterning the onItemLongClick " + view);
         if (!model.get(AppMenuItemProperties.ENABLED)) return false;
-        Log.d(TAG,"After the conditional check in onItemLongClick");
+
         mSelectedItemBeforeDismiss = true;
         CharSequence titleCondensed = model.get(AppMenuItemProperties.TITLE_CONDENSED);
         CharSequence message =
@@ -845,8 +907,13 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
     }
 
     @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        onItemClick(mModelList.get(position).model);
+    }
+
+    @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (mGridView == null) return false;
+        if (mListView == null) return false;
         if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
                 event.startTracking();
@@ -871,9 +938,44 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
     void updateMenu(ModelList newModelList, ModelListAdapter adapter) {
         mModelList = newModelList;
         mAdapter = adapter;
-        if (mGridAdapter != null) {
-            mGridAdapter.updateValidItems();
+    }
+
+    /** Dismisses the app menu and cancels the drag-to-scroll if it is taking place. */
+    void dismiss() {
+        if (isShowing()) {
+            mPopup.dismiss();
         }
+    }
+
+    /**
+     * @return Whether the app menu is currently showing.
+     */
+    boolean isShowing() {
+        if (mPopup == null) {
+            return false;
+        }
+        return mPopup.isShowing();
+    }
+
+    /**
+     * @return {@link PopupWindow} that displays all the menu options and optional footer.
+     */
+    PopupWindow getPopup() {
+        return mPopup;
+    }
+
+    /**
+     * @return {@link ListView} that contains all of the menu options.
+     */
+    ListView getListView() {
+        return mListView;
+    }
+
+    /**
+     * @return The menu instance inside of this class.
+     */
+    ModelList getMenuModelList() {
+        return mModelList;
     }
 
     /**
@@ -905,24 +1007,175 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         if (mAdapter != null) mAdapter.notifyDataSetChanged();
     }
 
-    private void inflateHeader(int headerResourceId, View contentView) {
-        if (headerResourceId == 0) return;
+    private int setMenuHeight(
+            List<Integer> menuItemIds,
+            List<Integer> heightList,
+            Rect appDimensions,
+            Rect padding,
+            int footerHeight,
+            int headerHeight,
+            View anchorView,
+            @IdRes int groupDividerResourceId,
+            int anchorViewOffset) {
+        int anchorViewImpactHeight = mIsByPermanentButton ? anchorView.getHeight() : 0;
 
-        View headerView = LayoutInflater.from(getContext()).inflate(headerResourceId, null);
-        ViewGroup headerContainer = contentView.findViewById(R.id.app_menu_header);
-        headerContainer.addView(headerView);
+        int availableScreenSpace =
+                appDimensions.height()
+                        - anchorViewOffset
+                        - padding.bottom
+                        - footerHeight
+                        - headerHeight
+                        - anchorViewImpactHeight;
+        if (ChromeFeatureList.sMoveTopToolbarToBottom.isEnabled()) {
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N) {
+                // due to an Android Nougat bug the popup does not appear above the anchorview.
+                // the display is not pleasant, so we reduce the space
+                availableScreenSpace -= anchorView.getHeight();
+            }
+        }
+        if (mIsByPermanentButton) availableScreenSpace -= padding.top;
+        if (availableScreenSpace <= 0 && sExceptionReporter != null) {
+            String logMessage =
+                    "there is no screen space for app menn, mIsByPermanentButton = "
+                            + mIsByPermanentButton
+                            + ", anchorViewOffset = "
+                            + anchorViewOffset
+                            + ", appDimensions.height() = "
+                            + appDimensions.height()
+                            + ", anchorView.getHeight() = "
+                            + anchorView.getHeight()
+                            + " padding.top = "
+                            + padding.top
+                            + ", padding.bottom = "
+                            + padding.bottom
+                            + ", footerHeight = "
+                            + footerHeight
+                            + ", headerHeight = "
+                            + headerHeight;
+            PostTask.postTask(
+                    TaskTraits.BEST_EFFORT_MAY_BLOCK,
+                    () -> sExceptionReporter.onResult(new Throwable(logMessage)));
+        }
 
-        if (mHandler != null) mHandler.onHeaderViewInflated(headerView);
+        int menuHeight =
+                calculateHeightForItems(
+                        menuItemIds, heightList, groupDividerResourceId, availableScreenSpace);
+        menuHeight += footerHeight + headerHeight + padding.top + padding.bottom;
+        mPopup.setHeight(menuHeight);
+        return menuHeight;
+
     }
 
-    private void inflateFooter(int footerResourceId, View contentView) {
-        if (footerResourceId == 0) return;
+    @VisibleForTesting
+    int calculateHeightForItems(
+            List<Integer> menuItemIds,
+            List<Integer> heightList,
+            @IdRes int groupDividerResourceId,
+            int screenSpaceForItems) {
+        int availableScreenSpace = screenSpaceForItems > 0 ? screenSpaceForItems : 0;
+        int spaceForFullItems = 0;
 
-        View footerView = LayoutInflater.from(getContext()).inflate(footerResourceId, null);
-        ViewGroup footerContainer = contentView.findViewById(R.id.app_menu_footer);
-        footerContainer.addView(footerView);
+        for (int i = 0; i < heightList.size(); i++) {
+            spaceForFullItems += heightList.get(i);
+        }
 
-        if (mHandler != null) mHandler.onFooterViewInflated(footerView);
+        int menuHeight;
+        // Fade out the last item if we cannot fit all items.
+        if (availableScreenSpace < spaceForFullItems) {
+            int spaceForItems = 0;
+            int lastItem = 0;
+            // App menu should show 1 full item at least.
+            do {
+                spaceForItems += heightList.get(lastItem++);
+                if (spaceForItems + heightList.get(lastItem) > availableScreenSpace) {
+                    break;
+                }
+            } while (lastItem < heightList.size() - 1);
+
+            int spaceForPartialItem = (int) (LAST_ITEM_SHOW_FRACTION * heightList.get(lastItem));
+            // Determine which item needs hiding. We only show Partial of the last item, if there is
+            // not enough screen space to partially show the last identified item, then partially
+            // show the second to last item instead. We also do not show the partial divider line.
+            assert menuItemIds.size() == heightList.size();
+            while (lastItem > 1
+                    && (spaceForItems + spaceForPartialItem > availableScreenSpace
+                            || menuItemIds.get(lastItem) == groupDividerResourceId)) {
+                // If we have space for < 2.5 items, size menu to available screen space.
+                if (spaceForItems <= availableScreenSpace && lastItem < 3) {
+                    spaceForPartialItem = availableScreenSpace - spaceForItems;
+                    break;
+                }
+                spaceForItems -= heightList.get(lastItem - 1);
+                spaceForPartialItem =
+                        (int) (LAST_ITEM_SHOW_FRACTION * heightList.get(lastItem - 1));
+                lastItem--;
+            }
+
+            menuHeight = spaceForItems + spaceForPartialItem;
+        } else {
+            menuHeight = spaceForFullItems;
+        }
+        return menuHeight;
+    }
+
+    private void runMenuItemEnterAnimations() {
+        mMenuItemEnterAnimator = new AnimatorSet();
+        AnimatorSet.Builder builder = null;
+
+        ViewGroup list = mListView;
+        for (int i = 0; i < list.getChildCount(); i++) {
+            View view = list.getChildAt(i);
+            Object animatorObject = view.getTag(R.id.menu_item_enter_anim_id);
+            if (animatorObject != null) {
+                if (builder == null) {
+                    builder = mMenuItemEnterAnimator.play((Animator) animatorObject);
+                } else {
+                    builder.with((Animator) animatorObject);
+                }
+            }
+        }
+
+        mMenuItemEnterAnimator.start();
+    }
+
+    private int inflateFooter(int footerResourceId, View contentView, int menuWidth) {
+        if (footerResourceId == 0) {
+            mFooterView = null;
+            return 0;
+        }
+
+        ViewStub footerStub = (ViewStub) contentView.findViewById(R.id.app_menu_footer_stub);
+        footerStub.setLayoutResource(footerResourceId);
+        mFooterView = footerStub.inflate();
+
+        int widthMeasureSpec = MeasureSpec.makeMeasureSpec(menuWidth, MeasureSpec.EXACTLY);
+        int heightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        mFooterView.measure(widthMeasureSpec, heightMeasureSpec);
+
+        if (mHandler != null) mHandler.onFooterViewInflated(mFooterView);
+
+        return mFooterView.getMeasuredHeight();
+    }
+
+    private int inflateHeader(int headerResourceId, View contentView, int menuWidth) {
+        if (headerResourceId == 0) return 0;
+
+        View headerView =
+                LayoutInflater.from(contentView.getContext())
+                        .inflate(headerResourceId, mListView, false);
+        mListView.addHeaderView(headerView);
+
+        int widthMeasureSpec = MeasureSpec.makeMeasureSpec(menuWidth, MeasureSpec.EXACTLY);
+        int heightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        headerView.measure(widthMeasureSpec, heightMeasureSpec);
+
+        if (mHandler != null) mHandler.onHeaderViewInflated(headerView);
+
+        return headerView.getMeasuredHeight();
+    }
+
+    void finishAnimationsForTests() {
+        if (mMenuItemEnterAnimator != null) mMenuItemEnterAnimator.end();
     }
 
     private void recordTimeToTakeActionHistogram() {

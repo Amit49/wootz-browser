@@ -17,8 +17,6 @@ import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 /** A factory for creating an {@link AppMenuCoordinator}. */
 public class AppMenuCoordinatorFactory {
-    private static final String TAG = "AppMenuCoordinatorFactory";
-
     private AppMenuCoordinatorFactory() {}
 
     /**
@@ -33,8 +31,6 @@ public class AppMenuCoordinatorFactory {
      * @param hardwareButtonAnchorView The {@link View} used as an anchor for the menu when it is
      *            displayed using a hardware button.
      * @param appRect Supplier of the app area in Window that the menu should fit in.
-     * @param fragmentManager The {@link FragmentManager} for the containing activity.
-     * @param itemRowHeight The height of each item row in the menu.
      */
     public static AppMenuCoordinator createAppMenuCoordinator(
             Context context,

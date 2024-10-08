@@ -12,8 +12,6 @@ import android.graphics.Region;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.graphics.Outline;
-import android.view.ViewOutlineProvider;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -21,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.Gravity;
+import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
@@ -124,7 +123,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
     @Override
     public void initWithToolbar(int toolbarLayoutId) {
         try (TraceEvent te = TraceEvent.scoped("ToolbarControlContainer.initWithToolbar")) {
-            if (true) {
+            if (ChromeFeatureList.sMoveTopToolbarToBottom.isEnabled()) {
                 // the top toolbar is docked at the bottom
                 CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams)getLayoutParams();
                 layoutParams.gravity = Gravity.START | Gravity.BOTTOM;
