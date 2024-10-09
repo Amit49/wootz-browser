@@ -16,7 +16,6 @@ android_library("java") {
     "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuButtonHelperImpl.java",
     "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuCoordinatorFactory.java",
     "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuCoordinatorImpl.java",
-    "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuDragHelper.java",
     "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java",
     "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuItemIcon.java",
     "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuItemViewBinder.java",
@@ -47,6 +46,9 @@ android_library("java") {
     "//third_party/androidx:androidx_core_core_java",
     "//third_party/androidx:androidx_fragment_fragment_java",
     "//ui/android:ui_java",
+    "//third_party/android_deps:material_design_java",
+    "//third_party/androidx:androidx_fragment_fragment_java",
+    "//third_party/androidx:androidx_coordinatorlayout_coordinatorlayout_java",
   ]
   resources_package = "org.chromium.chrome.browser.ui.appmenu.internal"
 }

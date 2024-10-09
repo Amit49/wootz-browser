@@ -20,11 +20,10 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.ActivityOptionsCompat;
 import android.view.Gravity;
-import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import org.chromium.base.Callback;
 import org.chromium.base.IntentUtils;
-import org.chromium.base.Log;
+// import org.chromium.base.Log;
 import org.chromium.base.ResettersForTesting;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.metrics.RecordHistogram;
@@ -63,6 +62,7 @@ import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.profiles.ProfileProvider;
 import org.chromium.chrome.browser.rlz.RevenueStats;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
+import org.chromium.chrome.browser.searchwidget.SearchActivity.TerminationReason;
 import org.chromium.chrome.browser.settings.SettingsLauncherImpl;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabBuilder;
@@ -85,11 +85,10 @@ import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.ui.base.WindowDelegate;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.url.GURL;
-
+import android.graphics.Rect;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
-<<<<<<< HEAD
 import org.chromium.chrome.browser.compositor.CompositorViewHolder;
 import org.chromium.chrome.browser.omnibox.OmniboxSuggestionsDropdownEmbedderImpl;
 import android.view.ViewTreeObserver;
@@ -99,9 +98,7 @@ import android.util.Log;
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
 import android.os.Handler;
-//import java.util.logging.Handler;
-=======
->>>>>>> 4bd080880b (Wallet Code Implementation)
+
 
 /** Queries the user's default search engine and shows autocomplete suggestions. */
 public class SearchActivity extends AsyncInitializationActivity
@@ -253,6 +250,8 @@ public class SearchActivity extends AsyncInitializationActivity
     private final LocationBarEmbedderUiOverrides mLocationBarUiOverrides =
             new LocationBarEmbedderUiOverrides();
     private UmaActivityObserver mUmaActivityObserver;
+    private CompositorViewHolder mCompositorViewHolder;
+    private OmniboxSuggestionsDropdownEmbedderImpl mOmniboxDropdownEmbedderImpl;
 
     public SearchActivity() {
         mUmaActivityObserver = new UmaActivityObserver(this);
@@ -308,7 +307,7 @@ public class SearchActivity extends AsyncInitializationActivity
                 (SearchActivityLocationBarLayout)
                         contentView.findViewById(R.id.search_location_bar);
         View anchorView = contentView.findViewById(R.id.toolbar);
-        if (ChromeFeatureList.sMoveTopToolbarToBottom.isEnabled()) {
+        if (true) {
             CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams)
                 anchorView.getLayoutParams();
             layoutParams.gravity = Gravity.START | Gravity.BOTTOM;
@@ -394,11 +393,14 @@ public class SearchActivity extends AsyncInitializationActivity
                         /* OmniboxSuggestionsDropdownScrollListener= */ null,
                         /* tabModelSelectorSupplier= */ null,
                         mLocationBarUiOverrides,
-                        null);
+                        null,
+                        mCompositorViewHolder
+                        );
         mLocationBarCoordinator.setUrlBarFocusable(true);
         mLocationBarCoordinator.setShouldShowMicButtonWhenUnfocused(true);
         mLocationBarCoordinator.getOmniboxStub().addUrlFocusChangeListener(this);
-
+        mOmniboxDropdownEmbedderImpl = mLocationBarCoordinator.getOmniboxDropdownEmbedder();
+        setupKeyboardVisibilityListener();
         // Kick off everything needed for the user to type into the box.
         handleNewIntent(getIntent(), false);
 
@@ -587,6 +589,7 @@ public class SearchActivity extends AsyncInitializationActivity
         super.onNewIntent(intent);
         setIntent(intent);
         handleNewIntent(intent, true);
+        recalculateOmniboxAlignment();
     }
 
     @Override
@@ -652,9 +655,7 @@ public class SearchActivity extends AsyncInitializationActivity
         recalculateOmniboxAlignment();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-    }
 
-    private void recalculateOmniboxAlignment() {
         if (mOmniboxDropdownEmbedderImpl != null) {
             Log.d("Omni", "recalculateOmniboxAlignment from SearchActivity");
             mOmniboxDropdownEmbedderImpl.recalculateOmniboxAlignment();
@@ -767,6 +768,7 @@ public class SearchActivity extends AsyncInitializationActivity
         }
 
         finish(TerminationReason.NAVIGATION);
+        // onSearchCompleted();
         return true;
     }
 

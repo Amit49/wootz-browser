@@ -62,6 +62,8 @@ class AppMenuCoordinatorImpl implements AppMenuCoordinator {
      * @param hardwareButtonAnchorView The {@link View} used as an anchor for the menu when it is
      *            displayed using a hardware button.
      * @param appRect Supplier of the app area in Window that the menu should fit in.
+     * @param fragmentManager The {@link FragmentManager} for the containing activity.
+     * @param itemRowHeight The height of each menu item row.
      */
     public AppMenuCoordinatorImpl(
             Context context,
