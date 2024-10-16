@@ -89,11 +89,10 @@ gn args out/Default
 ```
 
 and add following arguments:
-
-
 ```bash
 target_os = "android"
 target_cpu = "arm64" # or x64
+
 # basic debug
 is_official_build = false
 is_debug = true
