@@ -41,7 +41,24 @@
           "name": "showDialog",
           "type": "function",
           "description": "Shows the consent dialog and starts the service if consent is given",
-          "parameters": []
+          "parameters": [],
+          "returns_async": {
+            "name": "callback",
+            "parameters": []
+          }
+        },
+        {
+          "name": "log",
+          "type": "function",
+          "description": "Log to browser debug logs",
+          "parameters": [{
+            "type": "string",
+            "name": "log"
+          }],
+          "returns_async": {
+            "name": "callback",
+            "parameters": []
+          }
         }
       ],
       "events": []
