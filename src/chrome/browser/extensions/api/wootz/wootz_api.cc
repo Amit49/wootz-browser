@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/logging.h"
 #include "base/android/build_info.h"
 #include "base/android/jni_android.h"
 #include "base/android/jni_array.h"
@@ -88,53 +89,10 @@ ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
     return RespondNow(NoArguments());
 }
 
-// ExtensionFunction::ResponseAction
-// WootzShowConsentDialogAndMaybeStartServiceFunction::Run() {
-//   JNIEnv* env = base::android::AttachCurrentThread();
-
-//     content::WebContents* web_contents = GetSenderWebContents();
-//     if (!web_contents) {
-//         return RespondNow(Error("Unable to get WebContents"));
-//     }
-
-//     // First, check if we already have consent
-//     if (!Java_WootzBridge_hasUserConsent(env)) {
-//         // If not, show the consent dialog
-//         // auto* callback_ptr = new base::OnceCallback<void(bool)>(
-//         //     base::BindOnce(&WootzShowConsentDialogAndMaybeStartServiceFunction::OnConsentResult,
-//         //                    this));
-
-//         Java_WootzBridge_showConsentDialog(env, reinterpret_cast<jlong>(this),
-//                                            web_contents->GetJavaWebContents());
-//         return RespondLater();
-//     } else {
-//         // If we already have consent, start the service directly
-//         Java_WootzBridge_startBrowsingDataService(env);
-//         return RespondNow(NoArguments());
-//     }
-// //   base::Value::Dict result;
-// //   result.Set("message", "Consent dialog shown and service started");
-
-// //   std::string json_string;
-// //   base::JSONWriter::Write(result, &json_string);
-
-// //   return RespondNow(WithArguments(json_string));
-// }
-// void WootzShowConsentDialogAndMaybeStartServiceFunction::OnConsentDialogResult(JNIEnv* env, jboolean consented) {
-//     if (consented) {
-//         Java_WootzBridge_startBrowsingDataService(env);
-//     }
-//     Respond(NoArguments());
-// }
-
 }  // namespace extensions
 
-// extern "C" JNIEXPORT void JNICALL
-// Java_org_chromium_chrome_browser_extensions_WootzBridge_nativeOnConsentDialogResult(
-//     JNIEnv* env,
-//     jclass clazz,
-//     jlong native_ptr,
-//     jboolean consented) {
-//   auto* function = reinterpret_cast<extensions::WootzShowConsentDialogAndMaybeStartServiceFunction*>(native_ptr);
-//   function->OnConsentDialogResult(env, consented);
-// }
+
+void JNI_WootzBridge_OnConsentResult(JNIEnv* env, jboolean consented){
+  // Implement the consent result handling here
+  LOG(INFO) << "DKT: Consent result: " << (consented ? "true" : "false");
+}
