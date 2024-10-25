@@ -85,7 +85,9 @@ import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.ui.base.WindowDelegate;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.url.GURL;
+// import org.w3c.dom.css.Rect;
 import android.graphics.Rect;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -98,7 +100,7 @@ import android.util.Log;
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
 import android.os.Handler;
-
+//import java.util.logging.Handler;
 
 /** Queries the user's default search engine and shows autocomplete suggestions. */
 public class SearchActivity extends AsyncInitializationActivity
@@ -655,7 +657,9 @@ public class SearchActivity extends AsyncInitializationActivity
         recalculateOmniboxAlignment();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+    }
 
+    private void recalculateOmniboxAlignment() {
         if (mOmniboxDropdownEmbedderImpl != null) {
             Log.d("Omni", "recalculateOmniboxAlignment from SearchActivity");
             mOmniboxDropdownEmbedderImpl.recalculateOmniboxAlignment();

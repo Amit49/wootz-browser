@@ -1017,7 +1017,6 @@ static_library("ui") {
       "webui/webapks/webapks_handler.h",
       "webui/webapks/webapks_ui.cc",
       "webui/webapks/webapks_ui.h",
-<<<<<<< HEAD
       "global_error/global_error.cc",
       "global_error/global_error.h",
       "global_error/global_error_service.cc",
@@ -1043,7 +1042,6 @@ static_library("ui") {
       "webui/plural_string_handler.h",
       "webui/favicon_source.cc",
       "webui/favicon_source.h",
-=======
       "webui/wootz_wallet/android/android_wallet_page_handler.cc",
       "webui/wootz_wallet/android/android_wallet_page_handler.h",
       "webui/wootz_wallet/android/android_wallet_page_ui.cc",
@@ -1054,7 +1052,6 @@ static_library("ui") {
       "webui/wootz_wallet/page_handler/wallet_page_handler.h",
       "webui/wootz_wallet/wallet_common_ui.cc",
       "webui/wootz_wallet/wallet_common_ui.h",
->>>>>>> 4bd080880b (Wallet Code Implementation)
     ]
     if (enable_feed_v2) {
       sources += [
