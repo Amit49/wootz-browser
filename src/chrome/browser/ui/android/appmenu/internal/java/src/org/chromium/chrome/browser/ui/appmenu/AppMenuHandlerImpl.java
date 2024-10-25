@@ -21,6 +21,7 @@ import android.util.Log;
 import org.chromium.base.Callback;
 import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.supplier.Supplier;
+import org.chromium.chrome.browser.app.appmenu.AppMenuPropertiesDelegateImpl;
 import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
 import org.chromium.chrome.browser.lifecycle.ConfigurationChangedObserver;
 import org.chromium.chrome.browser.lifecycle.StartStopWithNativeObserver;
@@ -33,6 +34,8 @@ import org.chromium.ui.modelutil.ListObservable.ListObserver;
 import org.chromium.ui.modelutil.MVCListAdapter.ModelList;
 import org.chromium.ui.modelutil.ModelListAdapter;
 import org.chromium.ui.modelutil.PropertyModel;
+import org.chromium.ui.base.WindowAndroid;
+import org.chromium.chrome.browser.tab.Tab;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +65,7 @@ class AppMenuHandlerImpl
     private Callback<Integer> mTestOptionsItemSelectedListener;
     private FragmentManager mFragmentManager;
     private final int mItemRowHeight;
-
+    private WindowAndroid mWindowAndroid;
     /**
      * The resource id of the menu item to highlight when the menu next opens. A value of {@code
      * null} means no item will be highlighted. This value will be cleared after the menu is opened.
@@ -95,7 +98,8 @@ class AppMenuHandlerImpl
             View hardwareButtonAnchorView,
             Supplier<Rect> appRect,
             FragmentManager fragmentManager,
-            int itemRowHeight) {
+            int itemRowHeight,
+            WindowAndroid windowAndroid) {
                 Log.d(TAG, "Initializing AppMenuHandlerImpl");
         mContext = context;
         mAppMenuDelegate = appMenuDelegate;
@@ -107,6 +111,7 @@ class AppMenuHandlerImpl
         mAppRect = appRect;
         mFragmentManager = fragmentManager;
         mItemRowHeight = itemRowHeight;
+        mWindowAndroid = windowAndroid;
 
         mActivityLifecycleDispatcher = activityLifecycleDispatcher;
         mActivityLifecycleDispatcher.register(this);
@@ -138,6 +143,10 @@ class AppMenuHandlerImpl
                     }
                 };
                 Log.d(TAG, "AppMenuHandlerImpl initialized with itemRowHeight: " + itemRowHeight);
+    }
+
+    WindowAndroid getWindowAndroid() {
+        return mWindowAndroid;
     }
 
     /** Called when the containing activity is being destroyed. */
@@ -517,5 +526,13 @@ class AppMenuHandlerImpl
     @Nullable
     ModelList getModelListForTesting() {
         return mModelList;
+    }
+
+    public Tab getActivityTab() {
+    if (mDelegate != null && mDelegate instanceof AppMenuPropertiesDelegateImpl) {
+        AppMenuPropertiesDelegateImpl delegateImpl = (AppMenuPropertiesDelegateImpl) mDelegate;
+        return delegateImpl.getActivityTab();
+    }
+        return null;
     }
 }
