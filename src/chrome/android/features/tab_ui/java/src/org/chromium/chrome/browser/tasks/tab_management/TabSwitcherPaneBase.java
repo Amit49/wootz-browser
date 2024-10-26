@@ -294,7 +294,7 @@ public abstract class TabSwitcherPaneBase implements Pane, TabSwitcherResetHandl
                     initialRect.offset(leftOffset, -hubRect.top);
                 }
 
-                boolean useFallbackAnimation = true;
+                boolean useFallbackAnimation = false;
                 if (initialRect.isEmpty() || finalRect.isEmpty()) {
                     Log.d(TAG, "Geometry not ready using fallback animation.");
                     useFallbackAnimation = true;
