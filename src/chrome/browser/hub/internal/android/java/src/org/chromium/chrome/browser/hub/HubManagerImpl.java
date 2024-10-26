@@ -139,9 +139,7 @@ public class HubManagerImpl implements HubManager, HubController {
 
     @Override
     public @Nullable View getPaneHostView() {
-        if (mHubCoordinator == null) {
-            ensureHubCoordinatorIsInitialized();
-        }
+        ensureHubCoordinatorIsInitializedForPane();
         assert mHubCoordinator != null : "Access of a Hub pane host view that doesn't exist";
         return mHubContainerView.findViewById(R.id.hub_pane_host);
     }
@@ -179,6 +177,11 @@ public class HubManagerImpl implements HubManager, HubController {
                 assert false : "Not reached.";
                 return false;
         }
+    }
+
+    private void ensureHubCoordinatorIsInitializedForPane() {
+        if (mHubCoordinator != null) return;
+        ensureHubCoordinatorIsInitialized();
     }
 
     private void ensureHubCoordinatorIsInitialized() {
