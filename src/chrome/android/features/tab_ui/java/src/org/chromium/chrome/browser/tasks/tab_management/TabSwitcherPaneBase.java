@@ -255,61 +255,61 @@ public abstract class TabSwitcherPaneBase implements Pane, TabSwitcherResetHandl
         }
     }
 
-    private SyncOneshotSupplier<ShrinkExpandAnimationData> requestAnimationData(
-        @NonNull HubContainerView hubContainerView, boolean isShrink, int tabId) {
-    SyncOneshotSupplierImpl<ShrinkExpandAnimationData> animationDataSupplier =
-            new SyncOneshotSupplierImpl<>();
-    @Nullable TabSwitcherPaneCoordinator coordinator = getTabSwitcherPaneCoordinator();
-    assert coordinator != null;
-    Runnable provideAnimationData =
-            () -> {
-                Rect hubRect = new Rect();
-                hubContainerView.getGlobalVisibleRect(hubRect);
-                Rect initialRect;
-                Rect finalRect;
+private SyncOneshotSupplier<ShrinkExpandAnimationData> requestAnimationData(
+            @NonNull HubContainerView hubContainerView, boolean isShrink, int tabId) {
+        SyncOneshotSupplierImpl<ShrinkExpandAnimationData> animationDataSupplier =
+                new SyncOneshotSupplierImpl<>();
+        @Nullable TabSwitcherPaneCoordinator coordinator = getTabSwitcherPaneCoordinator();
+        assert coordinator != null;
+        Runnable provideAnimationData =
+                () -> {
+                    Rect hubRect = new Rect();
+                    hubContainerView.getGlobalVisibleRect(hubRect);
+                    Rect initialRect;
+                    Rect finalRect;
 
-                Rect recyclerViewRect = coordinator.getRecyclerViewRect();
-                if (ChromeFeatureList.sDrawEdgeToEdge.isEnabled()) {
-                    // Extend the recyclerViewRect to include the bottom nav bar area on
-                    // edge-to-edge to align the animation with the start / end state.
+                    Rect recyclerViewRect = coordinator.getRecyclerViewRect();
+                    if (ChromeFeatureList.sDrawEdgeToEdge.isEnabled()) {
+                        // Extend the recyclerViewRect to include the bottom nav bar area on
+                        // edge-to-edge to align the animation with the start / end state.
+                        Rect rootViewRect = new Rect();
+                        mRootView.getRootView().getGlobalVisibleRect(rootViewRect);
+                        recyclerViewRect.bottom = rootViewRect.bottom;
+                    }
+
+                    // Setting the rootViewRect as the initialRect (case: isShrik -> true) and
+                    // finalRect (case: isShrink -> false) instead of recyclerViewRect as we are
+                    // migrating from TabSwitcherView to HubLayout.
                     Rect rootViewRect = new Rect();
                     mRootView.getRootView().getGlobalVisibleRect(rootViewRect);
-                    recyclerViewRect.bottom = rootViewRect.bottom;
-                }
 
-                // Setting the rootViewRect as the initialRect (case: isShrik -> true) and
-                // finalRect (case: isShrink -> false) instead of recyclerViewRect as we are
-                // migrating from TabSwitcherView to HubLayout.
-                Rect rootViewRect = new Rect();
-                mRootView.getRootView().getGlobalVisibleRect(rootViewRect);
+                    int leftOffset = 0;
+                    if (isShrink) {
+                        initialRect = rootViewRect;
+                        finalRect = coordinator.getTabThumbnailRect(tabId);
+                        finalRect.offset(leftOffset, -hubRect.top);
+                    } else {
+                        initialRect = coordinator.getTabThumbnailRect(tabId);
+                        finalRect = rootViewRect;
+                        initialRect.offset(leftOffset, -hubRect.top);
+                    }
 
-                int leftOffset = 0;
-                if (isShrink) {
-                    initialRect = rootViewRect;
-                    finalRect = coordinator.getTabThumbnailRect(tabId);
-                    finalRect.offset(leftOffset, -hubRect.top);
-                } else {
-                    initialRect = coordinator.getTabThumbnailRect(tabId);
-                    finalRect = rootViewRect;
-                    initialRect.offset(leftOffset, -hubRect.top);
-                }
+                    boolean useFallbackAnimation = false;
+                    if (initialRect.isEmpty() || finalRect.isEmpty()) {
+                        Log.d(TAG, "Geometry not ready using fallback animation.");
+                        useFallbackAnimation = true;
+                    }
 
-                boolean useFallbackAnimation = false;
-                if (initialRect.isEmpty() || finalRect.isEmpty()) {
-                    Log.d(TAG, "Geometry not ready using fallback animation.");
-                    useFallbackAnimation = true;
-                }
-
-                animationDataSupplier.set(
-                        new ShrinkExpandAnimationData(
-                                initialRect,
-                                finalRect,
-                                coordinator.getThumbnailSize(),
-                                useFallbackAnimation));
-            };
-    coordinator.waitForLayoutWithTab(tabId, provideAnimationData);
-    return animationDataSupplier;
-}
+                    animationDataSupplier.set(
+                            new ShrinkExpandAnimationData(
+                                    initialRect,
+                                    finalRect,
+                                    coordinator.getThumbnailSize(),
+                                    useFallbackAnimation));
+                };
+        coordinator.waitForLayoutWithTab(tabId, provideAnimationData);
+        return animationDataSupplier;
+    }
 
     @Override
     public @BackPressResult int handleBackPress() {
