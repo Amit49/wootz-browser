@@ -6,13 +6,15 @@ package org.chromium.chrome.browser.tab;
 
 import android.app.Activity;
 
+import android.util.Log;
+
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ActivityState;
 import org.chromium.base.ApplicationStatus;
 import org.chromium.base.Callback;
 import org.chromium.base.ContextUtils;
-import org.chromium.base.Log;
+// import org.chromium.base.Log;
 import org.chromium.base.ObserverList;
 import org.chromium.base.ObserverList.RewindableIterator;
 import org.chromium.base.TerminationStatus;
@@ -339,14 +341,14 @@ public class TabWebContentsObserver extends TabWebContentsUserData {
 
         @Override
         public void didChangeThemeColor() {
-            mTab.updateThemeColor(mTab.getWebContents().getThemeColor());
+            // mTab.updateThemeColor(mTab.getWebContents().getThemeColor());
         }
 
         @Override
         public void onBackgroundColorChanged() {
-            if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
-                mTab.changeWebContentBackgroundColor(mTab.getWebContents().getBackgroundColor());
-            }
+            // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
+            //     mTab.changeWebContentBackgroundColor(mTab.getWebContents().getBackgroundColor());
+            // }
         }
 
         @Override

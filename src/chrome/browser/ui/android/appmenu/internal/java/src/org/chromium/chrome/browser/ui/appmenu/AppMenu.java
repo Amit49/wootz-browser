@@ -516,7 +516,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         view.setTag(webContents);
 
         mCurrentWebContents = webContents;
-        //setupFloatingBackButton();
+        // setupFloatingBackButton();
 
         return view;
     }
@@ -533,7 +533,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
             }
         }
     }
-/* This code is not used because we are removing the back button from the extension webview
+    /* This code is not used because we are removing the back button from the extension webview
     private void setupFloatingBackButton() {
         View view = getView();
         if (view != null) {

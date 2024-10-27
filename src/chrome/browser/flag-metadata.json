@@ -3428,11 +3428,11 @@
     "owners": [ "dschuff@chromium.org", "native-client-dev@googlegroups.com" ],
     "expiry_milestone": 128
   },
-  {
-    "name": "enable-nav-bar-matches-tab-android",
-    "owners": [ "twellington@chromium.org", "lazzzis@chromium.org"],
-    "expiry_milestone": 130
-  },
+  // {
+  //   "name": "enable-nav-bar-matches-tab-android",
+  //   "owners": [ "twellington@chromium.org", "lazzzis@chromium.org"],
+  //   "expiry_milestone": 130
+  // },
   {
     "name": "enable-network-and-issuer-icons-for-secure-payment-confirmation",
     "owners": [ "smcgruer@chromium.org", "chrome-payments-team@google.com" ],
