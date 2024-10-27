@@ -255,7 +255,7 @@ public abstract class TabSwitcherPaneBase implements Pane, TabSwitcherResetHandl
         }
     }
 
-private SyncOneshotSupplier<ShrinkExpandAnimationData> requestAnimationData(
+    private SyncOneshotSupplier<ShrinkExpandAnimationData> requestAnimationData(
             @NonNull HubContainerView hubContainerView, boolean isShrink, int tabId) {
         SyncOneshotSupplierImpl<ShrinkExpandAnimationData> animationDataSupplier =
                 new SyncOneshotSupplierImpl<>();

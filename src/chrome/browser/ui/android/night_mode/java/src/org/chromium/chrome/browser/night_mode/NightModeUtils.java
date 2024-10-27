@@ -120,7 +120,8 @@ public class NightModeUtils {
     public static @ThemeType int getThemeSetting() {
         int userSetting = ChromeSharedPreferences.getInstance().readInt(UI_THEME_SETTING, -1);
         if (userSetting == -1) {
-            return isNightModeDefaultToLight() ? ThemeType.LIGHT : ThemeType.SYSTEM_DEFAULT;
+            // return isNightModeDefaultToLight() ? ThemeType.LIGHT : ThemeType.SYSTEM_DEFAULT;
+            return ThemeType.LIGHT;
         } else {
             return userSetting;
         }
