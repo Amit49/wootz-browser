@@ -76,6 +76,14 @@ ExtensionFunction::ResponseAction WootzHelloWorldFunction::Run() {
   return RespondNow(WithArguments(json_string));
 }
 
+ExtensionFunction::ResponseAction WootzLogFunction::Run() {
+  if (args().size() < 1) {
+    return RespondNow(NoArguments());
+  }
+  LOG(ERROR) << "CONSOLE.LOG: " << args()[0];
+  return RespondNow(NoArguments());
+}
+
 [[maybe_unused]]
 ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
 #if 0

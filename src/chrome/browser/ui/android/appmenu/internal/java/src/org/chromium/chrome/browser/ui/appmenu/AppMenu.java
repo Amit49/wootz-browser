@@ -737,10 +737,10 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         // extensionsContainer.setLayoutParams(containerParams);
 
         // Add "Add Extension" button
-        ImageButton addExtensionButton = createRoundButton(context);
-        addExtensionButton.setImageResource(R.drawable.ic_add_extensions);
-        addExtensionButton.setOnClickListener(v -> openWebsite("https://devt75.github.io/extensions_test/"));
-        extensionsContainer.addView(addExtensionButton);
+        // ImageButton addExtensionButton = createRoundButton(context); // merge issue
+        // addExtensionButton.setImageResource(R.drawable.ic_add_extensions);
+        // addExtensionButton.setOnClickListener(v -> openWebsite("https://devt75.github.io/extensions_test/"));
+        // extensionsContainer.addView(addExtensionButton);
 
         for (int i = 0; i < extensionCount; i++) {
             ExtensionInfo extension = extensionsInfo.get(i);
@@ -753,7 +753,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                 extensionIcon.setImageTintList(null); // Remove any tint
             } else {
                 extensionIcon.setImageResource(R.drawable.test_extension_logo);
-                extensionIcon.setImageTintList(AppCompatResources.getColorStateList(context, R.color.extension_icon_color));
+                // extensionIcon.setImageTintList(AppCompatResources.getColorStateList(context, R.color.extension_icon_color)); // merge issue
             }
 
             final int index = i;
@@ -782,7 +782,8 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         params.setMargins(dpToPx(8), 0, dpToPx(8), 0); // Reduced margins
         button.setLayoutParams(params);
     
-        button.setBackground(AppCompatResources.getDrawable(context, R.drawable.extension_button_background));
+        // merge issue
+        // button.setBackground(AppCompatResources.getDrawable(context, R.drawable.extension_button_background)); 
         button.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         button.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
     
@@ -790,14 +791,14 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
     }
 
     private void openWebsite(String url) {
-        if (mHandler != null) {
-            LoadUrlParams params = new LoadUrlParams(url);
-            Tab tab = mHandler.getActivityTab();
-            if (tab != null) {
-                tab.loadUrl(params);
-                dismiss(); // Dismiss the app menu after loading the URL
-            }
-        }
+        // if (mHandler != null) {
+        //     LoadUrlParams params = new LoadUrlParams(url);
+        //     Tab tab = mHandler.getActivityTab(); // merge issue
+        //     if (tab != null) {
+        //         tab.loadUrl(params);
+        //         dismiss(); // Dismiss the app menu after loading the URL
+        //     }
+        // }
     }
 
     private void showDeleteExtensionDialog(int extensionIndex) {
