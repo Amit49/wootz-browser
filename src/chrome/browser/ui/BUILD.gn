@@ -1025,6 +1025,8 @@ static_library("ui") {
       "global_error/global_error_service_factory.h",
       "app_icon_loader.cc",
       "app_icon_loader.h",
+      "browser_navigator.cc",
+      "browser_navigator.h",
 
       "webui/extension_control_handler.cc",
       "webui/extension_control_handler.h",

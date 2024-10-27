@@ -23,14 +23,18 @@
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/renderer_host/chrome_navigation_ui_data.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/tab_contents/tab_util.h"
 #include "chrome/browser/task_manager/web_contents_tags.h"
+#include "chrome/browser/android/tab_android.h"
+#include "chrome/browser/ui/android/tab_model/tab_model.h"
+#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_finder.h"
 #include "chrome/browser/ui/browser_navigator_params.h"
-#include "chrome/browser/ui/browser_window.h"
+// #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/status_bubble.h"
@@ -102,6 +106,7 @@ namespace {
 // popups. TYPE_APP will open a new tab if the browser was launched from a
 // template, otherwise only if the URL is within the app scope.
 bool WindowCanOpenTabs(const NavigateParams& params) {
+#if 0
   if (!params.browser) {
     return false;
   }
@@ -117,6 +122,8 @@ bool WindowCanOpenTabs(const NavigateParams& params) {
 
   return params.browser->CanSupportWindowFeature(Browser::FEATURE_TABSTRIP) ||
          params.browser->tab_strip_model()->empty();
+#endif
+  return true;
 }
 
 // Finds an existing Browser compatible with |profile|, making a new one if no
@@ -158,7 +165,7 @@ bool AdjustNavigateParamsForURL(NavigateParams* params) {
     }
 
     params->disposition = WindowOpenDisposition::SINGLETON_TAB;
-    params->browser = GetOrCreateBrowser(profile, params->user_gesture);
+    // params->browser = GetOrCreateBrowser(profile, params->user_gesture);
     params->window_action = NavigateParams::SHOW_WINDOW;
   }
 
@@ -180,7 +187,7 @@ Browser::ValueSpecified GetOriginSpecified(const NavigateParams& params) {
 std::pair<Browser*, int> GetBrowserAndTabForDisposition(
     const NavigateParams& params) {
   Profile* profile = params.initiating_profile;
-
+#if 0
   if (params.open_pwa_window_if_possible) {
     std::optional<webapps::AppId> app_id =
         web_app::FindInstalledAppWithUrlInScope(profile, params.url,
@@ -236,6 +243,7 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
       }
     }
   }
+#endif
 
   switch (params.disposition) {
     case WindowOpenDisposition::SWITCH_TO_TAB:
@@ -250,13 +258,17 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
 #endif
       [[fallthrough]];
     case WindowOpenDisposition::CURRENT_TAB:
+#if 0
       if (params.browser) {
         return {params.browser, -1};
       }
       // Find a compatible window and re-execute this command in it. Otherwise
       // re-run with NEW_WINDOW.
       return {GetOrCreateBrowser(profile, params.user_gesture), -1};
+#endif
+      return {nullptr, -1};
     case WindowOpenDisposition::SINGLETON_TAB: {
+#if 0
       // If we have a browser window, check it first.
       if (params.browser) {
         int index = GetIndexOfExistingTab(params.browser, params);
@@ -264,6 +276,7 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
           return {params.browser, index};
         }
       }
+#endif
       // If we don't have a a window, or if this window can't open tabs, then
       // it would load in a random window, potentially opening a second copy.
       // Instead, make an extra effort to see if there's an already open copy.
@@ -278,6 +291,7 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
       [[fallthrough]];
     case WindowOpenDisposition::NEW_FOREGROUND_TAB:
     case WindowOpenDisposition::NEW_BACKGROUND_TAB:
+#if 0
       // See if we can open the tab in the window this navigator is bound to.
       if (WindowCanOpenTabs(params)) {
         return {params.browser, -1};
@@ -286,6 +300,8 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
       // Find a compatible window and re-execute this command in it. Otherwise
       // re-run with NEW_WINDOW.
       return {GetOrCreateBrowser(profile, params.user_gesture), -1};
+#endif
+      return {nullptr, -1};
     case WindowOpenDisposition::NEW_PICTURE_IN_PICTURE:
 #if !BUILDFLAG(IS_ANDROID)
     {
@@ -340,6 +356,7 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
     case WindowOpenDisposition::NEW_POPUP: {
       // Make a new popup window.
       // Coerce app-style if |source| represents an app.
+#if 0
       std::string app_name;
       if (!params.app_id.empty()) {
         app_name = web_app::GenerateApplicationNameFromAppId(params.app_id);
@@ -364,9 +381,12 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
               profile, params.user_gesture);
       browser_params.initial_origin_specified = GetOriginSpecified(params);
       return {Browser::Create(browser_params), -1};
+#endif
+      return {nullptr, -1};
     }
     case WindowOpenDisposition::NEW_WINDOW: {
       // Make a new normal browser window.
+#if 0
       Browser* browser = nullptr;
       if (Browser::GetCreationStatusForProfile(profile) ==
           Browser::CreationStatus::kOk) {
@@ -374,6 +394,8 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
             Browser::CreateParams(profile, params.user_gesture));
       }
       return {browser, -1};
+#endif       
+      return {nullptr, -1};
     }
     case WindowOpenDisposition::OFF_THE_RECORD:
       // Make or find an incognito window.
@@ -395,13 +417,15 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
 // conditions.
 void NormalizeDisposition(NavigateParams* params) {
   // Calculate the WindowOpenDisposition if necessary.
-  if (params->browser->tab_strip_model()->empty() &&
+  // if (params->browser->tab_strip_model()->empty() &&
+  if (!TabModelList::GetCurrentTabModel()->GetTabCount() &&
       (params->disposition == WindowOpenDisposition::NEW_BACKGROUND_TAB ||
        params->disposition == WindowOpenDisposition::CURRENT_TAB ||
        params->disposition == WindowOpenDisposition::SINGLETON_TAB)) {
     params->disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
   }
-  if (params->browser->profile()->IsOffTheRecord() &&
+  // if (params->browser->profile()->IsOffTheRecord() &&
+  if (ProfileManager::GetActiveUserProfile()->IsOffTheRecord() &&
       params->disposition == WindowOpenDisposition::OFF_THE_RECORD) {
     params->disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
   }
@@ -415,7 +439,7 @@ void NormalizeDisposition(NavigateParams* params) {
       // Disposition trumps add types. ADD_ACTIVE is a default, so we need to
       // remove it if disposition implies the tab is going to open in the
       // background.
-      params->tabstrip_add_types &= ~AddTabTypes::ADD_ACTIVE;
+      // params->tabstrip_add_types &= ~AddTabTypes::ADD_ACTIVE;
       break;
 
     case WindowOpenDisposition::NEW_PICTURE_IN_PICTURE:
@@ -433,7 +457,7 @@ void NormalizeDisposition(NavigateParams* params) {
     }
     case WindowOpenDisposition::NEW_FOREGROUND_TAB:
     case WindowOpenDisposition::SINGLETON_TAB:
-      params->tabstrip_add_types |= AddTabTypes::ADD_ACTIVE;
+      // params->tabstrip_add_types |= AddTabTypes::ADD_ACTIVE;
       break;
 
     default:
@@ -519,6 +543,7 @@ class ScopedBrowserShower {
   ScopedBrowserShower& operator=(const ScopedBrowserShower&) = delete;
 
   ~ScopedBrowserShower() {
+#if 0
     BrowserWindow* window = params_->browser->window();
     if (params_->window_action == NavigateParams::SHOW_WINDOW_INACTIVE) {
       // TODO(crbug.com/40284685): investigate if SHOW_WINDOW_INACTIVE needs to
@@ -544,6 +569,7 @@ class ScopedBrowserShower {
         window->Activate();
       }
     }
+#endif
   }
 
   void set_source_contents(content::WebContents* source_contents) {
@@ -572,10 +598,12 @@ std::unique_ptr<content::WebContents> CreateTargetContents(
   scoped_refptr<content::SiteInstance> initial_site_instance_for_new_contents =
       params.opener
           ? params.opener->GetSiteInstance()
-          : tab_util::GetSiteInstanceForNewTab(params.browser->profile(), url);
+          // : tab_util::GetSiteInstanceForNewTab(params.browser->profile(), url);
+          : tab_util::GetSiteInstanceForNewTab(ProfileManager::GetActiveUserProfile(), url);
 
   WebContents::CreateParams create_params(
-      params.browser->profile(), initial_site_instance_for_new_contents);
+      // params.browser->profile(), initial_site_instance_for_new_contents);
+      ProfileManager::GetActiveUserProfile(), initial_site_instance_for_new_contents);
   create_params.main_frame_name = params.frame_name;
   if (params.opener) {
     create_params.opener_render_frame_id = params.opener->GetRoutingID();
@@ -602,8 +630,8 @@ std::unique_ptr<content::WebContents> CreateTargetContents(
   // tab helpers, so the entire set of tab helpers needs to be set up
   // immediately.
   BrowserNavigatorWebContentsAdoption::AttachTabHelpers(target_contents.get());
-  apps::SetAppIdForWebContents(params.browser->profile(), target_contents.get(),
-                               params.app_id);
+  // apps::SetAppIdForWebContents(params.browser->profile(), target_contents.get(),
+  //                              params.app_id);
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
   if (params.is_captive_portal_popup) {
@@ -622,17 +650,18 @@ std::unique_ptr<content::WebContents> CreateTargetContents(
 base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   TRACE_EVENT1("navigation", "wootzapp::Navigate", "disposition",
                params->disposition);
-  Browser* source_browser = params->browser;
-  if (source_browser) {
-    params->initiating_profile = source_browser->profile();
-  }
+  // Browser* source_browser = params->browser;
+  // if (source_browser) {
+  //   params->initiating_profile = source_browser->profile();
+  // }
+  params->initiating_profile = ProfileManager::GetActiveUserProfile();
   DCHECK(params->initiating_profile);
 
-  if (source_browser &&
-      platform_util::IsBrowserLockedFullscreen(source_browser)) {
-    // Block any navigation requests in locked fullscreen mode.
-    return nullptr;
-  }
+  // if (source_browser &&
+  //     platform_util::IsBrowserLockedFullscreen(source_browser)) {
+  //   // Block any navigation requests in locked fullscreen mode.
+  //   return nullptr;
+  // }
 
   // Open System Apps in their standalone window if necessary.
   // TODO(crbug.com/40136163): Remove this code after we integrate with intent
@@ -677,26 +706,26 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   // focusing a regular browser window and opening a tab in the background
   // of that window. Change the disposition to NEW_FOREGROUND_TAB so that
   // the new tab is focused.
-  if (source_browser && source_browser->is_type_app() &&
-      params->disposition == WindowOpenDisposition::NEW_BACKGROUND_TAB &&
-      !(source_browser->app_controller() &&
-        source_browser->app_controller()->has_tab_strip())) {
-    params->disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
-  }
+  // if (source_browser && source_browser->is_type_app() &&
+  //     params->disposition == WindowOpenDisposition::NEW_BACKGROUND_TAB &&
+  //     !(source_browser->app_controller() &&
+  //       source_browser->app_controller()->has_tab_strip())) {
+  //   params->disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
+  // }
 
   // Middle clicking a link to the home tab in a tabbed web app should open the
   // link in the home tab.
-  if (web_app::IsHomeTabUrl(source_browser, params->url)) {
-    source_browser->tab_strip_model()->ActivateTabAt(0);
-    // If the navigation URL is the same as the current home tab URL, skip the
-    // navigation.
-    if (source_browser->tab_strip_model()
-            ->GetActiveWebContents()
-            ->GetLastCommittedURL() == params->url) {
-      return nullptr;
-    }
-    params->disposition = WindowOpenDisposition::CURRENT_TAB;
-  }
+  // if (web_app::IsHomeTabUrl(source_browser, params->url)) {
+  //   source_browser->tab_strip_model()->ActivateTabAt(0);
+  //   // If the navigation URL is the same as the current home tab URL, skip the
+  //   // navigation.
+  //   if (source_browser->tab_strip_model()
+  //           ->GetActiveWebContents()
+  //           ->GetLastCommittedURL() == params->url) {
+  //     return nullptr;
+  //   }
+  //   params->disposition = WindowOpenDisposition::CURRENT_TAB;
+  // }
 
   // Picture-in-picture browser windows must have a source contents in order for
   // the window to function correctly. If we have no source contents to work
@@ -727,9 +756,10 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   // target browser. This must happen before GetBrowserAndTabForDisposition()
   // has a chance to replace |params->browser| with another one, but after the
   // above check that relies on the original source_contents value.
-  if (!params->source_contents && params->browser) {
+  if (!params->source_contents /* && params->browser */) {
     params->source_contents =
-        params->browser->tab_strip_model()->GetActiveWebContents();
+        // params->browser->tab_strip_model()->GetActiveWebContents();
+        TabModelList::GetCurrentTabModel()->GetActiveWebContents();
   }
 
   WebContents* contents_to_navigate_or_insert =
@@ -761,14 +791,16 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
 #endif  // !BUILDFLAG(IS_ANDROID)
 
   int singleton_index;
-  std::tie(params->browser, singleton_index) =
-      GetBrowserAndTabForDisposition(*params);
-  if (!params->browser) {
-    return nullptr;
-  }
+  // std::tie(params->browser, singleton_index) =
+  //     GetBrowserAndTabForDisposition(*params);
+  // if (!params->browser) {
+  //   return nullptr;
+  // }
+
   if (singleton_index != -1) {
     contents_to_navigate_or_insert =
-        params->browser->tab_strip_model()->GetWebContentsAt(singleton_index);
+        // params->browser->tab_strip_model()->GetWebContentsAt(singleton_index);
+        TabModelList::GetCurrentTabModel()->GetWebContentsAt(singleton_index);
   } else if (params->disposition == WindowOpenDisposition::SWITCH_TO_TAB) {
     // The user is trying to open a tab that no longer exists. If we open a new
     // tab, it could leave orphaned NTPs around, but always overwriting the
@@ -776,12 +808,12 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     // preserve. Fallback to the behavior used for singletons: overwrite the
     // current tab if it's the NTP, otherwise open a new tab.
     params->disposition = WindowOpenDisposition::SINGLETON_TAB;
-    ShowSingletonTabOverwritingNTP(params);
+    // ShowSingletonTabOverwritingNTP(params);
     return nullptr;
   }
-  if (params->force_open_pwa_window) {
-    CHECK(web_app::AppBrowserController::IsWebApp(params->browser));
-  }
+  // if (params->force_open_pwa_window) {
+  //   CHECK(web_app::AppBrowserController::IsWebApp(params->browser));
+  // }
 #if BUILDFLAG(IS_CHROMEOS_ASH)
   if (source_browser && source_browser != params->browser) {
     // When the newly created browser was spawned by a browser which visits
@@ -815,7 +847,8 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
 
   // Navigate() must not return early after this point.
 
-  if (GetSourceProfile(params) != params->browser->profile()) {
+  // if (GetSourceProfile(params) != params->browser->profile()) {
+  if (GetSourceProfile(params) != ProfileManager::GetActiveUserProfile()) {
     // A tab is being opened from a link from a different profile, we must reset
     // source information that may cause state to be shared.
     params->opener = nullptr;
@@ -825,10 +858,10 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   }
 
   // Make sure the Browser is shown if params call for it.
-  ScopedBrowserShower shower(params, &contents_to_navigate_or_insert);
-  if (params->is_tab_modal_popup) {
-    shower.set_source_contents(params->source_contents);
-  }
+  // ScopedBrowserShower shower(params, &contents_to_navigate_or_insert);
+  // if (params->is_tab_modal_popup) {
+  //   shower.set_source_contents(params->source_contents);
+  // }
 
   // Makes sure any WebContents created by this function is destroyed if
   // not properly added to a tab strip.
@@ -838,6 +871,7 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   // Some dispositions need coercion to base types.
   NormalizeDisposition(params);
 
+#if 0
   // If a new window has been created, it needs to be shown.
   if (params->window_action == NavigateParams::NO_ACTION &&
       source_browser != params->browser &&
@@ -851,7 +885,7 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
       params->user_gesture == false) {
     params->window_action = NavigateParams::SHOW_WINDOW_INACTIVE;
   }
-
+#endif
   // Determine if the navigation was user initiated. If it was, we need to
   // inform the target WebContents, and we may need to update the UI.
   bool user_initiated =
@@ -895,8 +929,8 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   // omnibox.
   if (params->source_contents &&
       (params->disposition == WindowOpenDisposition::NEW_FOREGROUND_TAB ||
-       params->disposition == WindowOpenDisposition::NEW_WINDOW) &&
-      (params->tabstrip_add_types & AddTabTypes::ADD_INHERIT_OPENER)) {
+       params->disposition == WindowOpenDisposition::NEW_WINDOW) /*&&
+      (params->tabstrip_add_types & AddTabTypes::ADD_INHERIT_OPENER)*/) {
     params->source_contents->Focus();
   }
 
@@ -904,8 +938,8 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     // Save data needed for link capturing into apps that cannot otherwise be
     // inferred later in the navigation. These are only needed when the
     // navigation happens in a different tab to the link click.
-    apps::SetLinkCapturingSourceDisposition(contents_to_insert.get(),
-                                            params->disposition);
+    // apps::SetLinkCapturingSourceDisposition(contents_to_insert.get(),
+    //                                         params->disposition);
 #if BUILDFLAG(IS_CHROMEOS)
     if (source_browser && source_browser != params->browser &&
         source_browser->app_controller()) {
@@ -917,40 +951,44 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
 
   if (params->source_contents == contents_to_navigate_or_insert) {
     // The navigation occurred in the source tab.
-    params->browser->UpdateUIForNavigationInTab(
-        contents_to_navigate_or_insert, params->transition,
-        params->window_action, user_initiated);
+    // params->browser->UpdateUIForNavigationInTab(
+    //     contents_to_navigate_or_insert, params->transition,
+    //     params->window_action, user_initiated);
   } else if (singleton_index == -1) {
-    if (source_browser != params->browser) {
-      params->tabstrip_index = params->browser->tab_strip_model()->count();
-    }
+    // if (source_browser != params->browser) {
+    //   params->tabstrip_index = params->browser->tab_strip_model()->count();
+    // }
 
     // If some non-default value is set for the index, we should tell the
     // TabStripModel to respect it.
-    if (params->tabstrip_index != -1) {
-      params->tabstrip_add_types |= AddTabTypes::ADD_FORCE_INDEX;
-    }
+    // if (params->tabstrip_index != -1) {
+    //   params->tabstrip_add_types |= AddTabTypes::ADD_FORCE_INDEX;
+    // }
 
     // Maybe notify that an open operation has been done from a gesture.
     // TODO(crbug.com/40719979): preferably pipe this information through the
     // TabStripModel instead. See bug for deeper discussion.
-    if (params->user_gesture && source_browser == params->browser) {
-      params->browser->window()->LinkOpeningFromGesture(params->disposition);
-    }
+    // if (params->user_gesture && source_browser == params->browser) {
+    //   params->browser->window()->LinkOpeningFromGesture(params->disposition);
+    // }
 
     DCHECK(contents_to_insert);
     // The navigation should insert a new tab into the target Browser.
-    params->browser->tab_strip_model()->AddWebContents(
-        std::move(contents_to_insert), params->tabstrip_index,
-        params->transition, params->tabstrip_add_types, params->group);
+    // params->browser->tab_strip_model()->AddWebContents(
+    //     std::move(contents_to_insert), params->tabstrip_index,
+    //     params->transition, params->tabstrip_add_types, params->group);
+    TabModel* tab_model = TabModelList::GetCurrentTabModel();
+    tab_model->CreateTab(
+        tab_model->GetTabAt(tab_model->GetActiveIndex()),
+        contents_to_insert.release());
   }
 
   if (singleton_index >= 0) {
     // If switching browsers, make sure it is shown.
-    if (params->disposition == WindowOpenDisposition::SWITCH_TO_TAB &&
-        params->browser != source_browser) {
-      params->window_action = NavigateParams::SHOW_WINDOW;
-    }
+    // if (params->disposition == WindowOpenDisposition::SWITCH_TO_TAB &&
+    //     params->browser != source_browser) {
+    //   params->window_action = NavigateParams::SHOW_WINDOW;
+    // }
 
     if (contents_to_navigate_or_insert->IsCrashed()) {
       contents_to_navigate_or_insert->GetController().Reload(
@@ -965,9 +1003,9 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     if (params->source_contents != contents_to_navigate_or_insert) {
       // Use the index before the potential close below, because it could
       // make the index refer to a different tab.
-      auto gesture_type = user_initiated
-                              ? TabStripUserGestureDetails::GestureType::kOther
-                              : TabStripUserGestureDetails::GestureType::kNone;
+      // auto gesture_type = user_initiated
+      //                         ? TabStripUserGestureDetails::GestureType::kOther
+      //                         : TabStripUserGestureDetails::GestureType::kNone;
       bool should_close_this_tab = false;
       if (params->disposition == WindowOpenDisposition::SWITCH_TO_TAB) {
         // Close orphaned NTP (and the like) with no history when the user
@@ -985,8 +1023,9 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
           }
         }
       }
-      params->browser->tab_strip_model()->ActivateTabAt(
-          singleton_index, TabStripUserGestureDetails(gesture_type));
+      // params->browser->tab_strip_model()->ActivateTabAt(
+      //     singleton_index, TabStripUserGestureDetails(gesture_type));
+      TabModelList::GetCurrentTabModel()->SetActiveIndex(singleton_index);
       // Close tab after switch so index remains correct.
       if (should_close_this_tab) {
         params->source_contents->Close();

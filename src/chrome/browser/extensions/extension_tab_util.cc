@@ -637,8 +637,9 @@ ExtensionTabUtil::ScrubTabBehavior ExtensionTabUtil::GetScrubTabBehavior(
     const Extension* extension,
     mojom::ContextType context,
     content::WebContents* contents) {
-  int tab_id = GetTabId(contents);
+  // int tab_id = GetTabId(contents);
   ScrubTabBehavior behavior;
+#if 0
   behavior.committed_info = GetScrubTabBehaviorImpl(
       extension, context, contents->GetLastCommittedURL(), tab_id);
   NavigationEntry* entry = contents->GetController().GetPendingEntry();
@@ -648,6 +649,7 @@ ExtensionTabUtil::ScrubTabBehavior ExtensionTabUtil::GetScrubTabBehavior(
   }
   behavior.pending_info =
       GetScrubTabBehaviorImpl(extension, context, pending_url, tab_id);
+#endif
   return behavior;
 }
 
