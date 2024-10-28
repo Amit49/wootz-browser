@@ -924,14 +924,12 @@ bool HandleNewTabPageLocationOverride(
 void MaybeBindEthereumProvider(
     content::RenderFrameHost* const frame_host,
     mojo::PendingReceiver<wootz_wallet::mojom::EthereumProvider> receiver) {
-     LOG(ERROR)<<"ANKIT3 WINDOW";       
   auto* wootz_wallet_service =
       wootz_wallet::WootzWalletServiceFactory::GetServiceForContext(
           frame_host->GetBrowserContext());
   if (!wootz_wallet_service) {
     return;
   }
-     LOG(ERROR)<<"ANKIT4 WINDOW";       
       
   content::WebContents* web_contents =
       content::WebContents::FromRenderFrameHost(frame_host);
@@ -1627,12 +1625,10 @@ void ChromeContentBrowserClient::RegisterBrowserInterfaceBindersForFrame(
 
   if (wootz_wallet::IsAllowedForContext(
           render_frame_host->GetBrowserContext())) {
-     LOG(ERROR)<<"ANKIT2 WINDOW";       
       map->Add<wootz_wallet::mojom::EthereumProvider>(
           base::BindRepeating(&MaybeBindEthereumProvider));
       map->Add<wootz_wallet::mojom::SolanaProvider>(
           base::BindRepeating(&MaybeBindSolanaProvider));
-     
   }
 
 }
@@ -1965,12 +1961,8 @@ void ChromeContentBrowserClient::RenderProcessWillLaunch(
 
   // The WootzRendererUpdater might be null for some irregular profiles, e.g.
   // the System Profile.
-
-  LOG(ERROR)<<"WootzRendererUpdater JAGADESH";
   if (WootzRendererUpdater* service =
           WootzRendererUpdaterFactory::GetForProfile(profile)) {
-  LOG(ERROR)<<"WootzRendererUpdater JAGADESH GetForProfile";
-
     service->InitializeRenderer(host);
   }
   WebRtcLoggingController::AttachToRenderProcessHost(host);

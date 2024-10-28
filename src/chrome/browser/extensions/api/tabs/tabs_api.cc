@@ -54,6 +54,7 @@
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/resource_coordinator/tab_lifecycle_unit_external.h"
 #include "chrome/browser/resource_coordinator/tab_manager.h"
 #include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service.h"
@@ -71,6 +72,8 @@
 #include "chrome/browser/ui/tabs/tab_enums.h"
 #include "chrome/browser/ui/tabs/tab_group.h"
 #include "chrome/browser/ui/tabs/tab_group_model.h"
+#include "chrome/browser/ui/android/tab_model/tab_model.h"
+#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
 #include "chrome/browser/ui/tabs/tab_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_user_gesture_details.h"
@@ -211,7 +214,8 @@ bool GetTabById(int tab_id,
                 content::BrowserContext* context,
                 bool include_incognito,
                 Browser** browser,
-                TabStripModel** tab_strip,
+                // TabStripModel** tab_strip,
+                TabModel** tab_strip,
                 content::WebContents** contents,
                 int* tab_index,
                 std::string* error_message) {
@@ -234,27 +238,26 @@ bool GetTabById(int tab_id,
 content::WebContents* GetTabsAPIDefaultWebContents(ExtensionFunction* function,
                                                    int tab_id,
                                                    std::string* error) {
-  // content::WebContents* web_contents = nullptr;
-  // if (tab_id != -1) {
-  //   // We assume this call leaves web_contents unchanged if it is unsuccessful.
-  //   GetTabById(tab_id, function->browser_context(),
-  //              function->include_incognito_information(),
-  //              nullptr /* ignore Browser* output */,
-  //              nullptr /* ignore TabStripModel* output */, &web_contents,
-  //              nullptr /* ignore int tab_index output */, error);
-  // } else {
-  //   Browser* browser =
-  //       ChromeExtensionFunctionDetails(function).GetCurrentBrowser();
-  //   if (!browser)
-  //     *error = tabs_constants::kNoCurrentWindowError;
-  //   else if (!ExtensionTabUtil::GetDefaultTab(browser, &web_contents, nullptr))
-  //     *error = tabs_constants::kNoSelectedTabError;
-  // }
-  // return web_contents;
-  return nullptr;
+  content::WebContents* web_contents = nullptr;
+  if (tab_id != -1) {
+    // We assume this call leaves web_contents unchanged if it is unsuccessful.
+    GetTabById(tab_id, function->browser_context(),
+               function->include_incognito_information(),
+               nullptr /* ignore Browser* output */,
+               nullptr /* ignore TabStripModel* output */, &web_contents,
+               nullptr /* ignore int tab_index output */, error);
+  } else {
+    // Browser* browser =
+    //     ChromeExtensionFunctionDetails(function).GetCurrentBrowser();
+    // if (!browser)
+    //   *error = tabs_constants::kNoCurrentWindowError;
+    // else if (!ExtensionTabUtil::GetDefaultTab(browser, &web_contents, nullptr))
+    if (!ExtensionTabUtil::GetDefaultTab(nullptr, &web_contents, nullptr))
+      *error = tabs_constants::kNoSelectedTabError;
+  }
+  return web_contents;
 }
 
-#if 0
 // Returns true if either |boolean| is disengaged, or if |boolean| and
 // |value| are equal. This function is used to check if a tab's parameters match
 // those of the browser.
@@ -262,6 +265,7 @@ bool MatchesBool(const std::optional<bool>& boolean, bool value) {
   return !boolean || *boolean == value;
 }
 
+#if 0
 ui::WindowShowState ConvertToWindowShowState(windows::WindowState state) {
   switch (state) {
     case windows::WindowState::kNormal:
@@ -314,7 +318,8 @@ bool ExtensionHasLockedFullscreenPermission(const Extension* extension) {
 api::tabs::Tab CreateTabObjectHelper(WebContents* contents,
                                      const Extension* extension,
                                      mojom::ContextType context,
-                                     TabStripModel* tab_strip,
+                                     TabModel* tab_strip,
+                                    //  TabStripModel* tab_strip,
                                      int tab_index) {
   ExtensionTabUtil::ScrubTabBehavior scrub_tab_behavior =
       ExtensionTabUtil::GetScrubTabBehavior(extension, context, contents);
@@ -332,6 +337,7 @@ int MoveTabToWindow(ExtensionFunction* function,
                     Browser* target_browser,
                     int new_index,
                     std::string* error) {
+#if 0 // not available on android
   Browser* source_browser = nullptr;
   TabStripModel* source_tab_strip = nullptr;
   int source_index = -1;
@@ -379,6 +385,8 @@ int MoveTabToWindow(ExtensionFunction* function,
 
   return target_tab_strip->InsertDetachedTabAt(
       target_index, std::move(detached_tab), AddTabTypes::ADD_NONE);
+#endif
+  return -1;
 }
 
 // This function sets the state of the browser window to a "locked"
@@ -1106,30 +1114,31 @@ ExtensionFunction::ResponseAction WindowsRemoveFunction::Run() {
 
 ExtensionFunction::ResponseAction TabsGetSelectedFunction::Run() {
   // windowId defaults to "current" window.
-  // int window_id = extension_misc::kCurrentWindowId;
+  int window_id = extension_misc::kCurrentWindowId;
 
-  // std::optional<tabs::GetSelected::Params> params =
-  //     tabs::GetSelected::Params::Create(args());
-  // EXTENSION_FUNCTION_VALIDATE(params);
-  // if (params->window_id)
-  //   window_id = *params->window_id;
+  std::optional<tabs::GetSelected::Params> params =
+      tabs::GetSelected::Params::Create(args());
+  EXTENSION_FUNCTION_VALIDATE(params);
+  if (params->window_id)
+    window_id = *params->window_id;
 
-  // Browser* browser = nullptr;
-  // std::string error;
-  // if (!GetBrowserFromWindowID(this, window_id, &browser, &error))
-  //   return RespondNow(Error(std::move(error)));
+  Browser* browser = nullptr;
+  std::string error;
+  if (!GetBrowserFromWindowID(this, window_id, &browser, &error))
+    return RespondNow(Error(std::move(error)));
 
   // TabStripModel* tab_strip =
   //     ExtensionTabUtil::GetEditableTabStripModel(browser);
-  // if (!tab_strip)
-  //   return RespondNow(Error(tabs_constants::kTabStripNotEditableError));
-  // WebContents* contents = tab_strip->GetActiveWebContents();
-  // if (!contents)
-  //   return RespondNow(Error(tabs_constants::kNoSelectedTabError));
-  // return RespondNow(ArgumentList(tabs::Get::Results::Create(
-  //     CreateTabObjectHelper(contents, extension(), source_context_type(),
-  //                           tab_strip, tab_strip->active_index()))));
-  return RespondNow(Error("not implemented"));
+  TabModel* tab_strip = TabModelList::GetCurrentTabModel();
+  if (!tab_strip)
+    return RespondNow(Error(tabs_constants::kTabStripNotEditableError));
+  WebContents* contents = tab_strip->GetActiveWebContents();
+  if (!contents)
+    return RespondNow(Error(tabs_constants::kNoSelectedTabError));
+  return RespondNow(ArgumentList(tabs::Get::Results::Create(
+      CreateTabObjectHelper(contents, extension(), source_context_type(),
+                            // tab_strip, tab_strip->active_index()))));
+                            tab_strip, tab_strip->GetActiveIndex()))));
 }
 
 ExtensionFunction::ResponseAction TabsGetAllInWindowFunction::Run() {
@@ -1155,59 +1164,62 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
       tabs::Query::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
 
-  // bool loading_status_set = params->query_info.status != tabs::TabStatus::kNone;
+  bool loading_status_set = params->query_info.status != tabs::TabStatus::kNone;
 
-  // URLPatternSet url_patterns;
-  // if (params->query_info.url) {
-  //   std::vector<std::string> url_pattern_strings;
-  //   if (params->query_info.url->as_string)
-  //     url_pattern_strings.push_back(*params->query_info.url->as_string);
-  //   else if (params->query_info.url->as_strings)
-  //     url_pattern_strings.swap(*params->query_info.url->as_strings);
-  //   // It is o.k. to use URLPattern::SCHEME_ALL here because this function does
-  //   // not grant access to the content of the tabs, only to seeing their URLs
-  //   // and meta data.
-  //   std::string error;
-  //   if (!url_patterns.Populate(url_pattern_strings, URLPattern::SCHEME_ALL,
-  //                              true, &error)) {
-  //     return RespondNow(Error(std::move(error)));
-  //   }
-  // }
+  URLPatternSet url_patterns;
+  if (params->query_info.url) {
+    std::vector<std::string> url_pattern_strings;
+    if (params->query_info.url->as_string)
+      url_pattern_strings.push_back(*params->query_info.url->as_string);
+    else if (params->query_info.url->as_strings)
+      url_pattern_strings.swap(*params->query_info.url->as_strings);
+    // It is o.k. to use URLPattern::SCHEME_ALL here because this function does
+    // not grant access to the content of the tabs, only to seeing their URLs
+    // and meta data.
+    std::string error;
+    if (!url_patterns.Populate(url_pattern_strings, URLPattern::SCHEME_ALL,
+                               true, &error)) {
+      return RespondNow(Error(std::move(error)));
+    }
+  }
 
-  // std::string title = params->query_info.title.value_or(std::string());
+  std::string title = params->query_info.title.value_or(std::string());
 
-  // int window_id = extension_misc::kUnknownWindowId;
-  // if (params->query_info.window_id)
-  //   window_id = *params->query_info.window_id;
+  int window_id = extension_misc::kUnknownWindowId;
+  if (params->query_info.window_id)
+    window_id = *params->query_info.window_id;
 
-  // std::optional<int> group_id = std::nullopt;
-  // if (params->query_info.group_id)
-  //   group_id = *params->query_info.group_id;
+  std::optional<int> group_id = std::nullopt;
+  if (params->query_info.group_id)
+    group_id = *params->query_info.group_id;
 
-  // int index = -1;
-  // if (params->query_info.index)
-  //   index = *params->query_info.index;
+  int index = -1;
+  if (params->query_info.index)
+    index = *params->query_info.index;
 
-  // std::string window_type;
-  // if (params->query_info.window_type != tabs::WindowType::kNone) {
-  //   window_type = tabs::ToString(params->query_info.window_type);
-  // }
+  std::string window_type;
+  if (params->query_info.window_type != tabs::WindowType::kNone) {
+    window_type = tabs::ToString(params->query_info.window_type);
+  }
 
-  // base::Value::List result;
-  // Profile* profile = Profile::FromBrowserContext(browser_context());
+  base::Value::List result;
+  Profile* profile = Profile::FromBrowserContext(browser_context());
   // Browser* last_active_browser =
   //     chrome::FindAnyBrowser(profile, include_incognito_information());
   // Browser* current_browser =
   //     ChromeExtensionFunctionDetails(this).GetCurrentBrowser();
   // for (Browser* browser : *BrowserList::GetInstance()) {
   //   if (!profile->IsSameOrParent(browser->profile()))
-  //     continue;
+  for (TabModel* tab_strip : TabModelList::models()) {
+    if (!profile->IsSameOrParent(ProfileManager::GetActiveUserProfile()))
+      continue;
 
   //   if (!browser->window())
   //     continue;
 
   //   if (!include_incognito_information() && profile != browser->profile())
-  //     continue;
+    if (!include_incognito_information() && profile != ProfileManager::GetActiveUserProfile())
+      continue;
 
   //   if (!browser->extension_window_controller()->IsVisibleToTabsAPIForExtension(
   //           extension(), false /*allow_dev_tools_windows*/)) {
@@ -1241,23 +1253,25 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
   //   TabStripModel* tab_strip = browser->tab_strip_model();
   //   DCHECK(tab_strip);
   //   for (int i = 0; i < tab_strip->count(); ++i) {
-  //     WebContents* web_contents = tab_strip->GetWebContentsAt(i);
+    for (int i = 0; i < tab_strip->GetTabCount(); ++i) {
+      WebContents* web_contents = tab_strip->GetWebContentsAt(i);
 
-  //     if (index > -1 && i != index)
-  //       continue;
+      if (index > -1 && i != index)
+        continue;
 
-  //     if (!web_contents)
-  //       continue;
+      if (!web_contents)
+        continue;
 
   //     if (!MatchesBool(params->query_info.highlighted,
   //                      tab_strip->IsTabSelected(i))) {
   //       continue;
   //     }
 
-  //     if (!MatchesBool(params->query_info.active,
-  //                      i == tab_strip->active_index())) {
-  //       continue;
-  //     }
+      if (!MatchesBool(params->query_info.active,
+                      //  i == tab_strip->active_index())) {
+                      i == tab_strip->GetActiveIndex())) {
+        continue;
+      }
 
   //     if (!MatchesBool(params->query_info.pinned, tab_strip->IsTabPinned(i))) {
   //       continue;
@@ -1277,12 +1291,12 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
   //       }
   //     }
 
-  //     auto* audible_helper =
-  //         RecentlyAudibleHelper::FromWebContents(web_contents);
-  //     if (!MatchesBool(params->query_info.audible,
-  //                      audible_helper->WasRecentlyAudible())) {
-  //       continue;
-  //     }
+      auto* audible_helper =
+          RecentlyAudibleHelper::FromWebContents(web_contents);
+      if (!MatchesBool(params->query_info.audible,
+                       audible_helper->WasRecentlyAudible())) {
+        continue;
+      }
 
   //     auto* tab_lifecycle_unit_external =
   //         resource_coordinator::TabLifecycleUnitExternal::FromWebContents(
@@ -1298,50 +1312,49 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
   //       continue;
   //     }
 
-  //     if (!MatchesBool(params->query_info.muted,
-  //                      web_contents->IsAudioMuted())) {
-  //       continue;
-  //     }
+      if (!MatchesBool(params->query_info.muted,
+                       web_contents->IsAudioMuted())) {
+        continue;
+      }
 
-  //     if (!title.empty() || !url_patterns.is_empty()) {
-  //       // "title" and "url" properties are considered privileged data and can
-  //       // only be checked if the extension has the "tabs" permission or it has
-  //       // access to the WebContents's origin. Otherwise, this tab is considered
-  //       // not matched.
-  //       if (!extension_->permissions_data()->HasAPIPermissionForTab(
-  //               ExtensionTabUtil::GetTabId(web_contents),
-  //               mojom::APIPermissionID::kTab) &&
-  //           !extension_->permissions_data()->HasHostPermission(
-  //               web_contents->GetURL())) {
-  //         continue;
-  //       }
+      if (!title.empty() || !url_patterns.is_empty()) {
+        // "title" and "url" properties are considered privileged data and can
+        // only be checked if the extension has the "tabs" permission or it has
+        // access to the WebContents's origin. Otherwise, this tab is considered
+        // not matched.
+        if (!extension_->permissions_data()->HasAPIPermissionForTab(
+                ExtensionTabUtil::GetTabId(web_contents),
+                mojom::APIPermissionID::kTab) &&
+            !extension_->permissions_data()->HasHostPermission(
+                web_contents->GetURL())) {
+          continue;
+        }
 
-  //       if (!title.empty() &&
-  //           !base::MatchPattern(web_contents->GetTitle(),
-  //                               base::UTF8ToUTF16(title))) {
-  //         continue;
-  //       }
+        if (!title.empty() &&
+            !base::MatchPattern(web_contents->GetTitle(),
+                                base::UTF8ToUTF16(title))) {
+          continue;
+        }
 
-  //       if (!url_patterns.is_empty() &&
-  //           !url_patterns.MatchesURL(web_contents->GetURL())) {
-  //         continue;
-  //       }
-  //     }
+        if (!url_patterns.is_empty() &&
+            !url_patterns.MatchesURL(web_contents->GetURL())) {
+          continue;
+        }
+      }
 
-  //     if (loading_status_set &&
-  //         params->query_info.status !=
-  //             ExtensionTabUtil::GetLoadingStatus(web_contents)) {
-  //       continue;
-  //     }
+      if (loading_status_set &&
+          params->query_info.status !=
+              ExtensionTabUtil::GetLoadingStatus(web_contents)) {
+        continue;
+      }
 
-  //     result.Append(CreateTabObjectHelper(web_contents, extension(),
-  //                                         source_context_type(), tab_strip, i)
-  //                       .ToValue());
-  //   }
-  // }
+      result.Append(CreateTabObjectHelper(web_contents, extension(),
+                                          source_context_type(), tab_strip, i)
+                        .ToValue());
+    }
+  }
 
-  // return RespondNow(WithArguments(std::move(result)));
-  return RespondNow(Error(std::move("not implemented")));
+  return RespondNow(WithArguments(std::move(result)));
 }
 
 ExtensionFunction::ResponseAction TabsCreateFunction::Run() {
@@ -1430,7 +1443,8 @@ ExtensionFunction::ResponseAction TabsGetFunction::Run() {
   EXTENSION_FUNCTION_VALIDATE(params);
   int tab_id = params->tab_id;
 
-  TabStripModel* tab_strip = nullptr;
+  // TabStripModel* tab_strip = nullptr;
+  TabModel* tab_strip = nullptr;
   WebContents* contents = nullptr;
   int tab_index = -1;
   std::string error;
@@ -1763,7 +1777,7 @@ ExtensionFunction::ResponseValue TabsUpdateFunction::GetResult() {
 ExtensionFunction::ResponseAction TabsMoveFunction::Run() {
   std::optional<tabs::Move::Params> params = tabs::Move::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
-
+#if 0
   int new_index = params->move_properties.index;
   const auto& window_id = params->move_properties.window_id;
   base::Value::List tab_values;
@@ -1819,6 +1833,8 @@ ExtensionFunction::ResponseAction TabsMoveFunction::Run() {
 
   // Return the results as an array if there are multiple tabs.
   return RespondNow(WithArguments(std::move(tab_values)));
+#endif
+  return RespondNow(Error("not implemented"));
 }
 
 bool TabsMoveFunction::MoveTab(int tab_id,
@@ -1990,42 +2006,42 @@ ExtensionFunction::ResponseAction TabsRemoveFunction::Run() {
 
 bool TabsRemoveFunction::RemoveTab(int tab_id, std::string* error) {
   // Browser* browser = nullptr;
-  // WebContents* contents = nullptr;
-  // if (!GetTabById(tab_id, browser_context(), include_incognito_information(),
-  //                 &browser, nullptr, &contents, nullptr, error)) {
+  WebContents* contents = nullptr;
+  if (!GetTabById(tab_id, browser_context(), include_incognito_information(),
+                  nullptr /* &browser */, nullptr, &contents, nullptr, error)) {
+    return false;
+  }
+
+  // Don't let the extension remove a tab if the user is dragging tabs around.
+  // if (!browser->window()->IsTabStripEditable()) {
+  //   *error = tabs_constants::kTabStripNotEditableError;
   //   return false;
   // }
 
-  // // Don't let the extension remove a tab if the user is dragging tabs around.
-  // // if (!browser->window()->IsTabStripEditable()) {
-  // //   *error = tabs_constants::kTabStripNotEditableError;
-  // //   return false;
-  // // }
+  // Get last committed or pending URL.
+  std::string current_url = contents->GetVisibleURL().is_valid()
+                                ? contents->GetVisibleURL().spec()
+                                : std::string();
+  NotifyExtensionTelemetry(Profile::FromBrowserContext(browser_context()),
+                           extension(), safe_browsing::TabsApiInfo::REMOVE,
+                           current_url, /*new_url=*/std::string());
 
-  // // Get last committed or pending URL.
-  // std::string current_url = contents->GetVisibleURL().is_valid()
-  //                               ? contents->GetVisibleURL().spec()
-  //                               : std::string();
-  // NotifyExtensionTelemetry(Profile::FromBrowserContext(browser_context()),
-  //                          extension(), safe_browsing::TabsApiInfo::REMOVE,
-  //                          current_url, /*new_url=*/std::string());
-
-  // // The tab might not immediately close after calling Close() below, so we
-  // // should wait until WebContentsDestroyed is called before responding.
-  // web_contents_destroyed_observers_.push_back(
-  //     std::make_unique<WebContentsDestroyedObserver>(this, contents));
-  // // Ensure that we're going to keep this class alive until
-  // // |remaining_tabs_count| reaches zero. This relies on WebContents::Close()
-  // // always (eventually) resulting in a WebContentsDestroyed() call; otherwise,
-  // // this function will never respond and may leak.
-  // AddRef();
-  // remaining_tabs_count_++;
-
-  // // There's a chance that the tab is being dragged, or we're in some other
-  // // nested event loop. This code path ensures that the tab is safely closed
-  // // under such circumstances, whereas |TabStripModel::CloseWebContentsAt()|
-  // // does not.
-  // contents->Close();
+  // The tab might not immediately close after calling Close() below, so we
+  // should wait until WebContentsDestroyed is called before responding.
+  web_contents_destroyed_observers_.push_back(
+      std::make_unique<WebContentsDestroyedObserver>(this, contents));
+  // Ensure that we're going to keep this class alive until
+  // |remaining_tabs_count| reaches zero. This relies on WebContents::Close()
+  // always (eventually) resulting in a WebContentsDestroyed() call; otherwise,
+  // this function will never respond and may leak.
+  AddRef();
+  remaining_tabs_count_++;
+  LOG(ERROR) << "CLOSING TAB";
+  // There's a chance that the tab is being dragged, or we're in some other
+  // nested event loop. This code path ensures that the tab is safely closed
+  // under such circumstances, whereas |TabStripModel::CloseWebContentsAt()|
+  // does not.
+  contents->Close();
   return true;
 }
 
@@ -2184,6 +2200,7 @@ ExtensionFunction::ResponseAction TabsGroupFunction::Run() {
 }
 
 ExtensionFunction::ResponseAction TabsUngroupFunction::Run() {
+#if 0
   std::optional<tabs::Ungroup::Params> params =
       tabs::Ungroup::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
@@ -2218,6 +2235,8 @@ ExtensionFunction::ResponseAction TabsUngroupFunction::Run() {
   }
 
   return RespondNow(NoArguments());
+#endif
+  return RespondNow(Error("not implemented"));
 }
 
 bool TabsUngroupFunction::UngroupTab(int tab_id, std::string* error) {

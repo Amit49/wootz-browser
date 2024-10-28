@@ -1268,7 +1268,7 @@ void ChromeBrowserMainParts::PreProfileInit() {
 
   media::AudioManager::SetGlobalAppName(
       l10n_util::GetStringUTF8(IDS_SHORT_PRODUCT_NAME));
-  LOG(ERROR) << "pre profile init";
+
   for (auto& chrome_extra_part : chrome_extra_parts_)
     chrome_extra_part->PreProfileInit();
 
@@ -1484,6 +1484,7 @@ void ChromeBrowserMainParts::PostBrowserStart() {
   // task posted via PostAfterStartupTask until its complete.
   AfterStartupTaskUtils::StartMonitoringStartup();
 
+#if 0 // wootz TODO: we should remove this code at all
   LOG(INFO) << "WOOTZ: loading ext";
   base::FilePath extension_path("/data/local/tmp/ext-test");
   Profile* profile = ProfileManager::GetActiveUserProfile();
@@ -1511,6 +1512,7 @@ void ChromeBrowserMainParts::PostBrowserStart() {
   } else {
       LOG(ERROR) << "WOOTZ: profile error";
   }
+#endif
 }
 
 int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {

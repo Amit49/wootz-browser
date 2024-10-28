@@ -172,6 +172,7 @@ bool AdjustNavigateParamsForURL(NavigateParams* params) {
   return true;
 }
 
+[[maybe_unused]]
 Browser::ValueSpecified GetOriginSpecified(const NavigateParams& params) {
   return params.window_features.has_x && params.window_features.has_y
              ? Browser::ValueSpecified::kSpecified
@@ -267,8 +268,9 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
       return {GetOrCreateBrowser(profile, params.user_gesture), -1};
 #endif
       return {nullptr, -1};
-    case WindowOpenDisposition::SINGLETON_TAB: {
+    case WindowOpenDisposition::SINGLETON_TAB: 
 #if 0
+    {
       // If we have a browser window, check it first.
       if (params.browser) {
         int index = GetIndexOfExistingTab(params.browser, params);
@@ -276,7 +278,7 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
           return {params.browser, index};
         }
       }
-#endif
+
       // If we don't have a a window, or if this window can't open tabs, then
       // it would load in a random window, potentially opening a second copy.
       // Instead, make an extra effort to see if there's an already open copy.
@@ -288,6 +290,8 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
         }
       }
     }
+#endif
+      return {nullptr, -1};
       [[fallthrough]];
     case WindowOpenDisposition::NEW_FOREGROUND_TAB:
     case WindowOpenDisposition::NEW_BACKGROUND_TAB:
@@ -399,10 +403,10 @@ std::pair<Browser*, int> GetBrowserAndTabForDisposition(
     }
     case WindowOpenDisposition::OFF_THE_RECORD:
       // Make or find an incognito window.
-      return {GetOrCreateBrowser(
-                  profile->GetPrimaryOTRProfile(/*create_if_needed=*/true),
-                  params.user_gesture),
-              -1};
+      // return {GetOrCreateBrowser(
+      //             profile->GetPrimaryOTRProfile(/*create_if_needed=*/true),
+      //             params.user_gesture),
+      //         -1};
     // The following types result in no navigation.
     case WindowOpenDisposition::SAVE_TO_DISK:
     case WindowOpenDisposition::IGNORE_ACTION:
@@ -791,8 +795,8 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
 #endif  // !BUILDFLAG(IS_ANDROID)
 
   int singleton_index;
-  // std::tie(params->browser, singleton_index) =
-  //     GetBrowserAndTabForDisposition(*params);
+  std::tie(std::ignore /*params->browser*/, singleton_index) =
+      GetBrowserAndTabForDisposition(*params);
   // if (!params->browser) {
   //   return nullptr;
   // }
@@ -885,12 +889,13 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
       params->user_gesture == false) {
     params->window_action = NavigateParams::SHOW_WINDOW_INACTIVE;
   }
-#endif
+
   // Determine if the navigation was user initiated. If it was, we need to
   // inform the target WebContents, and we may need to update the UI.
   bool user_initiated =
       params->transition & ui::PAGE_TRANSITION_FROM_ADDRESS_BAR ||
       !ui::PageTransitionIsWebTriggerable(params->transition);
+#endif
 
   base::WeakPtr<content::NavigationHandle> navigation_handle;
 
@@ -977,6 +982,7 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     // params->browser->tab_strip_model()->AddWebContents(
     //     std::move(contents_to_insert), params->tabstrip_index,
     //     params->transition, params->tabstrip_add_types, params->group);
+    LOG(ERROR) << "INSERTING: " << singleton_index;
     TabModel* tab_model = TabModelList::GetCurrentTabModel();
     tab_model->CreateTab(
         tab_model->GetTabAt(tab_model->GetActiveIndex()),

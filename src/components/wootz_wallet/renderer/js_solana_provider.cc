@@ -94,7 +94,6 @@ constexpr char kSolanaProxyHandlerScript[] = R"((function() {
 JSSolanaProvider::JSSolanaProvider(content::RenderFrame* render_frame)
     : RenderFrameObserver(render_frame),
       v8_value_converter_(content::V8ValueConverter::Create()) {
-  LOG(ERROR)<<"JSSolanaProvider ANKIT";      
   EnsureConnected();
   v8_value_converter_->SetStrategy(&strategy_);
 }

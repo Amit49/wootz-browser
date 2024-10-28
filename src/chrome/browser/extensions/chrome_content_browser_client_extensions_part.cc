@@ -782,11 +782,9 @@ bool ChromeContentBrowserClientExtensionsPart::
     return false;
   }
 
-#if 0 // wootz ext TODO
   const Extension* extension =
       registry->enabled_extensions().GetByID(site_url.host());
   extension_webkit_preferences::SetPreferences(extension, web_prefs);
-#endif
   return true;
 }
 
@@ -798,10 +796,10 @@ void ChromeContentBrowserClientExtensionsPart::OverrideWebkitPrefs(
 
 void ChromeContentBrowserClientExtensionsPart::BrowserURLHandlerCreated(
     BrowserURLHandler* handler) {
-  // handler->AddHandlerPair(&ExtensionWebUI::HandleChromeURLOverride,
-  //                         BrowserURLHandler::null_handler());
-  // handler->AddHandlerPair(BrowserURLHandler::null_handler(),
-  //                         &ExtensionWebUI::HandleChromeURLOverrideReverse);
+  handler->AddHandlerPair(&ExtensionWebUI::HandleChromeURLOverride,
+                          BrowserURLHandler::null_handler());
+  handler->AddHandlerPair(BrowserURLHandler::null_handler(),
+                          &ExtensionWebUI::HandleChromeURLOverrideReverse);
 }
 
 void ChromeContentBrowserClientExtensionsPart::
@@ -812,7 +810,7 @@ void ChromeContentBrowserClientExtensionsPart::
 
 void ChromeContentBrowserClientExtensionsPart::GetURLRequestAutoMountHandlers(
     std::vector<storage::URLRequestAutoMountHandler>* handlers) {
-  // handlers->push_back(base::BindRepeating(
+  // handlers->push_back(base::BindRepeating( // wootz disable media backend
   //     MediaFileSystemBackend::AttemptAutoMountForURLRequest));
 }
 
@@ -822,7 +820,7 @@ void ChromeContentBrowserClientExtensionsPart::GetAdditionalFileSystemBackends(
     download::QuarantineConnectionCallback quarantine_connection_callback,
     std::vector<std::unique_ptr<storage::FileSystemBackend>>*
         additional_backends) {
-  // additional_backends->push_back(std::make_unique<MediaFileSystemBackend>(
+  // additional_backends->push_back(std::make_unique<MediaFileSystemBackend>( // wootz disable media
   //     storage_partition_path, std::move(quarantine_connection_callback)));
 
   additional_backends->push_back(

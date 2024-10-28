@@ -119,9 +119,6 @@ WootzWalletService::WootzWalletService(
                                                 keyring_service_.get(),
                                                 profile_prefs)),
       weak_ptr_factory_(this) {
-
-    LOG(ERROR)<<"WootzWalletService ANKIT";
-
   CHECK(delegate_);
 
   if (IsBitcoinEnabled()) {
