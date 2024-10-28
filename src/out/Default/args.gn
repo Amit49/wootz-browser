@@ -1,3 +1,16 @@
 target_os = "android"
 target_cpu = "arm64"
-is_debug= true
+enable_cardboard = false
+enable_proguard_obfuscation = false
+enable_hls_demuxer = false
+enable_nacl = false
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+treat_warnings_as_errors=false
+enable_extensions=true
+is_java_debug = true
+is_component_build = true
+android_static_analysis = "off"
+cc_wrapper="env CCACHE_SLOPPINESS=time_macros ccache"
+# Build arguments go here.
+# See "gn args <out_dir> --list" for available build arguments.

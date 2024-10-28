@@ -21,6 +21,17 @@ public interface AppMenuCoordinator {
     AppMenuHandler getAppMenuHandler();
 
     /**
+     * Open the extensions Bottom Sheet.
+     */
+    void openExtensionById(String extensionId);
+
+    /**
+     * Close the extensions Bottom Sheet.
+     */
+    void closeExtensionBottomSheet();
+    
+
+    /**
      * @return The {@link AppMenuPropertiesDelegate} associated with this activity.
      */
     AppMenuPropertiesDelegate getAppMenuPropertiesDelegate();

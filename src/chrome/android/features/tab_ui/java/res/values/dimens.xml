@@ -39,7 +39,7 @@ found in the LICENSE file.
     <dimen name="selection_tab_list_toggle_button_lateral_inset">18dp</dimen>
     <dimen name="selection_tab_list_toggle_button_vertical_inset">22dp</dimen>
     <dimen name="tasks_view_items_vertical_spacing">8dp</dimen>
-    
+
     <!-- Dimens for bottom tab strip toolbar - by Sagar -->
     <dimen name="bottom_tab_strip_toolbar_margin">8dp</dimen>
 

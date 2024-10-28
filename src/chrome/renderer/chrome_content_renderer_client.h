@@ -83,7 +83,7 @@ class Origin;
 namespace web_cache {
 class WebCacheImpl;
 }
-
+class WootzRenderThreadObserver;
 class ChromeContentRendererClient
     : public content::ContentRendererClient,
       public service_manager::LocalInterfaceProvider {
@@ -274,8 +274,8 @@ class ChromeContentRendererClient
 #endif
 
   // Used to profile main thread.
-  std::unique_ptr<ThreadProfiler> main_thread_profiler_;
-
+  std::unique_ptr<ThreadProfiler> main_thread_profiler_;                                       
+  std::unique_ptr<WootzRenderThreadObserver> wootz_observer_;
   std::unique_ptr<ChromeRenderThreadObserver> chrome_observer_;
   std::unique_ptr<web_cache::WebCacheImpl> web_cache_impl_;
   std::unique_ptr<chrome::WebRtcLoggingAgentImpl> webrtc_logging_agent_impl_;
