@@ -188,6 +188,8 @@ void ExtensionUpdater::EnsureDownloaderCreated() {
 }
 
 void ExtensionUpdater::Start() {
+  if (alive_)
+    return;
   DCHECK(!alive_);
   // If these are NULL, then that means we've been called after Stop()
   // has been called.

@@ -1896,7 +1896,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   TRACE_EVENT0("browser", "chrome::RegisterProfilePrefs");
 
   throttle_webui::RegisterProfilePrefs(registry);
-  LOG(ERROR)<< "After throttle_webui::RegisterProfilePrefs(registry)";
+  // LOG(ERROR)<< "After throttle_webui::RegisterProfilePrefs(registry)";
   // User prefs. Please keep this list alphabetized.
   AccessibilityLabelsService::RegisterProfilePrefs(registry);
   AccessibilityUIMessageHandler::RegisterProfilePrefs(registry);

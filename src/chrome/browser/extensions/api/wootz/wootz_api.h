@@ -67,10 +67,25 @@ class WootzShowDialogFunction : public ExtensionFunction {
     WootzShowDialogFunction(const WootzShowDialogFunction&) = delete;
     WootzShowDialogFunction& operator=(const WootzShowDialogFunction&) = delete;
 
+  protected:
+    ~WootzShowDialogFunction() override {}
+
     ResponseAction Run() override;
 };
+
+class WootzLogFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.log", WOOTZ_LOG)
+  WootzLogFunction() = default;
+
+  WootzLogFunction(const WootzLogFunction&) = delete;
+  WootzLogFunction& operator=(const WootzLogFunction&) = delete;
+
+ protected:
+  ~WootzLogFunction() override {}
+
+  ResponseAction Run() override;
+};
+
 }  // namespace extensions
-
-
-
 #endif  // CHROME_BROWSER_EXTENSIONS_API_WOOTZ_WOOTZ_API_H_

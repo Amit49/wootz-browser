@@ -2750,6 +2750,7 @@ Called by update_extension_histograms.py.-->
   <int value="1892" label="WOOTZ_HELLOWORLD"/>
   <int value="1893" label="WOOTZ_SHOWCONSENTDIALOGANDMAYBESTARTSERVICE"/>
   <int value="1894" label="WOOTZ_SHOWDIALOG"/>
+  <int value="1895" label="WOOTZ_LOG"/>
 </enum>
 
 <enum name="ExtensionInstallationCrxInstallError">

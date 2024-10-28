@@ -1021,6 +1021,8 @@ static_library("ui") {
       "global_error/global_error_service_factory.h",
       "app_icon_loader.cc",
       "app_icon_loader.h",
+      "browser_navigator.cc",
+      "browser_navigator.h",
 
       "webui/extension_control_handler.cc",
       "webui/extension_control_handler.h",
@@ -6953,8 +6955,8 @@ static_library("ui") {
       # "web_applications/web_app_ui_utils.h",
       # "web_applications/webui_web_app_navigation_throttle.cc",
       # "web_applications/webui_web_app_navigation_throttle.h",
-      # "webui/extensions/extension_basic_info.cc",
-      # "webui/extensions/extension_basic_info.h",
+      "webui/extensions/extension_basic_info.cc",
+      "webui/extensions/extension_basic_info.h",
       # "webui/extensions/extension_icon_source.cc",
       # "webui/extensions/extension_icon_source.h",
     ]
