@@ -15,8 +15,9 @@ found in the LICENSE file.
         <item android:id="@+id/icon_row_menu_id"
             android:title="@null">
             <menu>
+                <!-- by Abhinandan -->
               <item android:id="@+id/forward_menu_id"
-                android:title="@string/accessibility_menu_forward"
+                android:title="Go forward"
                 android:titleCondensed="@string/menu_forward"
                 android:icon="@drawable/btn_forward"/>
               <item android:id="@+id/bookmark_this_page_id"
