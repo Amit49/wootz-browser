@@ -533,6 +533,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
             }
         }
     }
+
     /* This function is not used anymore since we are removing the back button from the extension webview
     private void setupFloatingBackButton() {
         View view = getView();
@@ -1143,6 +1144,12 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                     iconView.setImageDrawable(adaptiveIcon);
                 } else {
                     iconView.setImageDrawable(null);
+                }
+
+                if (title != null) {
+                    title = title.toString()
+                            .substring(0, 1)
+                            .toUpperCase() + title.toString().substring(1);
                 }
             
                 titleView.setText(title);

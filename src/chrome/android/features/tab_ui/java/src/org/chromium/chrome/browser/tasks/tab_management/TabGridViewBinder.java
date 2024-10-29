@@ -411,7 +411,7 @@ class TabGridViewBinder {
     private static void updateColor(
             ViewLookupCachingFrameLayout rootView, boolean isIncognito, boolean isSelected) {
         View cardView = rootView.fastFindViewById(R.id.card_view);
-        // TextView titleView = (TextView) rootView.fastFindViewById(R.id.tab_title);
+        TextView titleView = (TextView) rootView.fastFindViewById(R.id.tab_title);
         TabThumbnailView thumbnail =
                 (TabThumbnailView) rootView.fastFindViewById(R.id.tab_thumbnail);
         ChromeImageView backgroundView =
@@ -423,8 +423,8 @@ class TabGridViewBinder {
                         cardView.getContext(), isIncognito, isSelected);
         ViewCompat.setBackgroundTintList(cardView, ColorStateList.valueOf(backgroundColor));
 
-        // titleView.setTextColor(
-        //         TabUiThemeUtils.getTitleTextColor(titleView.getContext(), isIncognito, isSelected));
+        titleView.setTextColor(
+                TabUiThemeUtils.getTitleTextColor(titleView.getContext(), isIncognito, false));
 
         thumbnail.updateThumbnailPlaceholder(isIncognito, isSelected);
 

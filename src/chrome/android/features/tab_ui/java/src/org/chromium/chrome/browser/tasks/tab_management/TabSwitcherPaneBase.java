@@ -277,15 +277,21 @@ public abstract class TabSwitcherPaneBase implements Pane, TabSwitcherResetHandl
                         recyclerViewRect.bottom = rootViewRect.bottom;
                     }
 
+                    // Setting the rootViewRect as the initialRect (case: isShrik -> true) and
+                    // finalRect (case: isShrink -> false) instead of recyclerViewRect as we are
+                    // migrating from TabSwitcherView to HubLayout.
+                    Rect rootViewRect = new Rect();
+                    mRootView.getRootView().getGlobalVisibleRect(rootViewRect);
+
                     int leftOffset = 0;
                     if (isShrink) {
-                        initialRect = recyclerViewRect;
+                        initialRect = rootViewRect;
                         finalRect = coordinator.getTabThumbnailRect(tabId);
-                        leftOffset = initialRect.left;
+                        finalRect.offset(leftOffset, -hubRect.top);
                     } else {
                         initialRect = coordinator.getTabThumbnailRect(tabId);
-                        finalRect = recyclerViewRect;
-                        leftOffset = finalRect.left;
+                        finalRect = rootViewRect;
+                        initialRect.offset(leftOffset, -hubRect.top);
                     }
 
                     boolean useFallbackAnimation = false;
@@ -293,9 +299,7 @@ public abstract class TabSwitcherPaneBase implements Pane, TabSwitcherResetHandl
                         Log.d(TAG, "Geometry not ready using fallback animation.");
                         useFallbackAnimation = true;
                     }
-                    // Ignore left offset and just ensure the width is correct. See crbug/1502437.
-                    initialRect.offset(-leftOffset, -hubRect.top);
-                    finalRect.offset(-leftOffset, -hubRect.top);
+
                     animationDataSupplier.set(
                             new ShrinkExpandAnimationData(
                                     initialRect,
