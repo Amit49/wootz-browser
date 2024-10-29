@@ -1141,6 +1141,12 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                 } else {
                     iconView.setImageDrawable(null);
                 }
+
+                if (title != null) {
+                    title = title.toString()
+                            .substring(0, 1)
+                            .toUpperCase() + title.toString().substring(1);
+                }
             
                 titleView.setText(title);
             
