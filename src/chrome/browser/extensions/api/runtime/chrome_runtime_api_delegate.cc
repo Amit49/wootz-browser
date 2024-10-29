@@ -259,8 +259,8 @@ bool ChromeRuntimeAPIDelegate::CheckForUpdates(
 }
 
 void ChromeRuntimeAPIDelegate::OpenURL(const GURL& uninstall_url) {
-#if 0 // wootz temporary disable navigate
   Profile* profile = Profile::FromBrowserContext(browser_context_);
+#if 0
   Browser* browser = chrome::FindLastActiveWithProfile(profile);
   if (!browser) {
     browser = Browser::Create(Browser::CreateParams(profile, false));
@@ -268,13 +268,13 @@ void ChromeRuntimeAPIDelegate::OpenURL(const GURL& uninstall_url) {
   if (!browser) {
     return;
   }
+#endif
 
   NavigateParams params(profile, uninstall_url,
                         ui::PAGE_TRANSITION_CLIENT_REDIRECT);
   params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
   params.user_gesture = false;
   Navigate(&params);
-#endif
 }
 
 bool ChromeRuntimeAPIDelegate::GetPlatformInfo(PlatformInfo* info) {

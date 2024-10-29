@@ -92,7 +92,8 @@ using WebExposedIsolationLevel = content::WebExposedIsolationLevel;
 class BrowserNavigatorWebContentsAdoption {
  public:
   static void AttachTabHelpers(content::WebContents* contents) {
-    TabHelpers::AttachTabHelpers(contents);
+    // TabHelpers::AttachTabHelpers(contents);
+    TabAndroid::AttachTabHelpers(contents);
 
     // Make the tab show up in the task manager.
     task_manager::WebContentsTags::CreateForTabContents(contents);

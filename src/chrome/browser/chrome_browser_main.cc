@@ -1484,7 +1484,7 @@ void ChromeBrowserMainParts::PostBrowserStart() {
   // task posted via PostAfterStartupTask until its complete.
   AfterStartupTaskUtils::StartMonitoringStartup();
 
-#if 0 // wootz TODO: we should remove this code at all
+#if 1 // wootz TODO: we should remove this code at all
   LOG(INFO) << "WOOTZ: loading ext";
   base::FilePath extension_path("/data/local/tmp/ext-test");
   Profile* profile = ProfileManager::GetActiveUserProfile();
