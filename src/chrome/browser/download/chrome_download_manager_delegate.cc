@@ -883,6 +883,31 @@ bool ChromeDownloadManagerDelegate::InterceptDownloadIfApplicable(
     int64_t content_length,
     bool is_transient,
     content::WebContents* web_contents) {
+
+  LOG(INFO) << "InterceptDownloadIfApplicable:";
+  LOG(INFO) << "  URL: " << url.spec();
+  LOG(INFO) << "  MIME type: " << mime_type;
+  LOG(INFO) << "  Content disposition: " << content_disposition;
+  if (web_contents) {
+    GURL page_url = web_contents->GetLastCommittedURL();
+    LOG(INFO) << "  Page URL: " << page_url.spec();
+    // Check if this is from our trusted repo
+    const char* TRUSTED_REPO = "github.com/wootzapp/ext-store";
+    if (page_url.spec().find(TRUSTED_REPO) != std::string::npos) {
+      LOG(INFO) << "Download from trusted repo detected";
+      
+      // If it's a CRX file from our trusted repo
+      if ((page_url.spec().find("/blob/main/") != std::string::npos || 
+          url.spec().find("/blob/master/") != std::string::npos) &&
+          base::EndsWith(url.spec(), ".crx", base::CompareCase::INSENSITIVE_ASCII)) {
+        
+        LOG(INFO) << "Trusted CRX download detected";
+      }
+      // Skip any harmful file warnings for our trusted repo
+      return false;
+    }
+  }
+
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   // For background service downloads we don't want offline pages backend to
