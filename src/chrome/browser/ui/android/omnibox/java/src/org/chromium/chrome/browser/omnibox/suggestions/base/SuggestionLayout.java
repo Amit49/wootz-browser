@@ -151,7 +151,7 @@ class SuggestionLayout extends ViewGroup {
         var res = context.getResources();
 
         int endSpace = res.getDimensionPixelSize(R.dimen.omnibox_suggestion_end_padding_modern);
-        setPaddingRelative(0, 0, endSpace, 0);
+        setPaddingRelative(0, 0, endSpace, 8);
 
         mDecorationIconWidthPx =
                 OmniboxResourceProvider.getSuggestionDecorationIconSizeWidth(context);

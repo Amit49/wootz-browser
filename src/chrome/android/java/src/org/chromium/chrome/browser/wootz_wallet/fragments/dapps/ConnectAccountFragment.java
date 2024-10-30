@@ -148,14 +148,14 @@ public class ConnectAccountFragment extends BaseDAppsFragment implements Permiss
             Log.e(TAG, "initComponents " + e);
         }
         assert mWalletModel != null;
-        mWalletModel.getKeyringModel().mAllAccountsInfo.observe(
-                getViewLifecycleOwner(), allAccounts -> {
-                    mSelectedAccount = allAccounts.selectedAccount;
-                    mAccountInfos = Utils.filterAccountsByCoin(allAccounts.accounts,
-                                                 mSelectedAccount.accountId.coin)
-                                            .toArray(new AccountInfo[0]);
-                    updateAccounts();
-                });
+        // mWalletModel.getKeyringModel().mAllAccountsInfo.observe(
+        //         getViewLifecycleOwner(), allAccounts -> {
+        //             mSelectedAccount = allAccounts.selectedAccount;
+        //             mAccountInfos = Utils.filterAccountsByCoin(allAccounts.accounts,
+        //                                          mSelectedAccount.accountId.coin)
+        //                                     .toArray(new AccountInfo[0]);
+        //             updateAccounts();
+        //         });
     }
 
     private void onFaviconAvailable(GURL pageUrl, Bitmap favicon) {
@@ -223,26 +223,27 @@ public class ConnectAccountFragment extends BaseDAppsFragment implements Permiss
 
     @Override
     public void connectAccount(@NonNull final AccountInfo account) {
-        // Tab tab = WootzRewardsHelper.currentActiveChromeTabbedActivityTab();
-        // if (tab != null) {
-        if (true) {
-            // if (tab.getWebContents() != null) {
-            if (true) {
-                // Static data for WootzDappPermissionPromptDialog.show
-                setConnectAccountPendingData(account.address, PermissionLifetimeOption.FOREVER);
-                // ConnectAccountFragmentJni.get().connectAccount(
-                //         account.address, account.accountId.coin, tab.getWebContents(), success -> {
-                //             if (!success) {
-                //                 return;
-                //             }
-                //             if (CoinType.SOL != account.accountId.coin) {
-                //                 getKeyringService().setSelectedAccount(
-                //                         account.accountId, setSuccess -> {});
-                //             }
-                //             updateAccounts();
-                //         });
-            }
-        }
+        return ;
+        // // Tab tab = WootzRewardsHelper.currentActiveChromeTabbedActivityTab();
+        // // if (tab != null) {
+        // if (true) {
+        //     // if (tab.getWebContents() != null) {
+        //     if (true) {
+        //         // Static data for WootzDappPermissionPromptDialog.show
+        //         setConnectAccountPendingData(account.address, PermissionLifetimeOption.FOREVER);
+        //         // ConnectAccountFragmentJni.get().connectAccount(
+        //         //         account.address, account.accountId.coin, tab.getWebContents(), success -> {
+        //         //             if (!success) {
+        //         //                 return;
+        //         //             }
+        //         //             if (CoinType.SOL != account.accountId.coin) {
+        //         //                 getKeyringService().setSelectedAccount(
+        //         //                         account.accountId, setSuccess -> {});
+        //         //             }
+        //         //             updateAccounts();
+        //         //         });
+        //     }
+        // }
     }
 
     @Override

@@ -89,6 +89,10 @@ void WootzWalletProviderDelegateImpl::ShowWalletBackup() {
   ::wootz_wallet::ShowWalletBackup();
 }
 
+content::WebContents* WootzWalletProviderDelegateImpl::GetWebContents() {
+  return web_contents_;
+}
+
 void WootzWalletProviderDelegateImpl::WalletInteractionDetected() {
   ::wootz_wallet::WalletInteractionDetected(web_contents_);
 }
@@ -106,46 +110,86 @@ std::optional<std::vector<std::string>>
 WootzWalletProviderDelegateImpl::GetAllowedAccounts(
     mojom::CoinType type,
     const std::vector<std::string>& accounts) {
-  if (IsPermissionDenied(type)) {
-    return std::vector<std::string>();
-  }
+      
+  // if (IsPermissionDenied(type)) {
+  //   LOG(ERROR) << "JANGID: Permission Denied for type: " << static_cast<int>(type);
+  //   return std::vector<std::string>();
+  // }
 
   auto permission = CoinTypeToPermissionType(type);
   if (!permission) {
+    LOG(ERROR) << "JANGID: Invalid permission type";
     return std::nullopt;
   }
+  LOG(ERROR) << "JANGID: Permission type: " << static_cast<int>(*permission);
 
-  return permissions::WootzWalletPermissionContext::GetAllowedAccounts(
+  auto allowed = permissions::WootzWalletPermissionContext::GetAllowedAccounts(
       *permission, content::RenderFrameHost::FromID(host_id_), accounts);
+
+  if (allowed) {
+    LOG(ERROR) << "JANGID: Allowed accounts size: " << allowed->size();
+    for (const auto& account : *allowed) {
+      LOG(ERROR) << "JANGID: Allowed account: " << account;
+    }
+  } else {
+    LOG(ERROR) << "JANGID: No allowed accounts (nullopt)";
+  }
+
+  return allowed;
 }
 
 void WootzWalletProviderDelegateImpl::RequestPermissions(
     mojom::CoinType type,
     const std::vector<std::string>& accounts,
     RequestPermissionsCallback callback) {
+
+  LOG(ERROR) << "JANGID: RequestPermissions - CoinType: " << static_cast<int>(type);
+  LOG(ERROR) << "JANGID: Input accounts size: " << accounts.size();
+  for (const auto& account : accounts) {
+    LOG(ERROR) << "JANGID: Input account: " << account;
+  }
+
   if (!IsWeb3NotificationAllowed()) {
+    LOG(ERROR) << "JANGID: Web3 notification not allowed";
     std::move(callback).Run(mojom::RequestPermissionsError::kNone,
                             std::vector<std::string>());
     return;
   }
+
   auto request_type = CoinTypeToPermissionRequestType(type);
   auto permission = CoinTypeToPermissionType(type);
+  
   if (!request_type || !permission) {
+    LOG(ERROR) << "JANGID: Invalid request_type or permission";
     std::move(callback).Run(mojom::RequestPermissionsError::kInternal,
                             std::nullopt);
     return;
   }
-  // Check if there's already a permission request in progress
+
+  LOG(ERROR) << "JANGID: Request type: " << static_cast<int>(*request_type);
+  LOG(ERROR) << "JANGID: Permission type: " << static_cast<int>(*permission);
+
   auto* rfh = content::RenderFrameHost::FromID(host_id_);
-  if (rfh && permissions::WootzWalletPermissionContext::HasRequestsInProgress(
-                 rfh, *request_type)) {
+  if (!rfh) {
+    LOG(ERROR) << "JANGID: RenderFrameHost is null";
+    std::move(callback).Run(mojom::RequestPermissionsError::kInternal,
+                            std::nullopt);
+    return;
+  }
+
+  if (permissions::WootzWalletPermissionContext::HasRequestsInProgress(
+          rfh, *request_type)) {
+    LOG(ERROR) << "JANGID: Permission request already in progress";
     std::move(callback).Run(mojom::RequestPermissionsError::kRequestInProgress,
                             std::nullopt);
     return;
   }
 
+  LOG(ERROR) << "JANGID: Requesting permissions for accounts";
   permissions::WootzWalletPermissionContext::RequestPermissions(
-      *permission, content::RenderFrameHost::FromID(host_id_), accounts,
+      *permission, 
+      rfh, 
+      accounts,
       base::BindOnce(&OnRequestPermissions, accounts, std::move(callback)));
 }
 

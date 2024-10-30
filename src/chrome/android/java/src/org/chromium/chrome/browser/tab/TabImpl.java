@@ -491,14 +491,14 @@ class TabImpl implements Tab {
 
     @Override
     public int getBackgroundColor() {
-        if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
-            if (mCustomView != null && mCustomViewBackgroundColor != null) {
-                return mCustomViewBackgroundColor;
-            }
-            if (mNativePage != null) {
-                return mNativePage.getBackgroundColor();
-            }
-        }
+        // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
+        //     if (mCustomView != null && mCustomViewBackgroundColor != null) {
+        //         return mCustomViewBackgroundColor;
+        //     }
+        //     if (mNativePage != null) {
+        //         return mNativePage.getBackgroundColor();
+        //     }
+        // }
         return mWebContentBackgroundColor;
     }
 
@@ -1474,10 +1474,10 @@ class TabImpl implements Tab {
 
     /** Called to notify when the page had painted something non-empty. */
     void notifyDidFirstVisuallyNonEmptyPaint() {
-        if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
-                && mWaitingOnBgColorAfterHidingNativePage) {
-            onBackgroundColorChanged();
-        }
+        // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
+        //         && mWaitingOnBgColorAfterHidingNativePage) {
+        //     onBackgroundColorChanged();
+        // }
         mWaitingOnBgColorAfterHidingNativePage = false;
     }
 
@@ -1701,9 +1701,10 @@ class TabImpl implements Tab {
                     }
                     pushNativePageStateToNavigationEntry();
 
-                    if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
-                        onBackgroundColorChanged();
-                    }
+                    // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
+                    //     onBackgroundColorChanged();
+                    // }
+                    
                     updateThemeColor(TabState.UNSPECIFIED_THEME_COLOR);
                 });
     }

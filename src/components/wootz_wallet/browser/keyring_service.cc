@@ -59,6 +59,10 @@
 #include "crypto/random.h"
 #include "ui/base/l10n/l10n_util.h"
 
+#include "components/permissions/contexts/wootz_wallet_permission_context.h"
+#include "chrome/browser/profiles/profile_manager.h"
+#include "chrome/browser/browser_process.h"
+
 namespace wootz_wallet {
 namespace {
 
@@ -1592,6 +1596,12 @@ void KeyringService::Lock() {
   if (IsLockedSync()) {
     return;
   }
+
+    // Clear all wallet permissions when locking for removing auto login.
+    if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
+      permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
+    }
+
 
   keyrings_.clear();
   encryptor_.reset();

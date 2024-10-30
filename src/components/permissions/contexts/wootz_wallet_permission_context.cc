@@ -24,6 +24,7 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/permission_request_description.h"
+#include "third_party/blink/public/mojom/permissions/permission_status.mojom-shared.h"
 #include "third_party/blink/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
 #include "url/origin.h"
 
@@ -182,6 +183,8 @@ void WootzWalletPermissionContext::RequestPermissions(
     const std::vector<std::string>& addresses,
     base::OnceCallback<void(const std::vector<blink::mojom::PermissionStatus>&)>
         callback) {
+  LOG(ERROR) << "JANGID: Silent permission approval on request";
+  
   if (!rfh) {
     std::move(callback).Run(std::vector<blink::mojom::PermissionStatus>());
     return;
@@ -193,31 +196,24 @@ void WootzWalletPermissionContext::RequestPermissions(
     return;
   }
 
-  content::PermissionControllerDelegate* delegate =
-      web_contents->GetBrowserContext()->GetPermissionControllerDelegate();
-  if (!delegate) {
-    std::move(callback).Run(std::vector<blink::mojom::PermissionStatus>());
-    return;
-  }
-
-  // To support ethereum permission to be per Ethereum account per site, we map
-  // each account address to one ethereum permission request. And the requests
-  // will have different origins which includes the address information. Here
-  // we first get a concatenated origin to include information of all wallet
-  // addresses, then adjust the origin of each request later in the process
-  // because PermissionManager::RequestPermissions only accepts a single origin
-  // parameter to be passes in.
-  url::Origin origin;
-  if (!wootz_wallet::GetConcatOriginFromWalletAddresses(
-          rfh->GetLastCommittedOrigin(), addresses, &origin)) {
-    std::move(callback).Run(std::vector<blink::mojom::PermissionStatus>());
-    return;
-  }
-
-  std::vector<blink::PermissionType> types(addresses.size(), permission);
-  delegate->RequestPermissions(
-        rfh,content::PermissionRequestDescription(types, false,
-                                              origin.GetURL()),std::move(callback));
+  // Create a vector of GRANTED status for each address
+  std::vector<blink::mojom::PermissionStatus> results(
+      addresses.size(), blink::mojom::PermissionStatus::GRANTED);
+  
+  // Store the permissions in settings
+  const ContentSettingsType settings_type = 
+      PermissionUtil::PermissionTypeToContentSettingTypeSafe(permission);
+  
+  PermissionsClient::Get()
+      ->GetSettingsMap(web_contents->GetBrowserContext())
+      ->SetContentSettingDefaultScope(
+          rfh->GetLastCommittedOrigin().GetURL(),
+          rfh->GetLastCommittedOrigin().GetURL(),
+          settings_type,
+          CONTENT_SETTING_ALLOW);
+  
+  // Return granted status for all addresses
+  std::move(callback).Run(results);
 }
 
 // static
@@ -230,38 +226,28 @@ WootzWalletPermissionContext::GetAllowedAccounts(
     return std::nullopt;
   }
 
-  // Fail if there is no last committed URL yet
   auto* web_contents = content::WebContents::FromRenderFrameHost(rfh);
-  if (web_contents->GetPrimaryMainFrame()->GetLastCommittedURL().is_empty()) {
+  if (!web_contents) {
     return std::vector<std::string>();
   }
 
-  content::PermissionControllerDelegate* delegate =
-      web_contents->GetBrowserContext()->GetPermissionControllerDelegate();
-  if (!delegate) {
-    return std::nullopt;
-  }
-
-  const ContentSettingsType content_settings_type =
+  // Check if permission is already granted
+  const ContentSettingsType settings_type = 
       PermissionUtil::PermissionTypeToContentSettingTypeSafe(permission);
+      
+  auto setting = PermissionsClient::Get()
+                    ->GetSettingsMap(web_contents->GetBrowserContext())
+                    ->GetContentSetting(
+                        rfh->GetLastCommittedOrigin().GetURL(),
+                        rfh->GetLastCommittedOrigin().GetURL(),
+                        settings_type);
 
-  std::vector<std::string> allowed_accounts;
-  url::Origin origin = url::Origin::Create(rfh->GetLastCommittedURL());
-  for (const auto& address : addresses) {
-    url::Origin sub_request_origin;
-    bool success = wootz_wallet::GetSubRequestOrigin(
-        ContentSettingsTypeToRequestType(content_settings_type), origin,
-        address, &sub_request_origin);
-    if (success) {
-      auto status = delegate->GetPermissionStatus(
-          permission,origin.GetURL(),sub_request_origin.GetURL());
-      if (status == blink::mojom::PermissionStatus::GRANTED) {
-        allowed_accounts.push_back(address);
-      }
-    }
+  // Return all addresses if permission was previously granted
+  if (setting == CONTENT_SETTING_ALLOW) {
+    return addresses;
   }
 
-  return allowed_accounts;
+  return std::vector<std::string>();
 }
 
 // static

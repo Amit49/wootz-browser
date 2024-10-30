@@ -757,7 +757,7 @@ void JSEthereumProvider::AnnounceProvider() {
   // provider_info_value.Set(
   //     "name", l10n_util::GetStringUTF8(IDS_WALLET_EIP6963_PROVIDER_NAME));
   provider_info_value.Set(
-      "name", "WootzApp");
+      "name", "Wootzapp");
   provider_info_value.Set("icon", GetWootzWalletImage());
 
   auto detail = v8::Object::New(isolate);

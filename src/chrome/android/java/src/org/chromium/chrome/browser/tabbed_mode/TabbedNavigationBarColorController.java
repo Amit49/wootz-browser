@@ -135,15 +135,15 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
                 layoutManagerSupplier,
                 fullscreenManager,
                 edgeToEdgeControllerSupplier,
-                ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
-                        ? new BottomAttachedUiObserver(
-                                browserControlsStateProvider,
-                                snackbarManagerSupplier.get(),
-                                contextualSearchManagerSupplier,
-                                bottomSheetController,
-                                omniboxSuggestionsVisualState,
-                                insetObserver)
-                        : null);
+                // ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
+                //         ? new BottomAttachedUiObserver(
+                //                 browserControlsStateProvider,
+                //                 snackbarManagerSupplier.get(),
+                //                 contextualSearchManagerSupplier,
+                //                 bottomSheetController,
+                //                 omniboxSuggestionsVisualState,
+                //                 insetObserver)
+                null);
     }
 
     @VisibleForTesting
@@ -289,10 +289,10 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
 
                     @Override
                     public void onFinishedShowing(@LayoutType int layoutType) {
-                        if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
-                                && layoutType == LayoutType.BROWSING) {
-                            updateNavigationBarColor();
-                        }
+                        // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
+                        //         && layoutType == LayoutType.BROWSING) {
+                        //     updateNavigationBarColor();
+                        // }
                     }
                 };
         mLayoutManager.addObserver(mLayoutStateObserver);
@@ -300,7 +300,7 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
     }
 
     private void updateActiveTab() {
-        if (!ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) return;
+        // if (!ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) return;
 
         @Nullable Tab activeTab = mTabModelSelector.getCurrentTab();
         if (activeTab == mActiveTab) return;
@@ -331,9 +331,9 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
         mNavigationBarColor = newNavigationBarColor;
         mForceShowDivider = forceShowDivider;
 
-        if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled() && !toEdge) {
-            animateNavigationBarColor(currentNavigationBarColor, newNavigationBarColor);
-        } else {
+        // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled() && !toEdge) {
+        //     animateNavigationBarColor(currentNavigationBarColor, newNavigationBarColor);
+        // } else {
             mWindow.setNavigationBarColor(mNavigationBarColor);
 
             if (toEdge) return;
@@ -342,7 +342,7 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
                     getNavigationBarDividerColor(mForceDarkNavigationBarColor, false));
             UiUtils.setNavigationBarIconColor(
                     mRootView, !mForceDarkNavigationBarColor && mLightNavigationBar);
-        }
+        // }
     }
 
     private void animateNavigationBarColor(
@@ -449,17 +449,19 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
     }
 
     private boolean useBottomAttachedUiColor() {
-        return ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
-                && mBottomAttachedUiColor != null
-                && getBottomInset() == 0;
+        // return ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
+        //         && mBottomAttachedUiColor != null
+        //         && getBottomInset() == 0;
+        return false;
     }
 
     private boolean useActiveTabColor() {
-        return ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
-                && mLayoutManager != null
-                && mLayoutManager.getActiveLayoutType() == LayoutType.BROWSING
-                && mActiveTab != null
-                && getBottomInset() == 0;
+        // return ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()
+        //         && mLayoutManager != null
+        //         && mLayoutManager.getActiveLayoutType() == LayoutType.BROWSING
+        //         && mActiveTab != null
+        //         && getBottomInset() == 0;
+        return false;
     }
 
     private int getBottomInset() {

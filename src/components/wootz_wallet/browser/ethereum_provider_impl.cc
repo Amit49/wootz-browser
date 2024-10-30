@@ -20,7 +20,10 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/logging.h"
+#include "chrome/browser/browser_process.h"
+#include "chrome/browser/profiles/profile_manager.h"
 #include "components/api_request_helper/api_request_helper.h"
+#include "components/permissions/contexts/wootz_wallet_permission_context.h"
 #include "components/wootz_wallet/browser/account_resolver_delegate_impl.h"
 #include "components/wootz_wallet/browser/wootz_wallet_constants.h"
 #include "components/wootz_wallet/browser/wootz_wallet_provider_delegate.h"
@@ -39,11 +42,14 @@
 #include "components/wootz_wallet/common/web3_provider_constants.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/grit/wootz_components_strings.h"
+#include "content/public/browser/navigation_handle.h"
 #include "crypto/random.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "url/origin.h"
 
 #include "chrome/browser/extensions/api/wootz/wootz_api.h"
+
+
 namespace {
 
 base::Value::Dict GetJsonRpcRequest(const std::string& method,
@@ -178,6 +184,14 @@ EthereumProviderImpl::EthereumProviderImpl(
   keyring_service_->AddObserver(
       keyring_observer_receiver_.BindNewPipeAndPassRemote());
   host_content_settings_map_->AddObserver(this);
+
+  // Register as WebContentsObserver
+  if (auto* web_contents = delegate_->GetWebContents()) {
+    LOG(ERROR) << "JANGID: Registering WebContentsObserver";
+    Observe(web_contents);
+  } else {
+    LOG(ERROR) << "JANGID: Failed to get WebContents for observer registration";
+  }
 
   // Get the current so we can compare for changed events
   if (delegate_) {
@@ -1473,20 +1487,37 @@ void EthereumProviderImpl::OnGetAllAccounts(
   }
 
   LOG(ERROR) << "RequestEthereum: All Ethereum accounts: " << base::JoinString(account_details, " | ");
+  
+    const auto allowed_accounts =
+      delegate_->GetAllowedAccounts(mojom::CoinType::ETH, eth_addresses);
+
+  const bool success = allowed_accounts.has_value();
 
   if (eth_addresses.empty()) {
     LOG(ERROR) << "RequestEthereum: No ETH accounts found JANGID";
     OnRequestEthereumPermissions(std::move(callback), std::move(id), method,
                                  origin, RequestPermissionsError::kInternal,
                                  std::nullopt);
-  } else {
+  }
+
+  if(success && !allowed_accounts->empty()) {
     // Use the first Ethereum address
-    selected_account = eth_addresses[0];
+    // selected_account = eth_addresses[0];
     LOG(ERROR) << "RequestEthereum: Selected first ETH account: " << selected_account;
     
     OnRequestEthereumPermissions(std::move(callback), std::move(id), method,
                                  origin, RequestPermissionsError::kNone,
-                                 std::vector<std::string>{selected_account});
+                                 allowed_accounts);
+
+    return ;
+
+  }else{
+    // Request accounts if no accounts are connected.
+    delegate_->RequestPermissions(
+    mojom::CoinType::ETH, eth_addresses,
+    base::BindOnce(&EthereumProviderImpl::OnRequestEthereumPermissions,
+                    weak_factory_.GetWeakPtr(), std::move(callback),
+                    std::move(id), method, origin));
   }
 }
 
@@ -1617,27 +1648,25 @@ EthereumProviderImpl::GetAllowedAccounts(bool include_accounts_when_locked) {
       delegate_->GetAllowedAccounts(mojom::CoinType::ETH, addresses);
 
   if (!allowed_accounts) {
+    LOG(ERROR) << "JANGID: allowed_accounts is null";
     return std::nullopt;
   }
 
+  // Log the allowed accounts
+  LOG(ERROR) << "JANGID: Allowed accounts size: " << allowed_accounts->size();
+  for (const auto& account : *allowed_accounts) {
+    LOG(ERROR) << "JANGID: Allowed account: " << account;
+  }
+
   std::vector<std::string> filtered_accounts;
-  // if (!keyring_service_->IsLockedSync() || include_accounts_when_locked) {
-  //   filtered_accounts = FilterAccounts(*allowed_accounts, selected_account);
-  // }
+  if (!keyring_service_->IsLockedSync() || include_accounts_when_locked) {
+    filtered_accounts = FilterAccounts(*allowed_accounts, selected_account);
+  }
 
   LOG(ERROR) << "INSIDE filter accounts of BEFORE getallowedaccounts JANGID " 
              << (filtered_accounts.empty() ? "no-accounts" : 
                  base::JoinString(base::make_span(filtered_accounts), ","));
 
-  if (true) {
-    filtered_accounts = FilterAccounts(*allowed_accounts, selected_account);
-
-    
-    
-    filtered_accounts.clear();
-    if (selected_account && !selected_account->address.empty()) {
-      filtered_accounts.push_back(base::ToLowerASCII(selected_account->address));
-    }
 
 
     LOG(ERROR) << "INSIDE filter accounts of INSIDE getallowedaccounts JANGID " 
@@ -1645,7 +1674,6 @@ EthereumProviderImpl::GetAllowedAccounts(bool include_accounts_when_locked) {
                    base::JoinString(base::make_span(filtered_accounts), ","));
         LOG(ERROR) << "INSIDE selected accounts of INSIDE getallowedaccounts JANGID " 
                << (selected_account ? selected_account->address : "no-account");
-  }
 
   LOG(ERROR) << "INSIDE filter accounts of AFTER getallowedaccounts JANGID " 
              << (filtered_accounts.empty() ? "no-accounts" : 
@@ -1870,6 +1898,15 @@ void EthereumProviderImpl::Unlocked() {
         pending_request_ethereum_permissions_method_,
         pending_request_ethereum_permissions_origin_);
   } else {
+
+  LOG(ERROR) << "JANGID: Clearing permissions on page refresh/navigation";
+  
+  // Clear permissions using both approaches
+  if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
+    LOG(ERROR) << "JANGID: Got profile, resetting permissions";
+    permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
+  }
+
     UpdateKnownAccounts();
   }
 }
@@ -1989,6 +2026,43 @@ void EthereumProviderImpl::OnResponse(bool format_json_rpc_response,
   std::move(callback).Run(std::move(id), std::move(formed_response), reject,
                           first_allowed_account, update_bind_js_properties);
   LOG(ERROR) << "JANGID: Callback executed";
+}
+
+void EthereumProviderImpl::DidFinishNavigation(
+    content::NavigationHandle* navigation_handle) {
+  LOG(ERROR) << "JANGID: DidFinishNavigation called for URL: " 
+             << navigation_handle->GetURL().spec();
+
+  if (!navigation_handle->HasCommitted() || navigation_handle->IsErrorPage()) {
+    LOG(ERROR) << "JANGID: Navigation not committed or is error page, skipping permission reset";
+    return;
+  }
+
+  LOG(ERROR) << "JANGID: Clearing permissions on page refresh/navigation";
+  
+  // Clear permissions using both approaches
+  if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
+    LOG(ERROR) << "JANGID: Got profile, resetting permissions";
+    permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
+    
+    // Clear known accounts
+    known_allowed_accounts_.clear();
+  } else {
+    LOG(ERROR) << "JANGID: Failed to get profile for permission reset";
+  }
+
+  // Reset any pending permission requests
+  if (pending_request_ethereum_permissions_callback_) {
+    LOG(ERROR) << "JANGID: Canceling pending permission request";
+    std::move(pending_request_ethereum_permissions_callback_)
+        .Run(std::move(pending_request_ethereum_permissions_id_),
+             GetProviderErrorDictionary(
+                 mojom::ProviderError::kUserRejectedRequest,
+                 "Page navigation cancelled permission request"),
+             true, "", false);
+  }
+
+  UpdateKnownAccounts();
 }
 
 }  // namespace wootz_wallet

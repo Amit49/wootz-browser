@@ -79,9 +79,11 @@ public class RadioButtonGroupThemePreference extends Preference
         mCheckBox.setChecked(mDarkenWebsitesEnabled);
 
         assert ThemeType.NUM_ENTRIES == 3;
-        mButtons.set(
-                ThemeType.SYSTEM_DEFAULT,
-                (RadioButtonWithDescription) holder.findViewById(R.id.system_default));
+        // mButtons.set(
+        //         ThemeType.SYSTEM_DEFAULT,
+        //         (RadioButtonWithDescription) holder.findViewById(R.id.system_default));
+        mButtons.set(ThemeType.SYSTEM_DEFAULT, 
+            (RadioButtonWithDescription) holder.findViewById(R.id.system_default));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             mButtons.get(ThemeType.SYSTEM_DEFAULT)
                     .setDescriptionText(

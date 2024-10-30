@@ -339,14 +339,14 @@ public class TabWebContentsObserver extends TabWebContentsUserData {
 
         @Override
         public void didChangeThemeColor() {
-            mTab.updateThemeColor(mTab.getWebContents().getThemeColor());
+            // mTab.updateThemeColor(mTab.getWebContents().getThemeColor());
         }
 
         @Override
         public void onBackgroundColorChanged() {
-            if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
-                mTab.changeWebContentBackgroundColor(mTab.getWebContents().getBackgroundColor());
-            }
+            // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
+            //     mTab.changeWebContentBackgroundColor(mTab.getWebContents().getBackgroundColor());
+            // }
         }
 
         @Override

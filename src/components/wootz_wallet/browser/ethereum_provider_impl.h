@@ -21,6 +21,7 @@
 #include "components/wootz_wallet/browser/keyring_service_observer_base.h"
 #include "components/wootz_wallet/common/wootz_wallet.mojom.h"
 #include "components/content_settings/core/browser/content_settings_observer.h"
+#include "content/public/browser/web_contents_observer.h" 
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
@@ -45,7 +46,8 @@ class EthereumProviderImpl final : public mojom::EthereumProvider,
                                    public KeyringServiceObserverBase,
                                    public content_settings::Observer,
                                    public EthBlockTracker::Observer,
-                                   public EthLogsTracker::Observer {
+                                   public EthLogsTracker::Observer,
+                                   public content::WebContentsObserver {
  public:
   using RequestPermissionsError = mojom::RequestPermissionsError;
 
@@ -322,6 +324,9 @@ class EthereumProviderImpl final : public mojom::EthereumProvider,
                   const std::string& first_allowed_account,
                   const bool update_bind_js_properties);
 
+  void DidFinishNavigation(
+        content::NavigationHandle* navigation_handle) override;
+        
   // EthBlockTracker::Observer:
   void OnLatestBlock(const std::string& chain_id, uint256_t block_num) override;
   void OnNewBlock(const std::string& chain_id, uint256_t block_num) override;

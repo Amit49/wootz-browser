@@ -524,10 +524,13 @@ public class HubLayout extends Layout implements HubLayoutController, AppHeaderO
         View paneHost = mHubController.getPaneHostView();
         assert paneHost.isLaidOut();
         Rect finalRect = new Rect();
-        paneHost.getGlobalVisibleRect(finalRect);
+
+        mRootView.getRootView().getGlobalVisibleRect(finalRect);
+        // paneHost.getGlobalVisibleRect(finalRect);
+
         // Ignore left offset and just ensure the width is correct. See crbug/1502437.
-        int leftOffset = finalRect.left;
-        finalRect.offset(-leftOffset, -containerViewRect.top);
+        int leftOffset = 0;
+        finalRect.offset(leftOffset, 0);
 
         // TODO(crbug.com/40285429): Supply this from HubController so it can look like the
         // animation

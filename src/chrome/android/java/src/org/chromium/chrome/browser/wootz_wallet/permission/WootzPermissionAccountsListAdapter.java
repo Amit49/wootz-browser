@@ -232,9 +232,10 @@ public class WootzPermissionAccountsListAdapter
                             if (CoinType.SOL == accountInfo.accountId.coin) {
                                 if (hasPermission) {
                                     mDelegate.disconnectAccount(accountInfo);
-                                } else {
-                                    mDelegate.connectAccount(accountInfo);
                                 }
+                                //  else {
+                                //     mDelegate.connectAccount(accountInfo);
+                                // }
                             } else {
                                 if (hasPermission) {
                                     if (isConnected) {
@@ -242,9 +243,10 @@ public class WootzPermissionAccountsListAdapter
                                     } else {
                                         mDelegate.switchAccount(accountInfo);
                                     }
-                                } else {
-                                    mDelegate.connectAccount(accountInfo);
                                 }
+                                //  else {
+                                //     mDelegate.connectAccount(accountInfo);
+                                // }
                             }
                         });
             }

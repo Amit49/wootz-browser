@@ -208,7 +208,6 @@ ExtensionFunction::ResponseAction WootzUnlockWalletFunction::Run() {
 
   // Set the password again after unlocking
   keyring_service->SetPassword(input_password);
-  LOG(ERROR) << "JANGID: Password set again after unlocking";
 
   return RespondLater();
 }

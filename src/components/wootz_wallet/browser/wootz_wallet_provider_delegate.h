@@ -12,6 +12,7 @@
 
 #include "base/functional/callback.h"
 #include "components/wootz_wallet/common/wootz_wallet.mojom-forward.h"
+#include "content/public/browser/web_contents_observer.h"
 #include "url/origin.h"
 
 namespace wootz_wallet {
@@ -30,6 +31,9 @@ class WootzWalletProviderDelegate {
 
   virtual bool IsTabVisible() = 0;
   virtual void ShowPanel() = 0;
+
+  virtual content::WebContents* GetWebContents() = 0;
+
   virtual void ShowWalletBackup() = 0;
   virtual void WalletInteractionDetected() = 0;
   virtual void ShowWalletOnboarding() = 0;

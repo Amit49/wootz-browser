@@ -337,7 +337,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         view.setTag(webContents);
 
         mCurrentWebContents = webContents;
-        setupFloatingBackButton();
+        // setupFloatingBackButton();
 
         return view;
     }
@@ -354,7 +354,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
             }
         }
     }
-
+/*
     private void setupFloatingBackButton() {
         View view = getView();
         if (view != null) {
@@ -374,7 +374,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
             handler.post(updateBackButton);
         }
     }
-
+*/
     private void updateFloatingBackButtonState() {
         if (mCurrentWebContents != null && mFloatingBackButton != null) {
             if (mCurrentWebContents.getNavigationController().canGoBack()) {
@@ -477,7 +477,9 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         // Add "Add Extension" button
         ImageButton addExtensionButton = createRoundButton(context);
         addExtensionButton.setImageResource(R.drawable.ic_add_extensions);
-        addExtensionButton.setOnClickListener(v -> openWebsite("https://devt75.github.io/extensions_test/"));
+        addExtensionButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        addExtensionButton.setImageTintList(AppCompatResources.getColorStateList(context, R.color.extension_icon_color));
+        addExtensionButton.setOnClickListener(v -> openWebsite("https://github.com/wootzapp/ext-store"));
         extensionsContainer.addView(addExtensionButton);
 
         for (int i = 0; i < extensionCount; i++) {
@@ -890,6 +892,12 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                     iconView.setImageDrawable(null);
                 }
             
+                if (title != null) {
+                    title = title.toString()
+                            .substring(0, 1)
+                            .toUpperCase() + title.toString().substring(1);
+                }
+                
                 titleView.setText(title);
             
                 boolean isEnabled = model.get(AppMenuItemProperties.ENABLED);
