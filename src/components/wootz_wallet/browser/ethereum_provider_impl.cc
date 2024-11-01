@@ -43,13 +43,12 @@
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/grit/wootz_components_strings.h"
 #include "content/public/browser/navigation_handle.h"
+#include "content/public/browser/web_contents.h"
 #include "crypto/random.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "url/origin.h"
 
 #include "chrome/browser/extensions/api/wootz/wootz_api.h"
-
-
 namespace {
 
 base::Value::Dict GetJsonRpcRequest(const std::string& method,
@@ -187,7 +186,6 @@ EthereumProviderImpl::EthereumProviderImpl(
 
   // Register as WebContentsObserver
   if (auto* web_contents = delegate_->GetWebContents()) {
-    LOG(ERROR) << "JANGID: Registering WebContentsObserver";
     Observe(web_contents);
   } else {
     LOG(ERROR) << "JANGID: Failed to get WebContents for observer registration";
@@ -1471,7 +1469,6 @@ void EthereumProviderImpl::OnGetAllAccounts(
 
   std::vector<std::string> account_details;
   std::vector<std::string> eth_addresses;
-  std::string selected_account;
 
   LOG(ERROR) << "RequestEthereum: Listing all Ethereum accounts:";
   for (const auto& account : all_accounts_info->accounts) {
@@ -1488,7 +1485,7 @@ void EthereumProviderImpl::OnGetAllAccounts(
 
   LOG(ERROR) << "RequestEthereum: All Ethereum accounts: " << base::JoinString(account_details, " | ");
   
-    const auto allowed_accounts =
+  const auto allowed_accounts =
       delegate_->GetAllowedAccounts(mojom::CoinType::ETH, eth_addresses);
 
   const bool success = allowed_accounts.has_value();
@@ -1501,10 +1498,6 @@ void EthereumProviderImpl::OnGetAllAccounts(
   }
 
   if(success && !allowed_accounts->empty()) {
-    // Use the first Ethereum address
-    // selected_account = eth_addresses[0];
-    LOG(ERROR) << "RequestEthereum: Selected first ETH account: " << selected_account;
-    
     OnRequestEthereumPermissions(std::move(callback), std::move(id), method,
                                  origin, RequestPermissionsError::kNone,
                                  allowed_accounts);
@@ -1648,14 +1641,7 @@ EthereumProviderImpl::GetAllowedAccounts(bool include_accounts_when_locked) {
       delegate_->GetAllowedAccounts(mojom::CoinType::ETH, addresses);
 
   if (!allowed_accounts) {
-    LOG(ERROR) << "JANGID: allowed_accounts is null";
     return std::nullopt;
-  }
-
-  // Log the allowed accounts
-  LOG(ERROR) << "JANGID: Allowed accounts size: " << allowed_accounts->size();
-  for (const auto& account : *allowed_accounts) {
-    LOG(ERROR) << "JANGID: Allowed account: " << account;
   }
 
   std::vector<std::string> filtered_accounts;
@@ -1666,7 +1652,6 @@ EthereumProviderImpl::GetAllowedAccounts(bool include_accounts_when_locked) {
   LOG(ERROR) << "INSIDE filter accounts of BEFORE getallowedaccounts JANGID " 
              << (filtered_accounts.empty() ? "no-accounts" : 
                  base::JoinString(base::make_span(filtered_accounts), ","));
-
 
 
     LOG(ERROR) << "INSIDE filter accounts of INSIDE getallowedaccounts JANGID " 
@@ -1898,12 +1883,8 @@ void EthereumProviderImpl::Unlocked() {
         pending_request_ethereum_permissions_method_,
         pending_request_ethereum_permissions_origin_);
   } else {
-
-  LOG(ERROR) << "JANGID: Clearing permissions on page refresh/navigation";
-  
-  // Clear permissions using both approaches
+ 
   if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
-    LOG(ERROR) << "JANGID: Got profile, resetting permissions";
     permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
   }
 
@@ -2030,39 +2011,46 @@ void EthereumProviderImpl::OnResponse(bool format_json_rpc_response,
 
 void EthereumProviderImpl::DidFinishNavigation(
     content::NavigationHandle* navigation_handle) {
-  LOG(ERROR) << "JANGID: DidFinishNavigation called for URL: " 
-             << navigation_handle->GetURL().spec();
-
   if (!navigation_handle->HasCommitted() || navigation_handle->IsErrorPage()) {
-    LOG(ERROR) << "JANGID: Navigation not committed or is error page, skipping permission reset";
     return;
   }
 
-  LOG(ERROR) << "JANGID: Clearing permissions on page refresh/navigation";
-  
-  // Clear permissions using both approaches
-  if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
-    LOG(ERROR) << "JANGID: Got profile, resetting permissions";
-    permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
-    
-    // Clear known accounts
-    known_allowed_accounts_.clear();
-  } else {
-    LOG(ERROR) << "JANGID: Failed to get profile for permission reset";
+  if (!navigation_handle->IsInMainFrame()) {
+    return;
   }
 
-  // Reset any pending permission requests
-  if (pending_request_ethereum_permissions_callback_) {
-    LOG(ERROR) << "JANGID: Canceling pending permission request";
-    std::move(pending_request_ethereum_permissions_callback_)
-        .Run(std::move(pending_request_ethereum_permissions_id_),
-             GetProviderErrorDictionary(
-                 mojom::ProviderError::kUserRejectedRequest,
-                 "Page navigation cancelled permission request"),
-             true, "", false);
+  GURL current_url = navigation_handle->GetURL();
+  bool should_clear_permissions = false;
+
+  if (navigation_handle->GetPageTransition() & ui::PAGE_TRANSITION_RELOAD) {
+    should_clear_permissions = true;
+  } 
+
+  else if (auto* web_contents = delegate_->GetWebContents()) {
+    GURL previous_url = web_contents->GetLastCommittedURL();
+    if (!previous_url.is_empty() && 
+        previous_url.host() != current_url.host()) {
+      should_clear_permissions = true;
+    }
   }
 
-  UpdateKnownAccounts();
+  if (should_clear_permissions) {
+    if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
+      permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
+      known_allowed_accounts_.clear();
+    }
+
+    if (pending_request_ethereum_permissions_callback_) {
+      std::move(pending_request_ethereum_permissions_callback_)
+          .Run(std::move(pending_request_ethereum_permissions_id_),
+               GetProviderErrorDictionary(
+                   mojom::ProviderError::kUserRejectedRequest,
+                   "Page navigation cancelled permission request"),
+               true, "", false);
+    }
+
+    UpdateKnownAccounts();
+  }
 }
 
 }  // namespace wootz_wallet
