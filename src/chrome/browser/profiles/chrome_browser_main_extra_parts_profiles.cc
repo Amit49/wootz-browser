@@ -567,12 +567,12 @@ void ChromeBrowserMainExtraPartsProfiles::
     // chrome_apps::EnsureBrowserContextKeyedServiceFactoriesBuilt();
     // chrome_apps::api::EnsureBrowserContextKeyedServiceFactoriesBuilt();
     chrome_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
+    extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
   }
 #if BUILDFLAG(IS_CHROMEOS)
   chromeos::EnsureBrowserContextKeyedServiceFactoriesBuilt();
   chromeos_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
 #endif  // BUILDFLAG(IS_CHROMEOS)
-  extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   // ---------------------------------------------------------------------------
@@ -623,12 +623,13 @@ if (full_init)
     ash::language_packs::LanguagePackFontServiceFactory::GetInstance();
   }
 #endif
-  if (full_init)
+  if (full_init){
     AutocompleteClassifierFactory::GetInstance();
   AutocompleteControllerEmitter::EnsureFactoryBuilt();
 #if BUILDFLAG(BUILD_WITH_TFLITE_LIB)
   AutocompleteScoringModelServiceFactory::GetInstance();
 #endif
+  }
   autofill::AutocompleteHistoryManagerFactory::GetInstance();
   autofill::AutofillClientProviderFactory::GetInstance();
   autofill::AutofillImageFetcherFactory::GetInstance();
@@ -703,8 +704,8 @@ if (full_init)
 #if !BUILDFLAG(IS_ANDROID)
   chrome_colors::ChromeColorsFactory::GetInstance();
 #endif
+  ChromeBrowsingDataLifetimeManagerFactory::GetInstance();
   if (full_init)
-    ChromeBrowsingDataLifetimeManagerFactory::GetInstance();
   ChromeBrowsingDataRemoverDelegateFactory::GetInstance();
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(IS_CHROMEOS)
@@ -1079,12 +1080,12 @@ if (full_init)
     predictors::AutocompleteActionPredictorFactory::GetInstance();
     predictors::LoadingPredictorFactory::GetInstance();
     predictors::PredictorDatabaseFactory::GetInstance();
-    PrefMetricsService::Factory::GetInstance();
-    PrefsTabHelper::GetServiceInstance();
     prerender::NoStatePrefetchLinkManagerFactory::GetInstance();
     prerender::NoStatePrefetchManagerFactory::GetInstance();
-    PrimaryAccountPolicyManagerFactory::GetInstance();
   }
+  PrefMetricsService::Factory::GetInstance();
+  PrefsTabHelper::GetServiceInstance();
+  PrimaryAccountPolicyManagerFactory::GetInstance();
   PrefWatcherFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
   PrivateNetworkDevicePermissionContextFactory::GetInstance();
@@ -1228,11 +1229,9 @@ if (full_init)
 #if !BUILDFLAG(IS_ANDROID)
   StorageNotificationServiceFactory::GetInstance();
 #endif
-  // if (full_init) {
-    SubresourceFilterProfileContextFactory::GetInstance();
-    SupervisedUserMetricsServiceFactory::GetInstance();
-    SupervisedUserServiceFactory::GetInstance();
-  // }
+    if (full_init) {
+      SupervisedUserServiceFactory::GetInstance();
+    }
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   sync_file_system::SyncFileSystemServiceFactory::GetInstance();
 #endif
@@ -1253,7 +1252,6 @@ if (full_init)
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   // ToolbarActionsModelFactory::GetInstance();
 #endif
-  // if (full_init)
   TopSitesFactory::GetInstance();
   tpcd::experiment::EligibilityServiceFactory::GetInstance();
   tpcd::trial::TpcdTrialServiceFactory::GetInstance();

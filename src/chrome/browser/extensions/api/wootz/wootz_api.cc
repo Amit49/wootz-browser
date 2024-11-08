@@ -137,6 +137,14 @@ ExtensionFunction::ResponseAction WootzHelloWorldFunction::Run() {
   return RespondNow(WithArguments(json_string));
 }
 
+ExtensionFunction::ResponseAction WootzLogFunction::Run() {
+  if (args().size() < 1) {
+    return RespondNow(NoArguments());
+  }
+  LOG(ERROR) << "CONSOLE.LOG: " << args()[0];
+  return RespondNow(NoArguments());
+}
+
 ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
     JNIEnv* env = base::android::AttachCurrentThread();
     
@@ -147,6 +155,41 @@ ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
 
     Java_WootzBridge_showDialog(env, web_contents->GetJavaWebContents());
     return RespondNow(NoArguments());
+}
+
+ExtensionFunction::ResponseAction WootzSetSelectedChainsFunction::Run() {
+  if (args().empty() || !args()[0].is_list()) {
+    return RespondNow(Error("Invalid arguments"));
+  }
+
+  const base::Value::List& chains_list = args()[0].GetList();
+  std::vector<std::string> selected_chains;
+
+  for (const auto& chain : chains_list) {
+    if (!chain.is_string()) {
+      continue;
+    }
+    const std::string& chain_str = chain.GetString();
+    if (chain_str == "ethereum" || chain_str == "solana") {
+      selected_chains.push_back(chain_str);
+    }
+  }
+
+  // Ensure at least one chain is selected
+  if (selected_chains.empty()) {
+    return RespondNow(Error("At least one chain must be selected"));
+  }
+
+  auto* keyring_service = GetKeyringService(browser_context());
+  if (!keyring_service) {
+    return RespondNow(Error("KeyringService not available"));
+  }
+
+  keyring_service->SetSelectedChains(selected_chains);
+
+  base::Value::Dict result;
+  result.Set("success", true);
+  return RespondNow(WithArguments(std::move(result)));
 }
 
 ExtensionFunction::ResponseAction WootzCreateWalletFunction::Run() {

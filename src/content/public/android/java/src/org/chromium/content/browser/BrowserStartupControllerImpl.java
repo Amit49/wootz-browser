@@ -320,7 +320,6 @@ public class BrowserStartupControllerImpl implements BrowserStartupController {
     /** Wrap ContentMain.start() for testing. */
     @VisibleForTesting
     int contentMainStart(boolean startMinimalBrowser) {
-        // Log.d("lalala", "content main start");
         return ContentMain.start(startMinimalBrowser);
     }
 

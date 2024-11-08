@@ -16,6 +16,7 @@
 #include "components/permissions/request_type.h"
 #include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/web_contents.h"
+#include "base/logging.h"
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/wootz_wallet/wallet_bubble_manager_delegate.h"
@@ -37,12 +38,20 @@ WootzWalletTabHelper::~WootzWalletTabHelper() {
 void WootzWalletTabHelper::AddSolanaConnectedAccount(
     const content::GlobalRenderFrameHostId& id,
     const std::string& account) {
+  LOG(ERROR) << __func__ << ": Adding Solana account " << account 
+          << " for frame " << id;
+  
   base::flat_set<std::string> connection_set;
   if (solana_connected_accounts_.contains(id)) {
     connection_set = solana_connected_accounts_.at(id);
+    LOG(ERROR) << "Existing connection set size: " << connection_set.size();
   }
+  
   connection_set.insert(account);
   solana_connected_accounts_[id] = std::move(connection_set);
+  
+  LOG(ERROR) << "Successfully added Solana account. New connection set size: "
+          << solana_connected_accounts_[id].size();
 }
 
 void WootzWalletTabHelper::RemoveSolanaConnectedAccount(

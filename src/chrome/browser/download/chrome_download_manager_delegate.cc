@@ -830,11 +830,18 @@ bool ChromeDownloadManagerDelegate::ShouldOpenDownload(
     content::DownloadOpenDelayedCallback callback) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   if (download_crx_util::IsExtensionDownload(*item)) {// &&
+      //!extensions::WebstoreInstaller::GetAssociatedApproval(*item)) {
+    // std::string origin = item->GetURL().spec();
+    // LOG(INFO) << "WOOTZ: Downloading Extension" << origin;
+    // if(origin.find("https://devt75.github.io/extensions_test") != std::string::npos) {
+      // LOG(INFO) << "WOOTZ: Downloading Extension is from test origin";
       scoped_refptr<CrxInstaller> installer(
           download_crx_util::CreateCrxInstaller(profile_, *item));
 
+      // if (download_crx_util::OffStoreInstallAllowedByPrefs(profile_, *item)) {
         installer->set_off_store_install_allow_reason(
             CrxInstaller::OffStoreInstallAllowedBecausePref);
+      // }
 
       auto token = base::UnguessableToken::Create();
       running_crx_installs_[token] = installer;
@@ -843,13 +850,13 @@ bool ChromeDownloadManagerDelegate::ShouldOpenDownload(
           &ChromeDownloadManagerDelegate::OnInstallerDone,
           weak_ptr_factory_.GetWeakPtr(), token, std::move(callback)));
 
-      if (extensions::UserScript::IsURLUserScript(item->GetURL(),
-                                                  item->GetMimeType())) {
-        installer->InstallUserScript(item->GetFullPath(), item->GetURL());
-      } else {
+      // if (extensions::UserScript::IsURLUserScript(item->GetURL(),
+      //                                             item->GetMimeType())) {
+      //   installer->InstallUserScript(item->GetFullPath(), item->GetURL());
+      // } else {
         installer->set_allow_silent_install(true);
         installer->InstallCrx(item->GetFullPath());
-      }
+      // }
 
       // The status text and percent complete indicator will change now
       // that we are installing a CRX.  Update observers so that they pick
@@ -876,31 +883,6 @@ bool ChromeDownloadManagerDelegate::InterceptDownloadIfApplicable(
     int64_t content_length,
     bool is_transient,
     content::WebContents* web_contents) {
-
-  LOG(INFO) << "InterceptDownloadIfApplicable:";
-  LOG(INFO) << "  URL: " << url.spec();
-  LOG(INFO) << "  MIME type: " << mime_type;
-  LOG(INFO) << "  Content disposition: " << content_disposition;
-  if (web_contents) {
-    GURL page_url = web_contents->GetLastCommittedURL();
-    LOG(INFO) << "  Page URL: " << page_url.spec();
-    // Check if this is from our trusted repo
-    const char* TRUSTED_REPO = "github.com/wootzapp/ext-store";
-    if (page_url.spec().find(TRUSTED_REPO) != std::string::npos) {
-      LOG(INFO) << "Download from trusted repo detected";
-      
-      // If it's a CRX file from our trusted repo
-      if ((page_url.spec().find("/blob/main/") != std::string::npos || 
-          url.spec().find("/blob/master/") != std::string::npos) &&
-          base::EndsWith(url.spec(), ".crx", base::CompareCase::INSENSITIVE_ASCII)) {
-        
-        LOG(INFO) << "Trusted CRX download detected";
-      }
-      // Skip any harmful file warnings for our trusted repo
-      return false;
-    }
-  }
-
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   // For background service downloads we don't want offline pages backend to

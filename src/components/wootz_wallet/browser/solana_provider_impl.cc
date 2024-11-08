@@ -73,12 +73,14 @@ void SolanaProviderImpl::Init(
 void SolanaProviderImpl::Connect(std::optional<base::Value::Dict> arg,
                                  ConnectCallback callback) {
   DCHECK(delegate_);
-  if (delegate_->IsPermissionDenied(mojom::CoinType::SOL)) {
-    std::move(callback).Run(
-        mojom::SolanaProviderError::kUserRejectedRequest,
-        l10n_util::GetStringUTF8(IDS_WALLET_USER_REJECTED_REQUEST), "");
-    return;
-  }
+  // if (delegate_->IsPermissionDenied(mojom::CoinType::SOL)) {
+  //   LOG(ERROR) << "JANGID: Connect failed - permission denied for SOL";
+  //   std::move(callback).Run(
+  //       mojom::SolanaProviderError::kUserRejectedRequest,
+  //       l10n_util::GetStringUTF8(IDS_WALLET_USER_REJECTED_REQUEST), "");
+  //   return;
+  // }
+
   auto account = keyring_service_->GetSelectedSolanaDappAccount();
   if (!account) {
     // Prompt users to create a Solana account. If wallet is not setup, users

@@ -54,6 +54,7 @@ class KeyringService : public mojom::KeyringService {
 
  private:
   std::string password_;
+  std::vector<std::string> selected_chains_{"ethereum", "solana"};
   
  public:
   KeyringService(JsonRpcService* json_rpc_service,
@@ -112,6 +113,11 @@ class KeyringService : public mojom::KeyringService {
                             const std::string& payload,
                             const std::string& network,
                             ImportBitcoinAccountCallback callback) override;
+
+  void SetSelectedChains(const std::vector<std::string>& chains);
+  const std::vector<std::string>& GetSelectedChains() const { return selected_chains_; }
+  bool IsChainSelected(const std::string& chain) const;
+  
   mojom::AccountInfoPtr ImportBitcoinAccountSync(
       const std::string& account_name,
       const std::string& payload,

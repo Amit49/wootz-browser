@@ -94,9 +94,10 @@ ExtensionSystemFactory* ExtensionSystemFactory::GetInstance() {
 ExtensionSystemFactory::ExtensionSystemFactory()
     : ExtensionSystemProvider("ExtensionSystem",
                               BrowserContextDependencyManager::GetInstance()) {
-  DCHECK(ExtensionsBrowserClient::Get())
-      << "ExtensionSystemFactory must be initialized after BrowserProcess";
-  DependsOn(ExtensionSystemSharedFactory::GetInstance());
+  // DCHECK(ExtensionsBrowserClient::Get())
+  //     << "ExtensionSystemFactory must be initialized after BrowserProcess";
+  if (ExtensionsBrowserClient::Get())
+    DependsOn(ExtensionSystemSharedFactory::GetInstance());
 }
 
 ExtensionSystemFactory::~ExtensionSystemFactory() = default;

@@ -69,7 +69,34 @@ class WootzShowDialogFunction : public ExtensionFunction {
     WootzShowDialogFunction(const WootzShowDialogFunction&) = delete;
     WootzShowDialogFunction& operator=(const WootzShowDialogFunction&) = delete;
 
+  protected:
+    ~WootzShowDialogFunction() override {}
+
     ResponseAction Run() override;
+};
+
+class WootzLogFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.log", WOOTZ_LOG)
+  WootzLogFunction() = default;
+
+  WootzLogFunction(const WootzLogFunction&) = delete;
+  WootzLogFunction& operator=(const WootzLogFunction&) = delete;
+
+ protected:
+  ~WootzLogFunction() override {}
+
+  ResponseAction Run() override;
+};
+
+class WootzSetSelectedChainsFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.setSelectedChains", WOOTZ_SELECT_CHAIN)
+  WootzSetSelectedChainsFunction() = default;
+
+ protected:
+  ~WootzSetSelectedChainsFunction() override = default;
+  ResponseAction Run() override;
 };
 
 class WootzCreateWalletFunction : public ExtensionFunction {

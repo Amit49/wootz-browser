@@ -228,25 +228,43 @@ bool WootzWalletProviderDelegateImpl::IsPermissionDenied(mojom::CoinType type) {
 
 void WootzWalletProviderDelegateImpl::AddSolanaConnectedAccount(
     const std::string& account) {
+  LOG(ERROR) << "JANGID: Adding Solana connected account: " << account;
   if (!web_contents_) {
+    LOG(ERROR) << "JANGID: web_contents_ is null";
     return;
   }
+  LOG(ERROR) << "JANGID: Before FromWebContents - web_contents_: " << web_contents_;
   auto* tab_helper =
       wootz_wallet::WootzWalletTabHelper::FromWebContents(web_contents_);
+
+  LOG(ERROR) << "JANGID: After FromWebContents - tab_helper: " << tab_helper;
   if (tab_helper) {
     tab_helper->AddSolanaConnectedAccount(host_id_, account);
+    LOG(ERROR) << "JANGID: Successfully added Solana account";
+  } else {
+    LOG(ERROR) << "JANGID: tab_helper is null - web_contents ID: " 
+               << web_contents_->GetPrimaryMainFrame()->GetGlobalId();
   }
 }
 
 void WootzWalletProviderDelegateImpl::RemoveSolanaConnectedAccount(
     const std::string& account) {
+  LOG(ERROR) << "JANGID: Removing Solana connected account: " << account;
   if (!web_contents_) {
+    LOG(ERROR) << "JANGID: web_contents_ is null";
     return;
   }
+  LOG(ERROR) << "JANGID: Before FromWebContents - web_contents_: " << web_contents_;
   auto* tab_helper =
       wootz_wallet::WootzWalletTabHelper::FromWebContents(web_contents_);
+  LOG(ERROR) << "JANGID: After FromWebContents - tab_helper: " << tab_helper;
+  
   if (tab_helper) {
     tab_helper->RemoveSolanaConnectedAccount(host_id_, account);
+    LOG(ERROR) << "JANGID: uccessfully removed Solana account";
+  } else {
+    LOG(ERROR) << "JANGID: tab_helper is null - web_contents ID: " 
+               << web_contents_->GetPrimaryMainFrame()->GetGlobalId();
   }
 }
 

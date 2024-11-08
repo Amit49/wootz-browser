@@ -680,23 +680,33 @@ void KeyringService::CreateKeyrings(const KeyringSeed& keyring_seed) {
 #endif
 }
 
+void KeyringService::SetSelectedChains(const std::vector<std::string>& chains) {
+  selected_chains_ = chains;
+}
+
+bool KeyringService::IsChainSelected(const std::string& chain) const {
+  return base::Contains(selected_chains_, chain);
+}
+
 void KeyringService::CreateDefaultAccounts() {
-  if (auto account =
-          AddHDAccountForKeyring(mojom::kDefaultKeyringId, "WootzApp Ethereum " + GetAccountName(1))) {
-
-    LOG(ERROR)<<"JANGID accountCreate"<<mojom::kDefaultKeyringId<<" "<<account->address;
-
-    SetSelectedAccountInternal(*account);
-    NotifyAccountsAdded(*account);
+  if (IsChainSelected("ethereum")) {
+    if (auto account = AddHDAccountForKeyring(mojom::kDefaultKeyringId, 
+                                            "Wootzapp Ethereum " + GetAccountName(1))) {
+      LOG(ERROR) << "JANGID accountCreate " << mojom::kDefaultKeyringId << " " << account->address;
+      SetSelectedAccountInternal(*account);
+      NotifyAccountsAdded(*account);
+    }
   }
-  if (auto account = AddHDAccountForKeyring(mojom::kSolanaKeyringId,
-                                            "WootzApp Solana " + GetAccountName(1))) {
 
-    LOG(ERROR)<<"JANGID accountCreate"<<mojom::kSolanaKeyringId<<" "<<account->address;
-
-    SetSelectedAccountInternal(*account);
-    NotifyAccountsAdded(*account);
+  if (IsChainSelected("solana")) {
+    if (auto account = AddHDAccountForKeyring(mojom::kSolanaKeyringId,
+                                            "Wootzapp Solana " + GetAccountName(1))) {
+      LOG(ERROR) << "JANGID accountCreate " << mojom::kSolanaKeyringId << " " << account->address;
+      SetSelectedAccountInternal(*account);
+      NotifyAccountsAdded(*account);
+    }
   }
+  
   ResetAllAccountInfosCache();
 }
 
