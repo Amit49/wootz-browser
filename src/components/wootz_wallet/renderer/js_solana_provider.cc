@@ -62,67 +62,28 @@ constexpr char kSignature[] = "signature";
 constexpr char kSignatures[] = "signatures";
 constexpr char kToString[] = "toString";
 constexpr char kWalletStandardOnDemandScript[] = R"((function () {
-  try {
-    window.addEventListener('wallet-standard:app-ready', (e) => {
-      try {
-        console.log('JANGID: Wallet standard initialization triggered');
-        if (window.wootzSolana && typeof window.wootzSolana.walletStandardInit === 'function') {
-          window.wootzSolana.walletStandardInit();
-        } else {
-          console.error('JANGID: wootzSolana or walletStandardInit not available');
-        }
-      } catch (error) {
-        console.error('JANGID: Error in wallet-standard init:', error);
-      }
-    });
-  } catch (error) {
-    console.error('JANGID: Error setting up wallet-standard listener:', error);
-  }
+  window.addEventListener('wallet-standard:app-ready', (e) => {
+    window.wootzSolana.walletStandardInit()
+  })
 })())";
 constexpr char kSolanaProxyHandlerScript[] = R"((function() {
   const handler = {
     get: (target, property, receiver) => {
-      try {
-        console.log('JANGID: Accessing property:', property);
-        const value = target[property];
-        
-        // Handle function properties
-        if (typeof value === 'function' &&
-            (property === 'connect' || property === 'disconnect' ||
-             property === 'signAndSendTransaction' ||
-             property === 'signMessage' || property === 'request' ||
-             property === 'signTransaction' ||
-             property === 'signAllTransactions' ||
-             property === 'walletStandardInit')) {
-          
-          console.log('JANGID: Creating proxy for method:', property);
-          
-          return new Proxy(value, {
-            apply: async (targetFunc, thisArg, args) => {
-              console.log('JANGID: Calling method:', property, 'with args:', args);
-              
-              try {
-                const result = await targetFunc.call(target, ...args);
-                console.log('JANGID: Method succeeded:', property, 'result:', result);
-                return result;
-              } catch (error) {
-                console.error('JANGID: Method failed:', property, 'error:', error);
-                console.error('JANGID: Error stack:', error.stack);
-                return Promise.reject(error);
-              }
-            }
-          });
-        }
-
-        // Handle non-function properties
-        console.log('JANGID: Returning property value:', property, value);
-        return value;
-        
-      } catch (error) {
-        console.error('JANGID: Error in proxy handler get:', error);
-        console.error('JANGID: Error stack:', error.stack);
-        return undefined;
+      const value = target[property];
+      if (typeof value === 'function' &&
+          (property === 'connect' || property === 'disconnect' ||
+           property === 'signAndSendTransaction' ||
+           property === 'signMessage' || property === 'request' ||
+           property === 'signTransaction' ||
+           property === 'signAllTransactions' ||
+           property === 'walletStandardInit')) {
+        return new Proxy(value, {
+          apply: (targetFunc, thisArg, args) => {
+            return targetFunc.call(target, ...args);
+          }
+        });
       }
+      return value;
     }
   };
   return handler;
@@ -170,134 +131,82 @@ bool JSSolanaProvider::V8ConverterStrategy::FromV8ArrayBuffer(
 
 // static
 void JSSolanaProvider::Install(bool allow_overwrite_window_solana,
-                              content::RenderFrame* render_frame) {
-  LOG(ERROR) << "JANGID Starting Solana Installation with allow_overwrite: " 
-             << allow_overwrite_window_solana;
-
+                               content::RenderFrame* render_frame) {
   CHECK(render_frame);
   v8::Isolate* isolate =
       render_frame->GetWebFrame()->GetAgentGroupScheduler()->Isolate();
-  LOG(ERROR) << "JANGID Got isolate: " << isolate;
-
   v8::HandleScope handle_scope(isolate);
   v8::Local<v8::Context> context =
       render_frame->GetWebFrame()->MainWorldScriptContext();
   if (context.IsEmpty()) {
-    LOG(ERROR) << "JANGID Context is empty, aborting";
     return;
   }
-  
-  blink::WebLocalFrame* web_frame = render_frame->GetWebFrame();
-
-  // Add console log to check in browser
-  ExecuteScript(web_frame, "console.log('JANGID: Starting Solana provider installation');");
-
   v8::MicrotasksScope microtasks(isolate, context->GetMicrotaskQueue(),
-                                v8::MicrotasksScope::kDoNotRunMicrotasks);
+                                 v8::MicrotasksScope::kDoNotRunMicrotasks);
   v8::Context::Scope context_scope(context);
 
   // check window.wootzSolana existence
-  LOG(ERROR) << "JANGID Checking for existing window.wootzSolana";
   v8::Local<v8::Object> global = context->Global();
   v8::Local<v8::Value> wootz_solana_value =
       global->Get(context, gin::StringToV8(isolate, kWootzSolana))
           .ToLocalChecked();
   if (!wootz_solana_value->IsUndefined()) {
-    LOG(ERROR) << "JANGID window.wootzSolana already exists, skipping";
     return;
   }
 
-  LOG(ERROR) << "JANGID Creating provider";
+  // v8 will manage the lifetime of JSSolanaProvider
   gin::Handle<JSSolanaProvider> provider =
       gin::CreateHandle(isolate, new JSSolanaProvider(render_frame));
   if (provider.IsEmpty()) {
-    LOG(ERROR) << "JANGID Failed to create provider";
     return;
   }
-
   v8::Local<v8::Value> provider_value = provider.ToV8();
   v8::Local<v8::Object> provider_object =
       provider_value->ToObject(context).ToLocalChecked();
 
-  LOG(ERROR) << "JANGID Creating proxy handler";
+  // Create a proxy to the actual JSSolanaProvider object which will be
+  // exposed via window.wootzSolana and window.solana.
+  blink::WebLocalFrame* web_frame = render_frame->GetWebFrame();
   v8::Local<v8::Proxy> solana_proxy;
-  
-  // Log proxy handler script execution
-  ExecuteScript(web_frame, "console.log('JANGID: Executing proxy handler script');");
   auto solana_proxy_handler_val =
       ExecuteScript(web_frame, kSolanaProxyHandlerScript);
-  LOG(ERROR) << "JANGID Proxy handler created";
-
   v8::Local<v8::Object> solana_proxy_handler_obj =
       solana_proxy_handler_val.ToLocalChecked()
           ->ToObject(context)
           .ToLocalChecked();
   if (!v8::Proxy::New(context, provider_object, solana_proxy_handler_obj)
            .ToLocal(&solana_proxy)) {
-    LOG(ERROR) << "JANGID Failed to create solana proxy";
     return;
   }
 
-  LOG(ERROR) << "JANGID Setting window.wootzSolana";
   SetProviderNonWritable(context, global, solana_proxy,
-                        gin::StringToV8(isolate, kWootzSolana), true);
+                         gin::StringToV8(isolate, kWootzSolana), true);
 
-  // Check window.wootzSolana installation
-  ExecuteScript(web_frame, 
-      "console.log('JANGID: window.wootzSolana installed:', window.wootzSolana);");
-
-  LOG(ERROR) << "JANGID Setting window.solana";
+  // window.solana will be removed in the future, we use window.wootzSolana
+  // mainly from now on and keep window.solana for compatibility
   if (!allow_overwrite_window_solana) {
     SetProviderNonWritable(context, global, solana_proxy,
-                          gin::StringToV8(isolate, kSolana), true);
-    LOG(ERROR) << "JANGID Set window.solana as non-writable";
+                           gin::StringToV8(isolate, kSolana), true);
   } else {
     global->Set(context, gin::StringToSymbol(isolate, kSolana), solana_proxy)
         .Check();
-    LOG(ERROR) << "JANGID Set window.solana as writable";
   }
 
-  // Check window.solana installation
-  ExecuteScript(web_frame, 
-      "console.log('JANGID: window.solana installed:', window.solana);");
-
-  LOG(ERROR) << "JANGID Setting method properties";
+  // Non-function properties are readonly guaranteed by gin::Wrappable
   for (const std::string& method :
        {"connect", "disconnect", "signAndSendTransaction", "signMessage",
         "request", "signTransaction", "signAllTransactions",
         "walletStandardInit"}) {
-    LOG(ERROR) << "JANGID Setting " << method << " to non-writable";
     SetOwnPropertyWritable(context,
-                          provider_value->ToObject(context).ToLocalChecked(),
-                          gin::StringToV8(isolate, method), false);
+                           provider_value->ToObject(context).ToLocalChecked(),
+                           gin::StringToV8(isolate, method), false);
   }
 
-  LOG(ERROR) << "JANGID Executing provider script bundle";
-  ExecuteScript(web_frame, "console.log('JANGID: Before provider script bundle');");
   ExecuteScript(web_frame,
                 LoadDataResource(
                     IDR_WOOTZ_WALLET_SCRIPT_SOLANA_PROVIDER_SCRIPT_BUNDLE_JS));
-  ExecuteScript(web_frame, "console.log('JANGID: After provider script bundle');");
 
-  LOG(ERROR) << "JANGID Executing wallet standard script";
-  ExecuteScript(web_frame, "console.log('JANGID: Before wallet standard script');");
   ExecuteScript(web_frame, kWalletStandardOnDemandScript);
-  ExecuteScript(web_frame, "console.log('JANGID: After wallet standard script');");
-
-  // Final check of provider state
-  ExecuteScript(web_frame, R"(
-    console.log('JANGID: Final provider state:', {
-      wootzSolana: window.wootzSolana,
-      solana: window.solana,
-      methods: {
-        connect: window.wootzSolana?.connect,
-        disconnect: window.wootzSolana?.disconnect,
-        request: window.wootzSolana?.request
-      }
-    });
-  )");
-
-  LOG(ERROR) << "JANGID Solana Installation Complete";
 }
 
 gin::ObjectTemplateBuilder JSSolanaProvider::GetObjectTemplateBuilder(
@@ -712,98 +621,29 @@ v8::Local<v8::Promise> JSSolanaProvider::SignAllTransactions(
   return resolver.ToLocalChecked()->GetPromise();
 }
 
-// void JSSolanaProvider::WalletStandardInit(gin::Arguments* arguments) {
-//   if (wallet_standard_loaded_) {
-//     render_frame()->GetWebFrame()->AddMessageToConsole(
-//         blink::WebConsoleMessage(blink::mojom::ConsoleMessageLevel::kWarning,
-//                                  "Wallet Standard has already been loaded."));
-//     return;
-//   }
-//   blink::WebLocalFrame* web_frame = render_frame()->GetWebFrame();
-//   std::string wallet_standard_module_str = base::StrCat(
-//       {"(function() {", LoadDataResource(IDR_WOOTZ_WALLET_STANDARD_JS),
-//        "return walletStandardWootz; })()"});
-
-//   v8::Local<v8::Value> wallet_standard =
-//       ExecuteScript(web_frame, wallet_standard_module_str).ToLocalChecked();
-//   v8::Local<v8::Value> object;
-//   v8::Isolate* isolate = arguments->isolate();
-//   v8::Local<v8::Context> context = isolate->GetCurrentContext();
-//   if (!GetProperty(context, context->Global(), kWootzSolana).ToLocal(&object)) {
-//     return;
-//   }
-//   CallMethodOfObject(web_frame, wallet_standard, "initialize",
-//                      std::vector<v8::Local<v8::Value>>({object}));
-//   wallet_standard_loaded_ = true;
-// }
 void JSSolanaProvider::WalletStandardInit(gin::Arguments* arguments) {
-  ExecuteScript(render_frame()->GetWebFrame(), 
-      "console.log('WalletStandardInit: Starting initialization')");
-
-  if (!render_frame()) {
-    ExecuteScript(render_frame()->GetWebFrame(),
-        "console.log('WalletStandardInit: No render frame available')");
-    return;
-  }
-
   if (wallet_standard_loaded_) {
-    ExecuteScript(render_frame()->GetWebFrame(),
-        "console.log('WalletStandardInit: Already loaded, skipping')");
     render_frame()->GetWebFrame()->AddMessageToConsole(
         blink::WebConsoleMessage(blink::mojom::ConsoleMessageLevel::kWarning,
-                                "Wallet Standard has already been loaded."));
+                                 "Wallet Standard has already been loaded."));
     return;
   }
-
   blink::WebLocalFrame* web_frame = render_frame()->GetWebFrame();
-  ExecuteScript(web_frame, "console.log('WalletStandardInit: Got web frame')");
+  std::string wallet_standard_module_str = base::StrCat(
+      {"(function() {", LoadDataResource(IDR_WOOTZ_WALLET_STANDARD_JS),
+       "return walletStandardWootzapp; })()"});
 
-std::string resource_data = LoadDataResource(IDR_WOOTZ_WALLET_STANDARD_JS);
-if (resource_data.empty()) {
-  ExecuteScript(web_frame, "console.log('WalletStandardInit: Failed to load wallet standard JS resource')");
-  return;
-}
-ExecuteScript(web_frame, "console.log('WalletStandardInit: Successfully loaded resource')");
-
-std::string wallet_standard_module_str = base::StrCat(
-    {"(function() {", resource_data, "return walletStandardWootzapp; })()"});
-
-  ExecuteScript(web_frame, "console.log('WalletStandardInit: Executing wallet standard script')");
-  auto maybe_wallet_standard = ExecuteScript(web_frame, wallet_standard_module_str);
-  if (maybe_wallet_standard.IsEmpty()) {
-    ExecuteScript(web_frame, "console.log('WalletStandardInit: Script execution failed')");
-    return;
-  }
-  v8::Local<v8::Value> wallet_standard = maybe_wallet_standard.ToLocalChecked();
-
+  v8::Local<v8::Value> wallet_standard =
+      ExecuteScript(web_frame, wallet_standard_module_str).ToLocalChecked();
+  v8::Local<v8::Value> object;
   v8::Isolate* isolate = arguments->isolate();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
-
-  ExecuteScript(web_frame, "console.log('WalletStandardInit: Getting wootzSolana object')");
-  v8::Local<v8::Value> object;
   if (!GetProperty(context, context->Global(), kWootzSolana).ToLocal(&object)) {
-    ExecuteScript(web_frame, 
-        "console.log('WalletStandardInit: Failed to get wootzSolana object')");
     return;
   }
-
-  if (object->IsNullOrUndefined()) {
-    ExecuteScript(web_frame,
-        "console.log('WalletStandardInit: wootzSolana object is null or undefined')");
-    return;
-  }
-
-  ExecuteScript(web_frame, "console.log('WalletStandardInit: Calling initialize method')");
-  auto init_result = CallMethodOfObject(web_frame, wallet_standard, "initialize",
-                                      std::vector<v8::Local<v8::Value>>({object}));
-  if (init_result.IsEmpty()) {
-    ExecuteScript(web_frame,
-        "console.log('WalletStandardInit: Initialize method call failed')");
-    return;
-  }
-
+  CallMethodOfObject(web_frame, wallet_standard, "initialize",
+                     std::vector<v8::Local<v8::Value>>({object}));
   wallet_standard_loaded_ = true;
-  ExecuteScript(web_frame, "console.log('WalletStandardInit: Initialization complete')");
 }
 
 void JSSolanaProvider::FireEvent(

@@ -332,8 +332,3 @@ node_modules
 .gcs_entries
 .cipd/
 node_modules
-
-
-/bundletool.jar
-/delete.txt
-/delete_files.py
