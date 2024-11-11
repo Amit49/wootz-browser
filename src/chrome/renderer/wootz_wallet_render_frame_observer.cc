@@ -41,12 +41,17 @@ bool WootzWalletRenderFrameObserver::IsPageValid() {
     url_ = url::Origin(render_frame()->GetWebFrame()->GetSecurityOrigin())
                .GetURL();
   }
-  return url_.SchemeIsHTTPOrHTTPS();
+    return url_.SchemeIsHTTPOrHTTPS() || url_.SchemeIs("chrome-extension");
 }
 
 bool WootzWalletRenderFrameObserver::CanCreateProvider() {
   if (!IsPageValid()) {
     return false;
+  }
+
+  // Allow provider creation for extension pages without secure context check
+  if (url_.SchemeIs("chrome-extension")) {
+    return true;
   }
 
   // Wallet provider objects should only be created in secure contexts
