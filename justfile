@@ -41,7 +41,7 @@ build_shell arch="x64" rebuild="yes": (configure arch rebuild)
 
 run arch="x64":
     # ANDROID_SERIAL=172.17.0.2:5555 src/out/Debug_{{arch}}/bin/chrome_public_apk run -vvv
-    ANDROID_SERIAL=$DEVICE src/out/Debug_{{arch}}/bin/chrome_public_apk run --args="--enable-logging=stderr --v=3"
+    ANDROID_SERIAL=$DEVICE src/out/Debug_{{arch}}/bin/chrome_public_apk run # --args="--enable-logging=stderr --v=3"
 
 install arch="x64":
     ADB_TRACE="all adb" ANDROID_SERIAL=172.17.0.2:5555 adb install -r -t src/out/Debug_{{arch}}/apks/WootzApp.apk
