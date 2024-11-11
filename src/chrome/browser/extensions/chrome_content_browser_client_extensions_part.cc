@@ -796,10 +796,10 @@ void ChromeContentBrowserClientExtensionsPart::OverrideWebkitPrefs(
 
 void ChromeContentBrowserClientExtensionsPart::BrowserURLHandlerCreated(
     BrowserURLHandler* handler) {
-  handler->AddHandlerPair(&ExtensionWebUI::HandleChromeURLOverride,
-                          BrowserURLHandler::null_handler());
-  handler->AddHandlerPair(BrowserURLHandler::null_handler(),
-                          &ExtensionWebUI::HandleChromeURLOverrideReverse);
+  // handler->AddHandlerPair(&ExtensionWebUI::HandleChromeURLOverride,
+  //                         BrowserURLHandler::null_handler());
+  // handler->AddHandlerPair(BrowserURLHandler::null_handler(),
+  //                         &ExtensionWebUI::HandleChromeURLOverrideReverse);
 }
 
 void ChromeContentBrowserClientExtensionsPart::

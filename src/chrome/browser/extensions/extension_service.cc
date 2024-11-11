@@ -570,7 +570,7 @@ void ExtensionService::Init() {
   }
   EnabledReloadableExtensions();
   MaybeFinishShutdownDelayed();
-  // SetReadyAndNotifyListeners(); // wootz
+  SetReadyAndNotifyListeners();
 
   UninstallMigratedExtensions();
 
