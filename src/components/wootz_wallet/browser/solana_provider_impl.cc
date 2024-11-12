@@ -12,6 +12,8 @@
 #include "base/ranges/algorithm.h"
 #include "base/strings/strcat.h"
 #include "base/values.h"
+#include "chrome/browser/extensions/api/wootz/wootz_api.h"
+#include "chrome/browser/profiles/profile_manager.h"
 #include "components/wootz_wallet/browser/wootz_wallet_provider_delegate.h"
 #include "components/wootz_wallet/browser/wootz_wallet_service.h"
 #include "components/wootz_wallet/browser/wootz_wallet_utils.h"
@@ -44,8 +46,10 @@ constexpr char kOptions[] = "options";
 SolanaProviderImpl::SolanaProviderImpl(
     HostContentSettingsMap& host_content_settings_map,
     WootzWalletService* wootz_wallet_service,
-    std::unique_ptr<WootzWalletProviderDelegate> delegate)
+    std::unique_ptr<WootzWalletProviderDelegate> delegate,
+    Profile* profile)
     : host_content_settings_map_(host_content_settings_map),
+      profile_(profile),
       wootz_wallet_service_(wootz_wallet_service),
       keyring_service_(wootz_wallet_service->keyring_service()),
       tx_service_(wootz_wallet_service->tx_service()),
@@ -646,7 +650,7 @@ void SolanaProviderImpl::SignMessage(
       base::BindOnce(&SolanaProviderImpl::OnSignMessageRequestProcessed,
                      weak_factory_.GetWeakPtr(), blob_msg, std::move(account),
                      std::move(callback)));
-  delegate_->ShowPanel();
+  extensions::WootzSignMessageFunction::NotifyExtensionOfPendingRequest(profile_);
 }
 
 void SolanaProviderImpl::Request(base::Value::Dict arg,

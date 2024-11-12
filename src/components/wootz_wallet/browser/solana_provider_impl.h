@@ -16,6 +16,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
+#include "chrome/browser/profiles/profile.h"
 #include "components/wootz_wallet/browser/keyring_service_observer_base.h"
 #include "components/wootz_wallet/common/wootz_wallet.mojom.h"
 #include "components/content_settings/core/browser/content_settings_observer.h"
@@ -43,7 +44,8 @@ class SolanaProviderImpl final : public mojom::SolanaProvider,
 
   SolanaProviderImpl(HostContentSettingsMap& host_content_settings_map,
                      WootzWalletService* wootz_wallet_service,
-                     std::unique_ptr<WootzWalletProviderDelegate> delegate);
+                     std::unique_ptr<WootzWalletProviderDelegate> delegate,
+                     Profile* profile);
   ~SolanaProviderImpl() override;
   SolanaProviderImpl(const SolanaProviderImpl&) = delete;
   SolanaProviderImpl& operator=(const SolanaProviderImpl&) = delete;
@@ -166,6 +168,7 @@ class SolanaProviderImpl final : public mojom::SolanaProvider,
 
   const raw_ref<HostContentSettingsMap> host_content_settings_map_;
   bool account_creation_shown_ = false;
+  raw_ptr<Profile> profile_;
   mojo::Remote<mojom::SolanaEventsListener> events_listener_;
   raw_ptr<WootzWalletService> wootz_wallet_service_ = nullptr;
   raw_ptr<KeyringService> keyring_service_ = nullptr;

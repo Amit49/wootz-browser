@@ -995,7 +995,8 @@ void MaybeBindSolanaProvider(
       std::make_unique<wootz_wallet::SolanaProviderImpl>(
           *host_content_settings_map, wootz_wallet_service,
           std::make_unique<wootz_wallet::WootzWalletProviderDelegateImpl>(
-              web_contents, frame_host)),
+              web_contents, frame_host),
+              Profile::FromBrowserContext(web_contents->GetBrowserContext())),
       std::move(receiver));
 }
 
