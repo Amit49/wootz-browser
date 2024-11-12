@@ -45,19 +45,18 @@ bool WootzWalletRenderFrameObserver::IsPageValid() {
 }
 
 bool WootzWalletRenderFrameObserver::CanCreateProvider() {
-  if (!IsPageValid()) {
-    return false;
-  }
+  // if (!IsPageValid()) {
+  //   return false;
+  // }
 
-  // Allow provider creation for extension pages without secure context check
-  if (url_.SchemeIs("chrome-extension")) {
-    return true;
-  }
+  // if (url_.SchemeIs("chrome-extension")) {
+  //   return true;
+  // }
 
-  // Wallet provider objects should only be created in secure contexts
-  if (!render_frame()->GetWebFrame()->GetDocument().IsSecureContext()) {
-    return false;
-  }
+  // // Wallet provider objects should only be created in secure contexts
+  // if (!render_frame()->GetWebFrame()->GetDocument().IsSecureContext()) {
+  //   return false;
+  // }
 
   return true;
 }
