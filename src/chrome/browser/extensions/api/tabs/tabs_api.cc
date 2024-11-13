@@ -1185,10 +1185,6 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
 
   std::string title = params->query_info.title.value_or(std::string());
 
-  int window_id = extension_misc::kUnknownWindowId;
-  if (params->query_info.window_id)
-    window_id = *params->query_info.window_id;
-
   std::optional<int> group_id = std::nullopt;
   if (params->query_info.group_id)
     group_id = *params->query_info.group_id;

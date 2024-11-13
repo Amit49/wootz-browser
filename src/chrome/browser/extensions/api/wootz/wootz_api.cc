@@ -32,6 +32,12 @@
 #include "extensions/browser/extension_prefs_factory.h"
 #include "extensions/common/extension_id.h"
 #include "ui/gfx/image/image.h"
+#include "base/android/shared_preferences/shared_preferences_manager.h"
+#include "chrome/browser/preferences/android/chrome_shared_preferences.h"
+#include "base/json/json_writer.h"
+#include "base/json/json_reader.h"
+#include "base/json/values_util.h"
+#include "base/time/time.h"
 
 namespace extensions {
 
@@ -97,6 +103,104 @@ ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
     Java_WootzBridge_showDialog(env, web_contents->GetJavaWebContents());
 #endif
     return RespondNow(NoArguments());
+}
+
+// background worker
+
+const char kWootzJobsListKey[] = "Chrome.Wootzapp.Jobs";
+const char kWootzJobResultsKey[] = "Chrome.Wootzapp.JobsResult";
+
+ExtensionFunction::ResponseAction WootzSetJobFunction::Run() {
+  if (!args()[0].GetIfString())
+    return RespondNow(Error("URL must be a string"));
+  std::string url = *args()[0].GetIfString();
+
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  
+  std::string jobs_json = prefs.ReadString(kWootzJobsListKey, "[]");
+  LOG(ERROR) << "WOOTZ JOBS: " << jobs_json;
+  absl::optional<base::Value> parsed = base::JSONReader::Read(jobs_json);
+  base::Value::List* jobs = parsed->GetIfList();
+  if (!jobs) {
+    jobs = new base::Value::List();
+  }
+
+  jobs->Append(url);
+
+  std::string new_jobs_json;
+  base::JSONWriter::Write(base::Value(std::move(*jobs)), &new_jobs_json);
+  prefs.WriteString(kWootzJobsListKey, new_jobs_json);
+
+  return RespondNow(NoArguments());
+}
+
+ExtensionFunction::ResponseAction WootzRemoveJobFunction::Run() {
+  if (!args()[0].GetIfString())
+    return RespondNow(Error("URL must be a string"));
+  std::string url = *args()[0].GetIfString();
+
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  
+  std::string jobs_json = prefs.ReadString(kWootzJobsListKey, "[]");
+
+  LOG(ERROR) << "WOOTZ JOBS: " << jobs_json;
+
+  absl::optional<base::Value> parsed = base::JSONReader::Read(jobs_json);
+  base::Value::List* jobs = parsed->GetIfList();
+  if (!jobs) return RespondNow(NoArguments());
+
+  for (auto it = jobs->begin(); it != jobs->end(); ) {
+    if (it->GetIfString() && *it->GetIfString() == url) {
+      it = jobs->erase(it);
+    } else {
+      ++it;
+    }
+  }
+
+  std::string new_jobs_json;
+  base::JSONWriter::Write(base::Value(std::move(*jobs)), &new_jobs_json);
+  prefs.WriteString(kWootzJobsListKey, new_jobs_json);
+
+  return RespondNow(NoArguments());
+}
+
+ExtensionFunction::ResponseAction WootzGetJobsFunction::Run() {
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  std::string results_json = prefs.ReadString(kWootzJobResultsKey, "[]");
+  
+  absl::optional<base::Value> parsed = base::JSONReader::Read(results_json);
+  if (!parsed || !parsed->is_list()) {
+    // Return empty array rather than error
+    base::Value::List empty;
+    return RespondNow(WithArguments(base::Value(std::move(empty))));
+  }
+
+  return RespondNow(WithArguments(std::move(*parsed)));
+}
+
+ExtensionFunction::ResponseAction WootzListJobsFunction::Run() {
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  std::string jobs_json = prefs.ReadString(kWootzJobsListKey, "[]");
+  
+  LOG(ERROR) << "WOOTZ JOBS LIST JSON: " << jobs_json;
+
+  absl::optional<base::Value> parsed = base::JSONReader::Read(jobs_json);
+  if (!parsed || !parsed->is_list()) {
+    base::Value::List empty;
+    return RespondNow(WithArguments(base::Value(std::move(empty))));
+  }
+
+  return RespondNow(WithArguments(std::move(*parsed)));
+}
+
+ExtensionFunction::ResponseAction WootzCleanJobsFunction::Run() {
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  
+  // Clear both jobs and results
+  prefs.RemoveKey(kWootzJobsListKey);
+  prefs.RemoveKey(kWootzJobResultsKey);
+
+  return RespondNow(NoArguments());
 }
 
 // ExtensionFunction::ResponseAction
