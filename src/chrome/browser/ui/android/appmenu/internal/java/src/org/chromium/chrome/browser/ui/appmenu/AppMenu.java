@@ -150,6 +150,11 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
     private BottomSheetBehavior<View> mBehavior;
     private ImageButton mFloatingBackButton;
     private WebContents mCurrentWebContents;
+    private WebContents mWebContents;
+    private ContentView mContentView;
+    private ThinWebView mThinWebView;
+    private View mWebViewContainer;
+
     /**
      * Creates and sets up the App Menu.
      * @param itemRowHeight Desired height for each app menu row.
@@ -457,68 +462,184 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
 
 // In the code below we are setting the margin respective to parent i think
 
-    private View createWebView(int i) {
-        Log.d(TAG, "EXTS: " + Extensions.getExtensionsInfo().get(i).toString());
+    // private View createWebView(int i) {
+    //     Log.d(TAG, "EXTS: " + Extensions.getExtensionsInfo().get(i).toString());
 
-        NestedScrollView scrollView = new NestedScrollView(getContext());
-        scrollView.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+    //     NestedScrollView scrollView = new NestedScrollView(getContext());
+    //     scrollView.setLayoutParams(new ViewGroup.LayoutParams(
+    //             ViewGroup.LayoutParams.MATCH_PARENT,
+    //             ViewGroup.LayoutParams.MATCH_PARENT));
         
-        // Create a FrameLayout to wrap the GridView
+    //     // Create a FrameLayout to wrap the GridView
+    //     FrameLayout viewWrapper = new FrameLayout(getContext());
+    //     FrameLayout.LayoutParams wrapperParams = new FrameLayout.LayoutParams(
+    //             ViewGroup.LayoutParams.MATCH_PARENT,
+    //             ViewGroup.LayoutParams.MATCH_PARENT);
+        
+    //     // Set margins for the wrapper (adjust these values as needed)
+    //     int margin = dpToPx(32); // Convert 16dp to pixels
+    //     wrapperParams.setMargins(
+    //         0,
+    //         -margin, 
+    //         0, 
+    //         margin
+    //     );
+    //     viewWrapper.setLayoutParams(wrapperParams);
+
+    //     Profile profile = ProfileManager.getLastUsedRegularProfile();
+    //     WebContents webContents = WebContentsFactory.createWebContents(profile, true, false);
+    //     ContentView contentView = ContentView.createContentView(getContext(), null, webContents);
+    //     webContents.setDelegates(
+    //         VersionInfo.getProductVersion(),
+    //         ViewAndroidDelegate.createBasicDelegate(contentView),
+    //         contentView,
+    //         mHandler.getWindowAndroid(),
+    //         WebContents.createDefaultInternalsHolder());
+
+    //     Log.d(TAG, "contentview " + contentView.toString());
+    //     // viewWrapper.addView(contentView);
+    
+    //     IntentRequestTracker intentRequestTracker = mHandler.getWindowAndroid().getIntentRequestTracker();
+    //     ThinWebView thinWebView = ThinWebViewFactory.create(
+    //         getContext(), new ThinWebViewConstraints(), intentRequestTracker);
+    //     thinWebView.attachWebContents(webContents, contentView, null);
+    //     float borderRadius = dpToPx(24); // You can adjust this value as needed
+    //     thinWebView.getView().setClipToOutline(true);
+    //     thinWebView.getView().setOutlineProvider(new ViewOutlineProvider() {
+    //         @Override
+    //         public void getOutline(View view, Outline outline) {
+    //             outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
+    //         }
+    //     });
+
+
+    //     String popupUrl = Extensions.getExtensionsInfo().get(i).getPopupUrl();
+    //     webContents.getNavigationController().loadUrl(
+    //             new LoadUrlParams(popupUrl));
+        
+    //     View view = thinWebView.getView();
+    //     view.setTag(webContents);
+
+    //     mCurrentWebContents = webContents;
+    //     // setupFloatingBackButton();
+
+    //     return view;
+    // }
+
+    // private View createWebViewContainer() {
+    //     NestedScrollView scrollView = new NestedScrollView(getContext());
+    //     scrollView.setLayoutParams(new ViewGroup.LayoutParams(
+    //             ViewGroup.LayoutParams.MATCH_PARENT,
+    //             ViewGroup.LayoutParams.MATCH_PARENT));
+
+    //     FrameLayout viewWrapper = new FrameLayout(getContext());
+    //     FrameLayout.LayoutParams wrapperParams = new FrameLayout.LayoutParams(
+    //             ViewGroup.LayoutParams.MATCH_PARENT,
+    //             ViewGroup.LayoutParams.MATCH_PARENT);
+        
+    //     int margin = dpToPx(32);
+    //     wrapperParams.setMargins(0, -margin, 0, margin);
+    //     viewWrapper.setLayoutParams(wrapperParams);
+    
+    //     // Initialize WebView components only once
+    //     if (mWebContents == null) {
+    //         Profile profile = ProfileManager.getLastUsedRegularProfile();
+    //         mWebContents = WebContentsFactory.createWebContents(profile, true, false);
+    //         mContentView = ContentView.createContentView(getContext(), null, mWebContents);
+    //         mWebContents.setDelegates(
+    //             VersionInfo.getProductVersion(),
+    //             ViewAndroidDelegate.createBasicDelegate(mContentView),
+    //             mContentView,
+    //             mHandler.getWindowAndroid(),
+    //             WebContents.createDefaultInternalsHolder());
+    
+    //         IntentRequestTracker intentRequestTracker = mHandler.getWindowAndroid().getIntentRequestTracker();
+    //         mThinWebView = ThinWebViewFactory.create(
+    //             getContext(), new ThinWebViewConstraints(), intentRequestTracker);
+    //         mThinWebView.attachWebContents(mWebContents, mContentView, null);
+            
+    //         float borderRadius = dpToPx(24);
+    //         mThinWebView.getView().setClipToOutline(true);
+    //         mThinWebView.getView().setOutlineProvider(new ViewOutlineProvider() {
+    //             @Override
+    //             public void getOutline(View view, Outline outline) {
+    //                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
+    //             }
+    //         });
+    //     }
+    
+    //     viewWrapper.addView(mThinWebView.getView());
+    //     return viewWrapper;
+    // }
+
+    private View createWebViewContainer() {
         FrameLayout viewWrapper = new FrameLayout(getContext());
         FrameLayout.LayoutParams wrapperParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         
-        // Set margins for the wrapper (adjust these values as needed)
-        int margin = dpToPx(32); // Convert 16dp to pixels
-        wrapperParams.setMargins(
-            0,
-            -margin, 
-            0, 
-            margin
-        );
+        // Set horizontal margins to create padding from screen edges
+        int horizontalMargin = dpToPx(0);
+        int verticalMargin = dpToPx(0);
+        wrapperParams.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         viewWrapper.setLayoutParams(wrapperParams);
-
-        Profile profile = ProfileManager.getLastUsedRegularProfile();
-        WebContents webContents = WebContentsFactory.createWebContents(profile, true, false);
-        ContentView contentView = ContentView.createContentView(getContext(), null, webContents);
-        webContents.setDelegates(
-            VersionInfo.getProductVersion(),
-            ViewAndroidDelegate.createBasicDelegate(contentView),
-            contentView,
-            mHandler.getWindowAndroid(),
-            WebContents.createDefaultInternalsHolder());
-
-        Log.d(TAG, "contentview " + contentView.toString());
-        // viewWrapper.addView(contentView);
     
-        IntentRequestTracker intentRequestTracker = mHandler.getWindowAndroid().getIntentRequestTracker();
-        ThinWebView thinWebView = ThinWebViewFactory.create(
-            getContext(), new ThinWebViewConstraints(), intentRequestTracker);
-        thinWebView.attachWebContents(webContents, contentView, null);
-        float borderRadius = dpToPx(24); // You can adjust this value as needed
-        thinWebView.getView().setClipToOutline(true);
-        thinWebView.getView().setOutlineProvider(new ViewOutlineProvider() {
+        // Initialize WebView components only once
+        if (mWebContents == null) {
+            Profile profile = ProfileManager.getLastUsedRegularProfile();
+            mWebContents = WebContentsFactory.createWebContents(profile, true, false);
+            mContentView = ContentView.createContentView(getContext(), null, mWebContents);
+            mWebContents.setDelegates(
+                VersionInfo.getProductVersion(),
+                ViewAndroidDelegate.createBasicDelegate(mContentView),
+                mContentView,
+                mHandler.getWindowAndroid(),
+                WebContents.createDefaultInternalsHolder());
+    
+            IntentRequestTracker intentRequestTracker = mHandler.getWindowAndroid().getIntentRequestTracker();
+            mThinWebView = ThinWebViewFactory.create(
+                getContext(), new ThinWebViewConstraints(), intentRequestTracker);
+            mThinWebView.attachWebContents(mWebContents, mContentView, null);
+            
+            // Apply corner radius to the ThinWebView
+            View webView = mThinWebView.getView();
+            float cornerRadius = dpToPx(16); // Adjust this value for desired roundness
+            webView.setClipToOutline(true);
+            webView.setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadius);
+                }
+            });
+
+            // Set minimal padding on the WebView itself
+            webView.setPadding(0, 0, 0, 0);
+        
+            // Ensure the WebView fills its container
+            webView.setLayoutParams(new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+
+            // Set background color to match the design
+            // webView.setBackgroundColor(Color.parseColor("#1C1E21")); // Dark background color
+        }
+    
+        viewWrapper.addView(mThinWebView.getView());
+        
+        // Apply same corner radius to the wrapper for consistency
+        float wrapperCornerRadius = dpToPx(16);
+        viewWrapper.setClipToOutline(true);
+        viewWrapper.setOutlineProvider(new ViewOutlineProvider() {
             @Override
             public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), wrapperCornerRadius);
             }
         });
-
-
-        String popupUrl = Extensions.getExtensionsInfo().get(i).getPopupUrl();
-        webContents.getNavigationController().loadUrl(
-                new LoadUrlParams(popupUrl));
         
-        View view = thinWebView.getView();
-        view.setTag(webContents);
-
-        mCurrentWebContents = webContents;
-        // setupFloatingBackButton();
-
-        return view;
+        // Set background color to wrapper as well
+        // viewWrapper.setBackgroundColor(Color.parseColor("#1C1E21"));
+    
+        return viewWrapper;
     }
 
     private void returnToAppMenu() {
@@ -826,20 +947,57 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         createExtensionsRow();
     }
 
+    // private void openExtensionWebView(int index) {
+    //     View view = getView();
+    //     if (view != null) {
+    //         view.findViewById(R.id.app_menu_grid).setVisibility(View.GONE);
+    //         view.findViewById(R.id.app_menu_extensions).setVisibility(View.GONE);
+    //         view.findViewById(R.id.extensions_divider).setVisibility(View.GONE);
+    //         FrameLayout webViewContainer = view.findViewById(R.id.web_view_container);
+    //         webViewContainer.setVisibility(View.VISIBLE);
+    //         FrameLayout webViewFrame = view.findViewById(R.id.web_view);
+    //         webViewFrame.removeAllViews();
+    //         webViewFrame.setVisibility(View.VISIBLE);
+    //         View webView = createWebView(index);
+    //         webViewFrame.addView(webView);
+    //     }
+    // }
+
     private void openExtensionWebView(int index) {
         View view = getView();
         if (view != null) {
             view.findViewById(R.id.app_menu_grid).setVisibility(View.GONE);
             view.findViewById(R.id.app_menu_extensions).setVisibility(View.GONE);
             view.findViewById(R.id.extensions_divider).setVisibility(View.GONE);
+            
             FrameLayout webViewContainer = view.findViewById(R.id.web_view_container);
             webViewContainer.setVisibility(View.VISIBLE);
+            
             FrameLayout webViewFrame = view.findViewById(R.id.web_view);
             webViewFrame.removeAllViews();
             webViewFrame.setVisibility(View.VISIBLE);
-            View webView = createWebView(index);
-            webViewFrame.addView(webView);
+            
+            if (mWebViewContainer == null) {
+                mWebViewContainer = createWebViewContainer();
+            }
+            webViewFrame.addView(mWebViewContainer);
+    
+            // Load the extension URL
+            String popupUrl = Extensions.getExtensionsInfo().get(index).getPopupUrl();
+            mWebContents.getNavigationController().loadUrl(new LoadUrlParams(popupUrl));
         }
+    }
+    
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mWebContents != null) {
+            mWebContents.destroy();
+            mWebContents = null;
+        }
+        mContentView = null;
+        mThinWebView = null;
+        mWebViewContainer = null;
     }
 
     public boolean onBackPressed() {
@@ -899,7 +1057,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
 
         int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
         mSelectedItemBeforeDismiss = true;
-        // dismiss();
+        // dismiss();f
         if (mHandler != null) {
             Log.d(TAG,"Entering the onItemClick for " + id);
             mHandler.onOptionsItemSelected(id);
