@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.chrome.R;
 import org.chromium.base.ObserverList;
 import org.chromium.base.TraceEvent;
 import org.chromium.base.supplier.ObservableSupplier;
@@ -108,6 +109,8 @@ public class LayoutManagerImpl
     protected StaticLayout mStaticLayout;
 
     private final ViewGroup mContentContainer;
+    // private ViewGroup toolbar;
+    // private View toolbarHairline;
 
     // External Dependencies
     private TabModelSelector mTabModelSelector;
@@ -368,6 +371,8 @@ public class LayoutManagerImpl
 
         assert contentContainer != null;
         mContentContainer = contentContainer;
+        // toolbar = mContentContainer.findViewById(R.id.toolbar);
+        // toolbarHairline = mContentContainer.findViewById(R.id.toolbar_hairline);
 
         mAnimationHandler = new CompositorAnimationHandler(this::requestUpdate);
 
@@ -1146,6 +1151,17 @@ public class LayoutManagerImpl
      * @param layout  The new {@link Layout} to show.
      * @param animate Whether or not {@code layout} should animate as it shows.
      */
+
+    // public void hideToolbar() {
+    //     if (toolbar.getVisibility() == View.VISIBLE) {
+    //         toolbar.setVisibility(View.INVISIBLE);
+    //         toolbarHairline.setVisibility(View.INVISIBLE);
+    //     } else {
+    //         toolbar.setVisibility(View.VISIBLE);
+    //         toolbarHairline.setVisibility(View.VISIBLE);
+    //     }
+    // }
+
     protected void startShowing(Layout layout, boolean animate) {
         assert layout != null : "Can't show a null layout.";
 
