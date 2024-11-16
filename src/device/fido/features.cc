@@ -45,10 +45,10 @@ BASE_FEATURE(kWebAuthnGoogleCorpRemoteDesktopClientPrivilege,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
-// Added in M114. Not yet enabled by default.
+// Added in Wootzapp. Enabled by default.
 BASE_FEATURE(kWebAuthnAndroidCredMan,
              "WebAuthenticationAndroidCredMan",
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // Added in M115. Remove in or after M118
@@ -89,12 +89,12 @@ BASE_FEATURE(kWebAuthnLinkingExperimentation,
 // Not yet enabled by default.
 BASE_FEATURE(kWebAuthnEnclaveAuthenticator,
              "WebAuthenticationEnclaveAuthenticator",
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Not yet enabled by default.
 const base::FeatureParam<bool> kWebAuthnGpmPin{
     &kWebAuthnEnclaveAuthenticator, kWebAuthnGpmPinFeatureParameterName,
-    /*default_value=*/false};
+    /*default_value=*/true};
 
 // Enabled in M118 on all platforms except ChromeOS. Enabled on M121 for
 // ChromeOS. Remove in or after M124.
@@ -117,7 +117,7 @@ BASE_FEATURE(kWebAuthnAccessibleTimeouts,
 // Not yet enabled by default.
 BASE_FEATURE(kWebAuthnRelatedOrigin,
              "WebAuthenticationRelatedOrigin",
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enabled in M122. Remove in or after M125.
 BASE_FEATURE(kWebAuthnChromeImplementedInvariant,
