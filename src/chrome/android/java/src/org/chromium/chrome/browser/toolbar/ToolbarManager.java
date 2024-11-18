@@ -2272,7 +2272,7 @@ public class ToolbarManager
      *                     from the Tab.
      */
     public void setShouldUpdateToolbarPrimaryColor(boolean shouldUpdate) {
-        mShouldUpdateToolbarPrimaryColor = shouldUpdate;
+        mShouldUpdateToolbarPrimaryColor = true;
     }
 
     /**

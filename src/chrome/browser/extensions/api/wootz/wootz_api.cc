@@ -77,6 +77,14 @@ ExtensionFunction::ResponseAction WootzHelloWorldFunction::Run() {
   return RespondNow(WithArguments(json_string));
 }
 
+ExtensionFunction::ResponseAction WootzLogFunction::Run() {
+  if (args().size() < 1) {
+    return RespondNow(NoArguments());
+  }
+  LOG(ERROR) << "CONSOLE.LOG: " << args()[0];
+  return RespondNow(NoArguments());
+}
+
 ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
     JNIEnv* env = base::android::AttachCurrentThread();
     

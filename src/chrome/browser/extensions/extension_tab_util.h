@@ -23,6 +23,7 @@ class ChromeExtensionFunctionDetails;
 class ExtensionFunction;
 class GURL;
 class Profile;
+class TabModel;
 class TabStripModel;
 namespace content {
 class BrowserContext;
@@ -120,7 +121,8 @@ class ExtensionTabUtil {
   static api::tabs::Tab CreateTabObject(content::WebContents* web_contents,
                                         ScrubTabBehavior scrub_tab_behavior,
                                         const Extension* extension,
-                                        TabStripModel* tab_strip,
+                                        // TabStripModel* tab_strip,
+                                        TabModel* tab_strip,
                                         int tab_index);
 
   // Creates a base::Value::Dict representing the window for the given
@@ -163,6 +165,9 @@ class ExtensionTabUtil {
   static bool GetTabStripModel(const content::WebContents* web_contents,
                                TabStripModel** tab_strip_model,
                                int* tab_index);
+  static bool GetTabModel(const content::WebContents* web_contents,
+                               TabModel** tab_model,
+                               int* tab_index);
   static bool GetDefaultTab(Browser* browser,
                             content::WebContents** contents,
                             int* tab_id);
@@ -172,7 +177,8 @@ class ExtensionTabUtil {
                          content::BrowserContext* browser_context,
                          bool include_incognito,
                          Browser** browser,
-                         TabStripModel** tab_strip,
+                        //  TabStripModel** tab_strip,
+                         TabModel** tab_strip,
                          content::WebContents** contents,
                          int* tab_index);
   static bool GetTabById(int tab_id,

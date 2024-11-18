@@ -32,6 +32,7 @@ import org.chromium.chrome.browser.toolbar.menu_button.MenuButtonCoordinator;
 import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
 import org.chromium.components.browser_ui.widget.gesture.BackPressHandler.BackPressResult;
 
+import android.graphics.Color;
 import android.graphics.Outline;
 import android.view.ViewOutlineProvider;
 
@@ -93,6 +94,7 @@ public class HubCoordinator implements PaneHubController, BackPressHandler {
 
         mContainerView = containerView;
         mMainHubParent = LayoutInflater.from(context).inflate(R.layout.hub_layout, null);
+        mMainHubParent.setId(View.generateViewId());
         mContainerView.addView(mMainHubParent);
 
         hubToolbarView = mContainerView.findViewById(R.id.hub_toolbar);
@@ -130,6 +132,10 @@ public class HubCoordinator implements PaneHubController, BackPressHandler {
         mCurrentTabSupplier = currentTabSupplier;
         mCurrentTabSupplier.addObserver(castCallback(mBackPressStateChangeCallback));
 
+        mCurrentTabSupplier.addObserver((tab) -> {
+            setHubBackgroundColor();
+        });
+        
         mHubLayoutController
                 .getPreviousLayoutTypeSupplier()
                 .addObserver(castCallback(mBackPressStateChangeCallback));
@@ -137,6 +143,8 @@ public class HubCoordinator implements PaneHubController, BackPressHandler {
         updateHandleBackPressSupplier();
         setupViewForHubPaneHostView();
         setupViewForHubToolbarView();
+
+        setHubBackgroundColor();
     }
 
     /** Removes the hub from the layout tree and cleans up resources. */
@@ -277,4 +285,22 @@ public class HubCoordinator implements PaneHubController, BackPressHandler {
         path.close();
         return path;
     }
+
+    private void setHubBackgroundColor() {
+        if(mCurrentTabSupplier == null) {
+            return;
+        }
+        Tab currentTab = mCurrentTabSupplier.get();
+        boolean isIncognito = currentTab != null ? currentTab.isIncognito() : false;
+
+        if(mMainHubParent != null) {
+            if(isIncognito) {
+                mMainHubParent.setBackgroundColor(Color.parseColor("#000000"));
+            } 
+            else {
+                mMainHubParent.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            }
+        }
+    } 
+
 }
