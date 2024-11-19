@@ -588,7 +588,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   AccountPasswordStoreFactory::GetInstance();
   AccountReconcilorFactory::GetInstance();
   WootzRendererUpdaterFactory::GetInstance();
-if (full_init)
+  if (full_init)
     AdaptiveQuietNotificationPermissionUiEnabler::Factory::GetInstance();
 #if BUILDFLAG(IS_ANDROID)
   AndroidSessionDurationsServiceFactory::GetInstance();
@@ -623,11 +623,11 @@ if (full_init)
     ash::language_packs::LanguagePackFontServiceFactory::GetInstance();
   }
 #endif
-  if (full_init){
+  if (full_init) {
     AutocompleteClassifierFactory::GetInstance();
-  AutocompleteControllerEmitter::EnsureFactoryBuilt();
+    AutocompleteControllerEmitter::EnsureFactoryBuilt();
 #if BUILDFLAG(BUILD_WITH_TFLITE_LIB)
-  AutocompleteScoringModelServiceFactory::GetInstance();
+    AutocompleteScoringModelServiceFactory::GetInstance();
 #endif
   }
   autofill::AutocompleteHistoryManagerFactory::GetInstance();
@@ -1229,6 +1229,8 @@ if (full_init)
 #if !BUILDFLAG(IS_ANDROID)
   StorageNotificationServiceFactory::GetInstance();
 #endif
+    SubresourceFilterProfileContextFactory::GetInstance();
+    SupervisedUserMetricsServiceFactory::GetInstance();
     if (full_init) {
       SupervisedUserServiceFactory::GetInstance();
     }

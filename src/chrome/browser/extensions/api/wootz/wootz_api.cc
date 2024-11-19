@@ -22,6 +22,7 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/extensions/extension_service.h"
+// #include "chrome/android/chrome_jni_headers/WootzBridge_jni.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/wootz_wallet/wootz_wallet_service_factory.h"
 #include "components/search_engines/template_url_service.h"
@@ -35,12 +36,12 @@
 #include "extensions/browser/extension_system.h"
 #include "extensions/common/extension_id.h"
 #include "ui/gfx/image/image.h"
-#include "base/android/build_info.h"
-#include "base/json/json_writer.h"
-
-
 #include "chrome/android/chrome_jni_headers/OpenExtensionsById_jni.h"
-#include "chrome/android/chrome_jni_headers/WootzBridge_jni.h"
+#include "base/android/shared_preferences/shared_preferences_manager.h"
+#include "chrome/browser/preferences/android/chrome_shared_preferences.h"
+#include "base/json/json_reader.h"
+#include "base/json/values_util.h"
+#include "base/time/time.h"
 
 namespace extensions {
 
@@ -145,7 +146,9 @@ ExtensionFunction::ResponseAction WootzLogFunction::Run() {
   return RespondNow(NoArguments());
 }
 
+[[maybe_unused]]
 ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
+#if 0
     JNIEnv* env = base::android::AttachCurrentThread();
     
     content::WebContents* web_contents = GetSenderWebContents();
@@ -154,6 +157,7 @@ ExtensionFunction::ResponseAction WootzShowDialogFunction::Run() {
     }
 
     Java_WootzBridge_showDialog(env, web_contents->GetJavaWebContents());
+#endif
     return RespondNow(NoArguments());
 }
 
@@ -483,9 +487,156 @@ ExtensionFunction::ResponseAction WootzSignMessageFunction::Run() {
   return RespondNow(WithArguments(base::Value(true)));
 }
 
+// background worker
+
+const char kWootzJobsListKey[] = "Chrome.Wootzapp.Jobs";
+const char kWootzJobResultsKey[] = "Chrome.Wootzapp.JobsResult";
+
+ExtensionFunction::ResponseAction WootzSetJobFunction::Run() {
+  if (!args()[0].GetIfString())
+    return RespondNow(Error("URL must be a string"));
+  std::string url = *args()[0].GetIfString();
+
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  
+  std::string jobs_json = prefs.ReadString(kWootzJobsListKey, "[]");
+  LOG(ERROR) << "WOOTZ JOBS: " << jobs_json;
+  absl::optional<base::Value> parsed = base::JSONReader::Read(jobs_json);
+  base::Value::List* jobs = parsed->GetIfList();
+  if (!jobs) {
+    jobs = new base::Value::List();
+  }
+
+  jobs->Append(url);
+
+  std::string new_jobs_json;
+  base::JSONWriter::Write(base::Value(std::move(*jobs)), &new_jobs_json);
+  prefs.WriteString(kWootzJobsListKey, new_jobs_json);
+
+  return RespondNow(NoArguments());
+}
+
+ExtensionFunction::ResponseAction WootzRemoveJobFunction::Run() {
+  if (!args()[0].GetIfString())
+    return RespondNow(Error("URL must be a string"));
+  std::string url = *args()[0].GetIfString();
+
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  
+  std::string jobs_json = prefs.ReadString(kWootzJobsListKey, "[]");
+
+  LOG(ERROR) << "WOOTZ JOBS: " << jobs_json;
+
+  absl::optional<base::Value> parsed = base::JSONReader::Read(jobs_json);
+  base::Value::List* jobs = parsed->GetIfList();
+  if (!jobs) return RespondNow(NoArguments());
+
+  for (auto it = jobs->begin(); it != jobs->end(); ) {
+    if (it->GetIfString() && *it->GetIfString() == url) {
+      it = jobs->erase(it);
+    } else {
+      ++it;
+    }
+  }
+
+  std::string new_jobs_json;
+  base::JSONWriter::Write(base::Value(std::move(*jobs)), &new_jobs_json);
+  prefs.WriteString(kWootzJobsListKey, new_jobs_json);
+
+  return RespondNow(NoArguments());
+}
+
+ExtensionFunction::ResponseAction WootzGetJobsFunction::Run() {
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  std::string results_json = prefs.ReadString(kWootzJobResultsKey, "[]");
+  
+  absl::optional<base::Value> parsed = base::JSONReader::Read(results_json);
+  if (!parsed || !parsed->is_list()) {
+    // Return empty array rather than error
+    base::Value::List empty;
+    return RespondNow(WithArguments(base::Value(std::move(empty))));
+  }
+
+  return RespondNow(WithArguments(std::move(*parsed)));
+}
+
+ExtensionFunction::ResponseAction WootzListJobsFunction::Run() {
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  std::string jobs_json = prefs.ReadString(kWootzJobsListKey, "[]");
+  
+  LOG(ERROR) << "WOOTZ JOBS LIST JSON: " << jobs_json;
+
+  absl::optional<base::Value> parsed = base::JSONReader::Read(jobs_json);
+  if (!parsed || !parsed->is_list()) {
+    base::Value::List empty;
+    return RespondNow(WithArguments(base::Value(std::move(empty))));
+  }
+
+  return RespondNow(WithArguments(std::move(*parsed)));
+}
+
+ExtensionFunction::ResponseAction WootzCleanJobsFunction::Run() {
+  auto prefs = android::shared_preferences::GetChromeSharedPreferences();
+  
+  // Clear both jobs and results
+  prefs.RemoveKey(kWootzJobsListKey);
+  prefs.RemoveKey(kWootzJobResultsKey);
+
+  return RespondNow(NoArguments());
+}
+
+// ExtensionFunction::ResponseAction
+// WootzShowConsentDialogAndMaybeStartServiceFunction::Run() {
+//   JNIEnv* env = base::android::AttachCurrentThread();
+
+//     content::WebContents* web_contents = GetSenderWebContents();
+//     if (!web_contents) {
+//         return RespondNow(Error("Unable to get WebContents"));
+//     }
+
+//     // First, check if we already have consent
+//     if (!Java_WootzBridge_hasUserConsent(env)) {
+//         // If not, show the consent dialog
+//         // auto* callback_ptr = new base::OnceCallback<void(bool)>(
+//         //     base::BindOnce(&WootzShowConsentDialogAndMaybeStartServiceFunction::OnConsentResult,
+//         //                    this));
+
+//         Java_WootzBridge_showConsentDialog(env, reinterpret_cast<jlong>(this),
+//                                            web_contents->GetJavaWebContents());
+//         return RespondLater();
+//     } else {
+//         // If we already have consent, start the service directly
+//         Java_WootzBridge_startBrowsingDataService(env);
+//         return RespondNow(NoArguments());
+//     }
+// //   base::Value::Dict result;
+// //   result.Set("message", "Consent dialog shown and service started");
+
+// //   std::string json_string;
+// //   base::JSONWriter::Write(result, &json_string);
+
+// //   return RespondNow(WithArguments(json_string));
+// }
+// void WootzShowConsentDialogAndMaybeStartServiceFunction::OnConsentDialogResult(JNIEnv* env, jboolean consented) {
+//     if (consented) {
+//         Java_WootzBridge_startBrowsingDataService(env);
+//     }
+//     Respond(NoArguments());
+// }
+
 }  // namespace extensions
 
 void JNI_WootzBridge_OnConsentResult(JNIEnv* env, jboolean consented){
   // Implement the consent result handling here
   LOG(INFO) << "DKT: Consent result: " << (consented ? "true" : "false");
 }
+
+// extern "C" JNIEXPORT void JNICALL
+// Java_org_chromium_chrome_browser_extensions_WootzBridge_nativeOnConsentDialogResult(
+//     JNIEnv* env,
+//     jclass clazz,
+//     jlong native_ptr,
+//     jboolean consented) {
+//   auto* function = reinterpret_cast<extensions::WootzShowConsentDialogAndMaybeStartServiceFunction*>(native_ptr);
+//   function->OnConsentDialogResult(env, consented);
+// }

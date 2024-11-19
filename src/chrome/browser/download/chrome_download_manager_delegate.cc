@@ -878,9 +878,6 @@ bool ChromeDownloadManagerDelegate::InterceptDownloadIfApplicable(
     content::WebContents* web_contents) {
 
   LOG(INFO) << "InterceptDownloadIfApplicable:";
-  LOG(INFO) << "  URL: " << url.spec();
-  LOG(INFO) << "  MIME type: " << mime_type;
-  LOG(INFO) << "  Content disposition: " << content_disposition;
   if (web_contents) {
     GURL page_url = web_contents->GetLastCommittedURL();
     LOG(INFO) << "  Page URL: " << page_url.spec();

@@ -83,7 +83,7 @@ static ScopedJavaLocalRef<jstring> JNI_Extensions_GetExtensionsInfo(
     }
 
     const extensions::ExtensionSet& installed_extensions = registry->enabled_extensions();
-
+    
     base::Value::List extensions_list;
 
     for (const auto& extension : installed_extensions) {

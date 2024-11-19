@@ -524,10 +524,8 @@ public class HubLayout extends Layout implements HubLayoutController, AppHeaderO
         View paneHost = mHubController.getPaneHostView();
         assert paneHost.isLaidOut();
         Rect finalRect = new Rect();
-
         mRootView.getRootView().getGlobalVisibleRect(finalRect);
         // paneHost.getGlobalVisibleRect(finalRect);
-
         // Ignore left offset and just ensure the width is correct. See crbug/1502437.
         int leftOffset = 0;
         finalRect.offset(leftOffset, 0);

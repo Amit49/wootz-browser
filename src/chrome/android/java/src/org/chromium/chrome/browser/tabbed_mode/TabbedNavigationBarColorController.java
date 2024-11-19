@@ -12,6 +12,8 @@ import android.os.Build;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import android.util.Log;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -335,7 +337,6 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
         //     animateNavigationBarColor(currentNavigationBarColor, newNavigationBarColor);
         // } else {
             mWindow.setNavigationBarColor(mNavigationBarColor);
-
             if (toEdge) return;
 
             setNavigationBarDividerColor(

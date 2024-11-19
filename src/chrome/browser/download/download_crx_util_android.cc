@@ -15,6 +15,24 @@
 namespace download_crx_util {
 
 bool IsExtensionDownload(const download::DownloadItem& download_item) {
+    // std::string content_disposition = download_item.GetContentDisposition();
+    // if (content_disposition.find("filename=") != std::string::npos &&
+    //     content_disposition.find(".crx") != std::string::npos) {
+    //     return true;
+    // }
+
+    // if (download_item.GetMimeType() == extensions::Extension::kMimeType) {
+    //     return true; 
+    // }
+
+    // std::string url = download_item.GetURL().spec();
+    // if (url.ends_with(".crx")) {
+    //     return true;
+    // }
+
+    // return false;
+
+
     std::string content_disposition = download_item.GetContentDisposition();
     LOG(INFO) << "IsExtensionDownload checking:";
     LOG(INFO) << "  Content disposition: " << content_disposition;

@@ -17,6 +17,8 @@ import android.view.ViewStructure;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.autofill.AutofillValue;
 
+import android.util.Log;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +30,7 @@ import org.jni_zero.NativeMethods;
 
 import org.chromium.base.CommandLine;
 import org.chromium.base.ContextUtils;
-import org.chromium.base.Log;
+// import org.chromium.base.Log;
 import org.chromium.base.ObserverList;
 import org.chromium.base.ObserverList.RewindableIterator;
 import org.chromium.base.ThreadUtils;
@@ -1704,7 +1706,6 @@ class TabImpl implements Tab {
                     // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) {
                     //     onBackgroundColorChanged();
                     // }
-                    
                     updateThemeColor(TabState.UNSPECIFIED_THEME_COLOR);
                 });
     }
