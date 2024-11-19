@@ -97,7 +97,6 @@ public class NetworkSelectorActivity extends WootzWalletBaseActivity
         NetworkModel.NetworkLists networkLists = mNetworkModel.mNetworkLists.getValue();
         NetworkInfo selectedNetwork =
                 mWalletModel.getCryptoModel().getNetworkModel().mDefaultNetwork.getValue();
-        // See GitHub issue https://github.com/wootz/wootz-browser/issues/37399.
         // When live data will be refactored this check can be removed.
         if (networkLists == null || selectedNetwork == null) {
             Log.w(TAG, "Network lists and selected network must not be null.");

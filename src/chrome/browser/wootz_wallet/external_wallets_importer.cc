@@ -87,7 +87,6 @@ std::string GetLegacyCryptoWalletsPassword(const std::string& password,
 
   // We need to count characters here because js implemenation forcibly utf8
   // decode random bytes
-  // (https://github.com/wootz/KeyringController/blob/0769514cea07e85ae190f30765d0a301c631c56b/index.js#L91)
   // and causes 0xEFBFBD which is � (code point 0xFFFD) to be // NOLINT
   // inserted and replace the original byte when it is not a valid unicode
   // encoding. When we pass salt to argon2, argon2 decides salt size by
@@ -122,7 +121,6 @@ std::string GetLegacyCryptoWalletsPassword(const std::string& password,
   // We need to go through whole buffer trying to see if there is an invalid
   // unicdoe encoding and replace it with � (code point 0xFFFD) // NOLINT
   // because js implementation forcibly utf8 decode sub_key
-  // https://github.com/wootz/KeyringController/blob/0769514cea07e85ae190f30765d0a301c631c56b/index.js#L547
   for (size_t i = 0; i < sub_key.size(); ++i) {
     base_icu::UChar32 code_point;
     if (!base::ReadUnicodeCharacter(

@@ -74,7 +74,6 @@ interface Props {
 }
 
 // TODO: fix broken article link
-// https://github.com/wootz/wootz-browser/issues/39708
 const onClickLearnMore = () => {
   chrome.tabs.create(
     {

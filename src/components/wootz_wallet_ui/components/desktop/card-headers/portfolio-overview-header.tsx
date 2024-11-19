@@ -44,7 +44,6 @@ export const PortfolioOverviewHeader = () => {
       justifyContent='space-between'
     >
       <HeaderTitle>{getLocale('wootzWalletTopNavPortfolio')}</HeaderTitle>
-      {/* ToDo: Route to Add Token or Add NFT, to be handled in https://github.com/wootz/wootz-browser/issues/37258 */}
       <MenuButton onClick={() => history.push(WalletRoutes.AddAssetModal)}>
         <ButtonIcon name='plus-add' />
       </MenuButton>

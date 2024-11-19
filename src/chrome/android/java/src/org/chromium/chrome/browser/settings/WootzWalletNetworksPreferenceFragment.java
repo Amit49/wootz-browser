@@ -43,7 +43,6 @@ public class WootzWalletNetworksPreferenceFragment extends WootzPreferenceFragme
         requireActivity().setTitle(R.string.wootz_wallet_networks_title);
 
         // Pass {@code ActivityResultRegistry} reference explicitly to avoid crash
-        // https://github.com/wootz/wootz-browser/issues/31882
         mAddNetworkActivityResultLauncher =
                 registerForActivityResult(
                         new ActivityResultContracts.StartActivityForResult(),

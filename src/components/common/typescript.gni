@@ -153,7 +153,6 @@ template("transpile_web_ui") {
       }
     } else {
       # For explanation of "chromeapp", see:
-      # https://github.com/wootz/wootz-browser/issues/5587
       args += [ "--webpack_alias=chromeapp" ]
     }
 

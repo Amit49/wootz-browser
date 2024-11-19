@@ -552,7 +552,6 @@ TEST_F(ZCashWalletServiceUnitTest, ShieldFunds_FailsOnNetworkError) {
 }
 
 // ShieldFunds test is disabled on Windows x86 due to timeout.
-// See https://github.com/wootz/wootz-browser/issues/39698.
 #if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86)
 #define MAYBE_ShieldFunds DISABLED_ShieldFunds
 #else

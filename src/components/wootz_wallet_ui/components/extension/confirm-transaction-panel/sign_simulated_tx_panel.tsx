@@ -84,7 +84,6 @@ type Props = {
 }
 
 // TODO: fix broken article link:
-// https://github.com/wootz/wootz-browser/issues/39708
 const onClickLearnMore = () => {
   window.open(
     'https://support.wootz.com/hc/en-us/articles/4409513799693',

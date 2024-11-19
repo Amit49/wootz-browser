@@ -135,7 +135,6 @@ export const addressEndpoints = ({
         try {
           const { data: api, cache } = baseQuery(undefined)
 
-          // https://github.com/wootz/wootz-browser/issues/34796
           // name service URLs are case-insensitive, but backend currently
           // fails to resolve addresses for URLS containing capital letters
           const lowercaseURL = arg.url.toLowerCase()

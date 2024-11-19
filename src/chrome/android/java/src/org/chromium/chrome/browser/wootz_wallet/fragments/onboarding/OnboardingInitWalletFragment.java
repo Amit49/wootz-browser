@@ -125,7 +125,6 @@ public class OnboardingInitWalletFragment extends BaseOnboardingWalletFragment {
     }
 
     // We need to remove that check and restart once
-    // https://github.com/wootz/wootz-browser/issues/27887
     // is done.
     private void checkOnChromeActivity(boolean setupAction, boolean restoreAction) {
         try {

@@ -963,7 +963,6 @@ async function fetchAccountTokenBalanceRegistryForChainId({
     // then fetch balances for each batch
     // this is to avoid hitting the max request size
     // Can be removed once core implements batching
-    // https://github.com/wootz/wootz-browser/issues/39954
     const nftBatches = []
     for (let i = 0; i < nfts.length; i += MAX_NFT_BALANCE_CHECK_BATCH_SIZE) {
       nftBatches.push(nfts.slice(i, i + MAX_NFT_BALANCE_CHECK_BATCH_SIZE))

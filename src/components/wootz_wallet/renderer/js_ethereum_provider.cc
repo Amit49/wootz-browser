@@ -267,7 +267,6 @@ void JSEthereumProvider::Install(bool install_ethereum_provider,
   LOG(ERROR) << "Before nfor loop - JAGADESH";
   // Non-function properties are readonly guaranteed by gin::Wrappable
   // send should be writable because of
-  // https://github.com/wootz/wootz-browser/issues/25078
   for (const std::string& method :
        {"request", "isConnected", "enable", "sendAsync"}) {
 
@@ -281,7 +280,6 @@ void JSEthereumProvider::Install(bool install_ethereum_provider,
 
   // Set isMetaMask to writable.
   // isMetaMask should be writable because of
-  // https://github.com/wootz/wootz-browser/issues/22213;
   SetOwnPropertyWritable(context, provider_object,
                          gin::StringToV8(isolate, kIsMetaMask), true);
 

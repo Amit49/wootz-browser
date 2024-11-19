@@ -193,7 +193,6 @@ export const SelectAddressModal = React.forwardRef<HTMLDivElement, Props>(
 
       // TODO(apaymyshev): for bitcoin should allow sending to my account, but
       // from different keyring (i.e. segwit -> taproot)
-      // https://github.com/wootz/wootz-browser/issues/29262
       return accounts.filter(
         (account) =>
           account.accountId.keyringId === fromAccountId.keyringId ||

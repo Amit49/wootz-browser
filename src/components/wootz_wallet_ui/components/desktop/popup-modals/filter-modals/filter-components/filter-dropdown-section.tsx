@@ -32,7 +32,6 @@ interface Props {
 
 // ToDo: We need to remove this this declaration once
 // `leo-option` includes a key prop for us to use.
-// https://github.com/wootz/wootz-browser/issues/30826
 declare global {
   namespace JSX {
     interface IntrinsicElements {

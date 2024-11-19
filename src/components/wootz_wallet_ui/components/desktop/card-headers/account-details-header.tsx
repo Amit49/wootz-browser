@@ -196,7 +196,6 @@ export const AccountDetailsHeader = (props: Props) => {
     }
     // We are currently not able to support viewing a
     // BTC or ZEC account on a block explorer.
-    // Link to issue https://github.com/wootz/wootz-browser/issues/39699
     if (
       account.accountId.coin === WootzWallet.CoinType.BTC ||
       account.accountId.coin === WootzWallet.CoinType.ZEC
