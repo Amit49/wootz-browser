@@ -613,7 +613,7 @@ public class LayoutManagerChrome extends LayoutManagerImpl
                     || mScrollDirection == ScrollDirection.RIGHT) {
                 startShowing(mToolbarSwipeLayout, true);
             } else if (mScrollDirection == ScrollDirection.DOWN) {
-                // hideToolbar();
+                hideToolbar();
             }
             mToolbarSwipeLayout.swipeStarted(time(), mScrollDirection, x, y);
         }

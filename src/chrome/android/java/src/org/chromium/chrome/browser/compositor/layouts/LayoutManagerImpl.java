@@ -59,6 +59,7 @@ import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.tabmodel.TabModelSelectorObserver;
 import org.chromium.chrome.browser.tabmodel.TabModelSelectorTabObserver;
 import org.chromium.chrome.browser.tabmodel.TabModelUtils;
+import org.chromium.chrome.browser.theme.ThemeColorProvider;
 import org.chromium.chrome.browser.theme.ThemeUtils;
 import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
 import org.chromium.chrome.browser.toolbar.ControlContainer;
@@ -82,6 +83,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
 
 /**
  * A class that is responsible for managing an active {@link Layout} to show to the screen.  This
@@ -109,8 +111,7 @@ public class LayoutManagerImpl
     protected StaticLayout mStaticLayout;
 
     private final ViewGroup mContentContainer;
-    // private ViewGroup toolbar;
-    // private View toolbarHairline;
+    private ViewGroup mControlContainer;
 
     // External Dependencies
     private TabModelSelector mTabModelSelector;
@@ -371,8 +372,7 @@ public class LayoutManagerImpl
 
         assert contentContainer != null;
         mContentContainer = contentContainer;
-        // toolbar = mContentContainer.findViewById(R.id.toolbar);
-        // toolbarHairline = mContentContainer.findViewById(R.id.toolbar_hairline);
+        mControlContainer = mContentContainer.findViewById(R.id.control_container);
 
         mAnimationHandler = new CompositorAnimationHandler(this::requestUpdate);
 
@@ -747,10 +747,8 @@ public class LayoutManagerImpl
                         resourceManager,
                         browserControlsManager);
 
-        float offsetPx =
-                mBrowserControlsStateProvider == null
-                        ? 0
-                        : mBrowserControlsStateProvider.getTopControlOffset();
+        // Always set offset to 0, because we don't have a top toolbar.
+        float offsetPx = 0;
 
         for (int i = 0; i < mSceneOverlays.size(); i++) {
             // If the SceneOverlay is not showing, don't bother adding it to the tree.
@@ -1152,15 +1150,13 @@ public class LayoutManagerImpl
      * @param animate Whether or not {@code layout} should animate as it shows.
      */
 
-    // public void hideToolbar() {
-    //     if (toolbar.getVisibility() == View.VISIBLE) {
-    //         toolbar.setVisibility(View.INVISIBLE);
-    //         toolbarHairline.setVisibility(View.INVISIBLE);
-    //     } else {
-    //         toolbar.setVisibility(View.VISIBLE);
-    //         toolbarHairline.setVisibility(View.VISIBLE);
-    //     }
-    // }
+    public void hideToolbar() {
+        if (mControlContainer.getVisibility() == View.VISIBLE) {
+            mControlContainer.setVisibility(View.INVISIBLE);
+        } else {
+            mControlContainer.setVisibility(View.VISIBLE);
+        }
+    }
 
     protected void startShowing(Layout layout, boolean animate) {
         assert layout != null : "Can't show a null layout.";
@@ -1273,7 +1269,7 @@ public class LayoutManagerImpl
     /**
      * Creates a {@link SwipeHandler} instance.
      * @param supportSwipeDown Whether or not to the handler should support swipe down gesture.
-     * @return The {@link SwipeHandler} cerated.
+     * @return The {@link SwipeHandler} created.
      */
     public SwipeHandler createToolbarSwipeHandler(boolean supportSwipeDown) {
         return null;

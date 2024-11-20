@@ -59,6 +59,7 @@ class ViewportData final : public GarbageCollected<ViewportData> {
   // Stores the current value viewport-fit value.
   mojom::ViewportFit viewport_fit_ = blink::mojom::ViewportFit::kAuto;
   bool force_expand_display_cutout_ = false;
+  bool force_stop_display_cutout_ = true;
 
   HeapMojoAssociatedRemote<mojom::blink::DisplayCutoutHost>
       display_cutout_host_;
