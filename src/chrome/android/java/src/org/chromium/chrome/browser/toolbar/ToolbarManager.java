@@ -1501,8 +1501,6 @@ public class ToolbarManager
                             HomepagePolicyManager::isHomepageManagedByPolicy);
         }
 
-        // toolbarLayout.setElevation(10f);
-
         return toolbar;
     }
 
