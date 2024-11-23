@@ -46,8 +46,6 @@ void Aead::Init(const std::string* key) {
   Init(base::as_byte_span(*key));
 }
 
-
-
 std::vector<uint8_t> Aead::Seal(
     base::span<const uint8_t> plaintext,
     base::span<const uint8_t> nonce,

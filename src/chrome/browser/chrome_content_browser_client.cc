@@ -6291,7 +6291,7 @@ void AddChromeSchemeFactories(
   // URL is chrome-search://remote-ntp. This is to allow the use of the NTP
   // public api and to embed most-visited tiles
   // (chrome-search://most-visited/title.html).
-  
+
   // InstantService might be null for some irregular profiles, e.g. the System
   // Profile.
   if (instant_service && instant_service->IsInstantProcess(render_process_id)) {

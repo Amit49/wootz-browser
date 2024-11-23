@@ -372,8 +372,6 @@ void ChromeContentBrowserClient::RegisterReceiverBindingsForFrame(
 #endif
 }
 
-
-
 void ChromeContentBrowserClient::RegisterWebUIInterfaceBrokers(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
   chrome::internal::PopulateChromeWebUIFrameInterfaceBrokers(registry);

@@ -179,7 +179,7 @@ void WootzRendererUpdater::UpdateRenderer(
       wootz_wallet::mojom::DefaultWallet::WootzWalletPreferExtension;
 
   LOG(ERROR)<<"renderer_configuration ANKIT:"<<install_window_wootz_ethereum_provider<<",install_window_ethereum_provider:"<<install_window_ethereum_provider<<",allow_overwrite_window_ethereum_provider:"<<allow_overwrite_window_ethereum_provider;
-  
+
   (*renderer_configuration)
       ->SetConfiguration(wootz::mojom::DynamicParams::New(
           install_window_wootz_ethereum_provider,

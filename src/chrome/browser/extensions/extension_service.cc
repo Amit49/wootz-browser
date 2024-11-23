@@ -2221,7 +2221,7 @@ int ExtensionService::GetDisableReasonsOnInstalled(const Extension* extension) {
                ? disable_reason::DISABLE_USER_ACTION
                : disable_reasons;
   }
-
+  
   if (ExternalInstallManager::IsPromptingEnabled()) {
     // External extensions are initially disabled. We prompt the user before
     // enabling them. Hosted apps are excepted because they are not dangerous

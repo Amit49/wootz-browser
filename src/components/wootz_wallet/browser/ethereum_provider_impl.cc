@@ -51,6 +51,7 @@
 
 #include "chrome/browser/extensions/api/wootz/wootz_api.h"
 
+
 namespace {
 
 base::Value::Dict GetJsonRpcRequest(const std::string& method,

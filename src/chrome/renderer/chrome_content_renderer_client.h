@@ -248,7 +248,6 @@ class ChromeContentRendererClient
 
   static GURL GetNaClContentHandlerURL(const std::string& actual_mime_type,
                                        const content::WebPluginInfo& plugin);
-                                       
 
   // service_manager::LocalInterfaceProvider:
   void GetInterface(const std::string& name,

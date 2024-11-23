@@ -57,6 +57,7 @@ bool WootzWalletRenderFrameObserver::CanCreateProvider() {
   // if (!render_frame()->GetWebFrame()->GetDocument().IsSecureContext()) {
   //   return false;
   // }
+
   return true;
 }
 
