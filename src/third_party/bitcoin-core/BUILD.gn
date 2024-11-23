@@ -6,7 +6,6 @@ config("warnings") {
       "-Wno-bitwise-instead-of-logical",
       "-Wno-unused-function",
       "-fvisibility=default",
->>>>>>> upstream/development
       "-fexceptions",
     ]
   }

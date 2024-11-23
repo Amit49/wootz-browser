@@ -75,92 +75,6 @@ class WootzShowDialogFunction : public ExtensionFunction {
     ~WootzShowDialogFunction() override {}
 
     ResponseAction Run() override;
-  protected:
-    ~WootzShowDialogFunction() override {}
-};
-
-class WootzLogFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("wootz.log", WOOTZ_LOG)
-
-  WootzLogFunction() = default;
-
-  WootzLogFunction(
-      const WootzLogFunction&) = delete;
-  WootzLogFunction& operator=(
-      const WootzLogFunction&) = delete;
-
- protected:
-  ~WootzLogFunction() override {}
-
-  ResponseAction Run() override;
-};
-
-// background service api
-class WootzSetJobFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("wootz.setJob", WOOTZ_SETJOB)
-  WootzSetJobFunction() = default;
-  WootzSetJobFunction(const WootzSetJobFunction&) = delete;
-  WootzSetJobFunction& operator=(const WootzSetJobFunction&) = delete;
-
- protected:
-  ~WootzSetJobFunction() override = default;
-  ResponseAction Run() override;
-};
-
-class WootzRemoveJobFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("wootz.removeJob", WOOTZ_REMOVEJOB)
-  WootzRemoveJobFunction() = default;
-  WootzRemoveJobFunction(const WootzRemoveJobFunction&) = delete;
-  WootzRemoveJobFunction& operator=(const WootzRemoveJobFunction&) = delete;
-
- protected:
-  ~WootzRemoveJobFunction() override = default;
-  ResponseAction Run() override;
-};
-
-class WootzGetJobsFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("wootz.getJobs", WOOTZ_GETJOBS)
-  WootzGetJobsFunction() = default;
-  WootzGetJobsFunction(const WootzGetJobsFunction&) = delete;
-  WootzGetJobsFunction& operator=(const WootzGetJobsFunction&) = delete;
-
- protected:
-  ~WootzGetJobsFunction() override = default;
-  ResponseAction Run() override;
-};
-
-class WootzListJobsFunction : public ExtensionFunction {
-public:
- DECLARE_EXTENSION_FUNCTION("wootz.listJobs", WOOTZ_LISTJOBS)
-
- WootzListJobsFunction() = default;
-
- WootzListJobsFunction(const WootzListJobsFunction&) = delete;
- WootzListJobsFunction& operator=(const WootzListJobsFunction&) = delete;
-
-protected:
- ~WootzListJobsFunction() override {}
-
- ResponseAction Run() override;
-};
-
-class WootzCleanJobsFunction : public ExtensionFunction {
-public:
- DECLARE_EXTENSION_FUNCTION("wootz.cleanJobs", WOOTZ_CLEANJOBS)
-
- WootzCleanJobsFunction() = default;
-
- WootzCleanJobsFunction(const WootzCleanJobsFunction&) = delete;
- WootzCleanJobsFunction& operator=(const WootzCleanJobsFunction&) = delete;
-
-protected:
- ~WootzCleanJobsFunction() override {}
-
- ResponseAction Run() override;
 };
 
 class WootzLogFunction : public ExtensionFunction {
@@ -319,6 +233,7 @@ protected:
 
  ResponseAction Run() override;
 };
+
 
 }  // namespace extensions
 #endif  // CHROME_BROWSER_EXTENSIONS_API_WOOTZ_WOOTZ_API_H_
