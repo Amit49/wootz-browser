@@ -590,6 +590,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   WootzRendererUpdaterFactory::GetInstance();
   if (full_init)
     AdaptiveQuietNotificationPermissionUiEnabler::Factory::GetInstance();
+  WootzRendererUpdaterFactory::GetInstance();
 #if BUILDFLAG(IS_ANDROID)
   AndroidSessionDurationsServiceFactory::GetInstance();
 #endif

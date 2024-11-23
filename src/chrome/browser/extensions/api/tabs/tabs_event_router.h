@@ -97,6 +97,22 @@ class TabsEventRouter : public TabStripModelObserver,
                               bool is_discarded) override;
   void OnAutoDiscardableStateChange(content::WebContents* contents,
                                     bool is_auto_discardable) override;
+  //TabModelListObserver
+  void RegisterTabObserver();
+  void OnTabModelAdded() override;
+  void OnTabModelRemoved() override;
+
+  // TabModelObserver:
+  void DidSelectTab(TabAndroid* tab,
+                 TabModel::TabSelectionType type,
+                 int last_id) override;
+  void DidAddTab(TabAndroid* tab,
+                 TabModel::TabLaunchType type) override;
+  void WillCloseTab(TabAndroid* tab) override;
+  void TabRemoved(TabAndroid* tab) override;
+  void DidMoveTab(TabAndroid* tab, int new_index, int old_index) override;
+  void RestoreCompleted() override;
+  Profile* GetProfileFromBrowserContext(content::WebContents* contents);
 
   //TabModelListObserver
   void RegisterTabObserver();

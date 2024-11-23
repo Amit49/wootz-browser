@@ -19,7 +19,7 @@ import org.chromium.content_public.browser.WebContents;
 // import org.chromium.chrome.browser.extensions.BrowsingHistoryService;
 
 public class WootzBridge {
-
+/* 
     @CalledByNative
     private static void showDialog(WebContents webContents) {
         final Context context = ActivityUtils.getActivityFromWebContents(webContents);
@@ -80,4 +80,5 @@ public class WootzBridge {
     interface Natives {
         void onConsentResult(boolean consented);
     }
+*/
 }

@@ -38,20 +38,12 @@ WootzWalletTabHelper::~WootzWalletTabHelper() {
 void WootzWalletTabHelper::AddSolanaConnectedAccount(
     const content::GlobalRenderFrameHostId& id,
     const std::string& account) {
-  LOG(ERROR) << __func__ << ": Adding Solana account " << account 
-          << " for frame " << id;
-  
   base::flat_set<std::string> connection_set;
   if (solana_connected_accounts_.contains(id)) {
     connection_set = solana_connected_accounts_.at(id);
-    LOG(ERROR) << "Existing connection set size: " << connection_set.size();
   }
-  
   connection_set.insert(account);
   solana_connected_accounts_[id] = std::move(connection_set);
-  
-  LOG(ERROR) << "Successfully added Solana account. New connection set size: "
-          << solana_connected_accounts_[id].size();
 }
 
 void WootzWalletTabHelper::RemoveSolanaConnectedAccount(

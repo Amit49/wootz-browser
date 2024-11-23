@@ -637,7 +637,7 @@ void WebRequestAPI::OnExtensionUnloaded(
   if (HasAnyWebRequestPermissions(extension)) {
     --web_request_extension_count_;
     if (web_request_extension_count_ < 0)
-    web_request_extension_count_ = 0;
+      web_request_extension_count_ = 0;
     UpdateMayHaveProxies();
   }
 

@@ -51,6 +51,7 @@ static_library("ui") {
     "app_list/app_list_util.h",
     "webui/hello_world/hello_world_ui.cc",
     "webui/hello_world/hello_world_ui.h",
+
     # All other app_list/ files go under is_chromeos_ash below.
     "autofill/autofill_bubble_handler.h",
     "autofill/autofill_client_provider.cc",
@@ -1054,6 +1055,16 @@ static_library("ui") {
       "webui/plural_string_handler.h",
       "webui/favicon_source.cc",
       "webui/favicon_source.h",
+      "webui/wootz_wallet/android/android_wallet_page_handler.cc",
+      "webui/wootz_wallet/android/android_wallet_page_handler.h",
+      "webui/wootz_wallet/android/android_wallet_page_ui.cc",
+      "webui/wootz_wallet/android/android_wallet_page_ui.h",
+      # "webui/wootz_wallet/common_handler/wallet_handler.cc",
+      # "webui/wootz_wallet/common_handler/wallet_handler.h",
+      "webui/wootz_wallet/page_handler/wallet_page_handler.cc",
+      "webui/wootz_wallet/page_handler/wallet_page_handler.h",
+      "webui/wootz_wallet/wallet_common_ui.cc",
+      "webui/wootz_wallet/wallet_common_ui.h",
     ]
     if (enable_feed_v2) {
       sources += [

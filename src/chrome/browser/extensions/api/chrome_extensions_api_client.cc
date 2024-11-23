@@ -285,15 +285,15 @@ void ChromeExtensionsAPIClient::ClearActionCount(
 void ChromeExtensionsAPIClient::OpenFileUrl(
     const GURL& file_url,
     content::BrowserContext* browser_context) {
-  // CHECK(file_url.is_valid());
-  // CHECK(file_url.SchemeIsFile());
-  // Profile* profile = Profile::FromBrowserContext(browser_context);
-  // NavigateParams navigate_params(profile, file_url,
-  //                                ui::PAGE_TRANSITION_FROM_API);
-  // navigate_params.disposition = WindowOpenDisposition::CURRENT_TAB;
-  // // navigate_params.browser =
-  //     // chrome::FindTabbedBrowser(profile, /*match_original_profiles=*/false);
-  // Navigate(&navigate_params);
+  CHECK(file_url.is_valid());
+  CHECK(file_url.SchemeIsFile());
+  Profile* profile = Profile::FromBrowserContext(browser_context);
+  NavigateParams navigate_params(profile, file_url,
+                                 ui::PAGE_TRANSITION_FROM_API);
+  navigate_params.disposition = WindowOpenDisposition::CURRENT_TAB;
+  // navigate_params.browser =
+      // chrome::FindTabbedBrowser(profile, /*match_original_profiles=*/false);
+  Navigate(&navigate_params);
 }
 
 AppViewGuestDelegate* ChromeExtensionsAPIClient::CreateAppViewGuestDelegate()

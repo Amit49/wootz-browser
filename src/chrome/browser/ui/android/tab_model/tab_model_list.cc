@@ -135,6 +135,6 @@ TabModel* TabModelList::GetCurrentTabModel() {
     if (tab_model->IsActiveModel())
       return tab_model;
   }
-  
+
   return nullptr;
 }

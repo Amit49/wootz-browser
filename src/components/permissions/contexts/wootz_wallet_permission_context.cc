@@ -183,8 +183,6 @@ void WootzWalletPermissionContext::RequestPermissions(
     const std::vector<std::string>& addresses,
     base::OnceCallback<void(const std::vector<blink::mojom::PermissionStatus>&)>
         callback) {
-  LOG(ERROR) << "JANGID: Silent permission approval on request";
-  
   if (!rfh) {
     std::move(callback).Run(std::vector<blink::mojom::PermissionStatus>());
     return;

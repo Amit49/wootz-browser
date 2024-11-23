@@ -41,7 +41,7 @@ build_shell arch="x64" rebuild="yes": (configure arch rebuild)
 
 run arch="x64":
     # ANDROID_SERIAL=172.17.0.2:5555 src/out/Debug_{{arch}}/bin/chrome_public_apk run -vvv
-    ANDROID_SERIAL=$DEVICE src/out/Debug_{{arch}}/bin/chrome_public_apk run
+    ANDROID_SERIAL=$DEVICE src/out/Debug_{{arch}}/bin/chrome_public_apk run # --args="--enable-logging=stderr --v=3"
 
 install arch="x64":
     ADB_TRACE="all adb" ANDROID_SERIAL=172.17.0.2:5555 adb install -r -t src/out/Debug_{{arch}}/apks/WootzApp.apk
@@ -50,7 +50,16 @@ run_shell arch="x64":
     ANDROID_SERIAL=$DEVICE src/out/Debug_{{arch}}/bin/content_shell_apk run --args='--disable-fre' 'data:text/html;utf-8,<html>Hello World!</html>'
 
 symbolize arch="x64":
-    ANDROID_SERIAL=$DEVICE adb logcat -d | src/third_party/android_platform/development/scripts/stack --output-directory src/out/Debug_{{arch}}
+    ANDROID_SERIAL=$DEVICE adb logcat -d | src/third_party/android_platform/development/scripts/stack --output-directory src/out/Debug_{{arch}} && adb logcat -c
+
+bundle:
+    rm -f src/out/Release_arm64/apks/WootzBundle.apks
+    java -jar src/third_party/android_build_tools/bundletool/bundletool.jar build-apks \
+    --bundle=src/out/Release_arm64/apks/WootzApp.aab \
+    --output=src/out/Release_arm64/apks/WootzBundle.apks
+    java -jar src/third_party/android_build_tools/bundletool/bundletool.jar install-apks \
+    --device-id=$DEVICE \
+    --apks=src/out/Release_arm64/apks/WootzBundle.apks
 
 commit branch:
     cd ../wootz-browser && git switch -C {{branch}} && git reset --hard HEAD
@@ -63,8 +72,8 @@ setup_device:
     # DEVICE=$(docker inspect -f '{{{{range.NetworkSettings.Networks}}{{{{.IPAddress}}{{{{end}}' android-container):5555
     #DEVICE=emulator-5554
     adb connect $DEVICE
-    #ANDROID_SERIAL=$DEVICE adb root
-    #ANDROID_SERIAL=$DEVICE adb shell pm set-install-location 1
+    ANDROID_SERIAL=$DEVICE adb root
+    # ANDROID_SERIAL=$DEVICE adb shell pm set-install-location 1
     ANDROID_SERIAL=$DEVICE adb shell settings put global development_settings_enabled 1
     ANDROID_SERIAL=$DEVICE adb shell settings put global verifier_verify_adb_install 0
     ANDROID_SERIAL=$DEVICE adb shell settings put global art_verifier_verify_debuggable 0

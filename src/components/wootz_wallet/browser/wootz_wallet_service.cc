@@ -119,9 +119,6 @@ WootzWalletService::WootzWalletService(
                                                 keyring_service_.get(),
                                                 profile_prefs)),
       weak_ptr_factory_(this) {
-
-    LOG(ERROR)<<"WootzWalletService ANKIT";
-
   CHECK(delegate_);
 
   if (IsBitcoinEnabled()) {
@@ -957,21 +954,16 @@ mojom::OriginInfoPtr WootzWalletService::GetActiveOriginSync() {
 
 void WootzWalletService::GetPendingSignMessageRequests(
     GetPendingSignMessageRequestsCallback callback) {
-  LOG(ERROR) << "JANGID: GetPendingSignMessageRequests: Entering function";
-  
   std::vector<mojom::SignMessageRequestPtr> requests;
   if (sign_message_requests_.empty()) {
-    LOG(ERROR) << "JANGID: GetPendingSignMessageRequests: No pending requests";
     std::move(callback).Run(std::move(requests));
     return;
   }
 
   for (const auto& request : sign_message_requests_) {
     requests.push_back(request.Clone());
-    LOG(ERROR) << "JANGID: GetPendingSignMessageRequests: Added request with ID: " << request->id;
   }
 
-  LOG(ERROR) << "JANGID: GetPendingSignMessageRequests: Exiting function";
   std::move(callback).Run(std::move(requests));
 }
 

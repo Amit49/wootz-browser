@@ -615,7 +615,7 @@ public class LayoutManagerChrome extends LayoutManagerImpl
             }
             mToolbarSwipeLayout.swipeStarted(time(), mScrollDirection, x, y);
         }
-
+ 
         @Override
         public void onSwipeFinished() {
             if (mToolbarSwipeLayout == null || !mToolbarSwipeLayout.isActive()) return;

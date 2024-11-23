@@ -47,6 +47,9 @@ android_library("java") {
     "//third_party/androidx:androidx_core_core_java",
     "//third_party/androidx:androidx_fragment_fragment_java",
     "//ui/android:ui_java",
+    "//third_party/android_deps:material_design_java",
+    "//third_party/androidx:androidx_fragment_fragment_java",
+    "//third_party/androidx:androidx_coordinatorlayout_coordinatorlayout_java",
   ]
   resources_package = "org.chromium.chrome.browser.ui.appmenu.internal"
 }

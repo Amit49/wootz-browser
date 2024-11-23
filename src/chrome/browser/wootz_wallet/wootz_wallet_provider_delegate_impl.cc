@@ -142,54 +142,29 @@ void WootzWalletProviderDelegateImpl::RequestPermissions(
     mojom::CoinType type,
     const std::vector<std::string>& accounts,
     RequestPermissionsCallback callback) {
-
-  LOG(ERROR) << "JANGID: RequestPermissions - CoinType: " << static_cast<int>(type);
-  LOG(ERROR) << "JANGID: Input accounts size: " << accounts.size();
-  for (const auto& account : accounts) {
-    LOG(ERROR) << "JANGID: Input account: " << account;
-  }
-
   if (!IsWeb3NotificationAllowed()) {
-    LOG(ERROR) << "JANGID: Web3 notification not allowed";
     std::move(callback).Run(mojom::RequestPermissionsError::kNone,
                             std::vector<std::string>());
     return;
   }
-
   auto request_type = CoinTypeToPermissionRequestType(type);
   auto permission = CoinTypeToPermissionType(type);
-  
   if (!request_type || !permission) {
-    LOG(ERROR) << "JANGID: Invalid request_type or permission";
     std::move(callback).Run(mojom::RequestPermissionsError::kInternal,
                             std::nullopt);
     return;
   }
-
-  LOG(ERROR) << "JANGID: Request type: " << static_cast<int>(*request_type);
-  LOG(ERROR) << "JANGID: Permission type: " << static_cast<int>(*permission);
-
+  // Check if there's already a permission request in progress
   auto* rfh = content::RenderFrameHost::FromID(host_id_);
-  if (!rfh) {
-    LOG(ERROR) << "JANGID: RenderFrameHost is null";
-    std::move(callback).Run(mojom::RequestPermissionsError::kInternal,
-                            std::nullopt);
-    return;
-  }
-
-  if (permissions::WootzWalletPermissionContext::HasRequestsInProgress(
-          rfh, *request_type)) {
-    LOG(ERROR) << "JANGID: Permission request already in progress";
+  if (rfh && permissions::WootzWalletPermissionContext::HasRequestsInProgress(
+                 rfh, *request_type)) {
     std::move(callback).Run(mojom::RequestPermissionsError::kRequestInProgress,
                             std::nullopt);
     return;
   }
 
-  LOG(ERROR) << "JANGID: Requesting permissions for accounts";
   permissions::WootzWalletPermissionContext::RequestPermissions(
-      *permission, 
-      rfh, 
-      accounts,
+      *permission, content::RenderFrameHost::FromID(host_id_), accounts,
       base::BindOnce(&OnRequestPermissions, accounts, std::move(callback)));
 }
 
@@ -228,43 +203,25 @@ bool WootzWalletProviderDelegateImpl::IsPermissionDenied(mojom::CoinType type) {
 
 void WootzWalletProviderDelegateImpl::AddSolanaConnectedAccount(
     const std::string& account) {
-  LOG(ERROR) << "JANGID: Adding Solana connected account: " << account;
   if (!web_contents_) {
-    LOG(ERROR) << "JANGID: web_contents_ is null";
     return;
   }
-  LOG(ERROR) << "JANGID: Before FromWebContents - web_contents_: " << web_contents_;
   auto* tab_helper =
       wootz_wallet::WootzWalletTabHelper::FromWebContents(web_contents_);
-
-  LOG(ERROR) << "JANGID: After FromWebContents - tab_helper: " << tab_helper;
   if (tab_helper) {
     tab_helper->AddSolanaConnectedAccount(host_id_, account);
-    LOG(ERROR) << "JANGID: Successfully added Solana account";
-  } else {
-    LOG(ERROR) << "JANGID: tab_helper is null - web_contents ID: " 
-               << web_contents_->GetPrimaryMainFrame()->GetGlobalId();
   }
 }
 
 void WootzWalletProviderDelegateImpl::RemoveSolanaConnectedAccount(
     const std::string& account) {
-  LOG(ERROR) << "JANGID: Removing Solana connected account: " << account;
   if (!web_contents_) {
-    LOG(ERROR) << "JANGID: web_contents_ is null";
     return;
   }
-  LOG(ERROR) << "JANGID: Before FromWebContents - web_contents_: " << web_contents_;
   auto* tab_helper =
       wootz_wallet::WootzWalletTabHelper::FromWebContents(web_contents_);
-  LOG(ERROR) << "JANGID: After FromWebContents - tab_helper: " << tab_helper;
-  
   if (tab_helper) {
     tab_helper->RemoveSolanaConnectedAccount(host_id_, account);
-    LOG(ERROR) << "JANGID: uccessfully removed Solana account";
-  } else {
-    LOG(ERROR) << "JANGID: tab_helper is null - web_contents ID: " 
-               << web_contents_->GetPrimaryMainFrame()->GetGlobalId();
   }
 }
 

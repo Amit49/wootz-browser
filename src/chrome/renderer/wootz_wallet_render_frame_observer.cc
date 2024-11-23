@@ -57,7 +57,6 @@ bool WootzWalletRenderFrameObserver::CanCreateProvider() {
   // if (!render_frame()->GetWebFrame()->GetDocument().IsSecureContext()) {
   //   return false;
   // }
-
   return true;
 }
 
@@ -103,13 +102,10 @@ void WootzWalletRenderFrameObserver::DidClearWindowObject() {
     return;
   }
  
- LOG(ERROR)<<"JSEthereumProvider JAGADESH" << dynamic_params.install_window_wootz_ethereum_provider<<"value:" <<web_frame->GetDocument().IsDOMFeaturePolicyEnabled(isolate,context, "ethereum");
   if (dynamic_params.install_window_wootz_ethereum_provider &&
       web_frame->GetDocument().IsDOMFeaturePolicyEnabled(isolate,context, "ethereum")) {
 
   // if (dynamic_params.install_window_wootz_ethereum_provider) {
- LOG(ERROR)<<"JSEthereumProvider JAGADESH";
-
     JSEthereumProvider::Install(
         dynamic_params.install_window_ethereum_provider,
         dynamic_params.allow_overwrite_window_ethereum_provider,

@@ -30,6 +30,7 @@ by a child template that "extends" this file.
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
     <!--
       Enable runtime permissions as uses-permission in tip of tree builds
       only for ease of development on Android L and earlier. For consumer

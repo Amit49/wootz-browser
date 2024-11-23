@@ -706,7 +706,6 @@ void KeyringService::CreateDefaultAccounts() {
       NotifyAccountsAdded(*account);
     }
   }
-  
   ResetAllAccountInfosCache();
 }
 
@@ -1611,7 +1610,6 @@ void KeyringService::Lock() {
     if (auto* profile = g_browser_process->profile_manager()->GetLastUsedProfile()) {
       permissions::WootzWalletPermissionContext::ResetAllPermissions(profile);
     }
-
 
   keyrings_.clear();
   encryptor_.reset();

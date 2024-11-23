@@ -51,7 +51,6 @@
 
 #include "chrome/browser/extensions/api/wootz/wootz_api.h"
 
-
 namespace {
 
 base::Value::Dict GetJsonRpcRequest(const std::string& method,
@@ -173,8 +172,6 @@ EthereumProviderImpl::EthereumProviderImpl(
       eth_block_tracker_(json_rpc_service_),
       eth_logs_tracker_(json_rpc_service_),
       prefs_(prefs) {
-
-  LOG(ERROR)<<"ETHEREUM IMPL HELLO";      
   DCHECK(json_rpc_service_);
   json_rpc_service_->AddObserver(
       rpc_observer_receiver_.BindNewPipeAndPassRemote());
@@ -848,7 +845,6 @@ void EthereumProviderImpl::SignMessageInternal(
 
   
   extensions::WootzSignMessageFunction::NotifyExtensionOfPendingRequest(profile_);
-
 }
 
 void EthereumProviderImpl::OnSignMessageRequestProcessed(
@@ -967,18 +963,14 @@ void EthereumProviderImpl::OnAddEthereumChainRequestCompleted(
 
 void EthereumProviderImpl::Request(base::Value input,
                                    RequestCallback callback) {
-  LOG(ERROR) << "JANGID: EthereumProviderImpl::Request called with input: " << input;
   CommonRequestOrSendAsync(input, std::move(callback), false);
   delegate_->WalletInteractionDetected();
-  LOG(ERROR) << "JANGID: EthereumProviderImpl::Request completed";
 }
 
 void EthereumProviderImpl::SendAsync(base::Value input,
                                      SendAsyncCallback callback) {
-  LOG(ERROR) << "JANGID: EthereumProviderImpl::SendAsync called with input: " << input;
   CommonRequestOrSendAsync(input, std::move(callback), true);
   delegate_->WalletInteractionDetected();
-  LOG(ERROR) << "JANGID: EthereumProviderImpl::SendAsync completed";
 }
 
 void EthereumProviderImpl::SendErrorOnRequest(const mojom::ProviderError& error,
@@ -1362,9 +1354,6 @@ if (method == kEthSignTypedDataV4) {
 void EthereumProviderImpl::Send(const std::string& method,
                                 base::Value params,
                                 SendCallback callback) {
-  
-  LOG(ERROR) << "JANGID: EthereumProviderImpl::Send called"<<" method"<<method<<" params"<<params;
-
   CommonRequestOrSendAsync(GetJsonRpcRequest(method, std::move(params)),
                            std::move(callback), true);
   delegate_->WalletInteractionDetected();
@@ -1438,7 +1427,7 @@ void EthereumProviderImpl::OnIsLockedChecked(
                      std::move(id),
                      method,
                      origin));
-  LOG(ERROR) << "RequestEthereum UNLOCKING START JANGID2";
+
 }
 
 void EthereumProviderImpl::OnUnlockComplete(
@@ -1725,7 +1714,6 @@ void EthereumProviderImpl::GetAllowedAccountsInternal(
 }
 
 void EthereumProviderImpl::UpdateKnownAccounts() {
-
    LOG(ERROR) << "JANGID: EthereumProviderImpl::UpdateKnownAccounts called";
 
   const auto allowed_accounts = GetAllowedAccounts(false);
@@ -1796,9 +1784,7 @@ mojom::AccountIdPtr EthereumProviderImpl::FindAccountByAddress(
 
 void EthereumProviderImpl::Init(
     ::mojo::PendingRemote<mojom::EventsListener> events_listener) {
-  LOG(ERROR)<<"EthereumProviderImpl Init DANIYAL";    
   if (!events_listener_.is_bound()) {
-  LOG(ERROR)<<"EthereumProviderImpl Init DANIYAL";    
     events_listener_.Bind(std::move(events_listener));
   }
 
