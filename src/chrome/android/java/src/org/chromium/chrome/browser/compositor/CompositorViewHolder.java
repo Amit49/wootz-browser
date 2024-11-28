@@ -610,6 +610,14 @@ public class CompositorViewHolder extends FrameLayout
     // state changes while fullscreened and is used to simulate a view resize. This is only needed
     // if the page has opted in to keyboard resizes.
     private void handleWindowInsetChanged() {
+         if (mApplicationBottomInsetSupplier != null
+                && mApplicationBottomInsetSupplier.insetsAffectWebContentsSize()) {
+            tryUpdateControlsAndWebContentsSizing();
+        }
+
+        // Notify the compositor layout that the size has changed.  The layout does not drive
+        // the WebContents sizing, so this needs to be done in addition to the above size
+        // update.
         onViewportChanged();
     }
 
@@ -887,13 +895,24 @@ public class CompositorViewHolder extends FrameLayout
         // TODO(crbug.com/40767446): Centralize the logic for calculating bottom insets by
         // merging them into ApplicationBottomInsetSupplier.
         int controlsInsets = 0;
- 
-        int keyboardInset = 0;
+         if (mBrowserControlsManager != null) {
+            int controlsMinHeight =
+                    mBrowserControlsManager.getTopControlsMinHeight()
+                            + mBrowserControlsManager.getBottomControlsMinHeight();
+            int controlsHeight =
+                    mBrowserControlsManager.getTopControlsHeight()
+                            + mBrowserControlsManager.getBottomControlsHeight();
+            controlsInsets = mControlsResizeView ? controlsHeight : controlsMinHeight;
+        }
+        int keyboardInset =
+                mApplicationBottomInsetSupplier != null
+                        ? mApplicationBottomInsetSupplier.get().webContentsHeightInset
+                        : 0;
 
         int viewportInsets = controlsInsets + keyboardInset;
 
         if (isAttachedToWindow(view)) {
-            webContents.setSize(width, height/* - viewportInsets*/);
+            webContents.setSize(width, height - viewportInsets);
 
             // Dispatch the geometrychange JavaScript event to the page.
             // TODO(bokan): This doesn't belong in updateWebContentsSize. Ideally the content/ layer
@@ -1022,12 +1041,18 @@ public class CompositorViewHolder extends FrameLayout
     @Override
     public void onBottomControlsHeightChanged(
             int bottomControlsHeight, int bottomControlsMinHeight) {
-        return;
+        if (mTabVisible == null) return;
+        onBrowserControlsHeightChanged();
+        updateWebContentsSize(getCurrentTab());
+        onViewportChanged();
     }
 
     @Override
     public void onTopControlsHeightChanged(int topControlsHeight, int topControlsMinHeight) {
-        return;
+        if (mTabVisible == null) return;
+        onBrowserControlsHeightChanged();
+        updateWebContentsSize(getCurrentTab());
+        onViewportChanged();
     }
 
     /**
@@ -1038,7 +1063,9 @@ public class CompositorViewHolder extends FrameLayout
 
     // Browser Controls height never change in Wootzapp.
     private void onBrowserControlsHeightChanged() {
-        return;
+        final WebContents webContents = getWebContents();
+        if (webContents == null) return;
+        webContents.notifyBrowserControlsHeightChanged();
     }
 
     /**
@@ -1086,6 +1113,11 @@ public class CompositorViewHolder extends FrameLayout
         TraceEvent.begin("CompositorViewHolder:updateContentViewChildrenDimension");
         ViewGroup view = getContentView();
         if (view != null) {
+             assert mBrowserControlsManager != null;
+            float topViewsTranslation = mBrowserControlsManager.getTopVisibleContentOffset();
+            float bottomMargin =
+                    BrowserControlsUtils.getBottomContentOffset(mBrowserControlsManager);
+            applyMarginToFullscreenChildViews(view, topViewsTranslation, bottomMargin);
             tryUpdateControlsAndWebContentsSizing();
         }
         TraceEvent.end("CompositorViewHolder:updateContentViewChildrenDimension");
@@ -1151,6 +1183,14 @@ public class CompositorViewHolder extends FrameLayout
         if (mApplicationBottomInsetSupplier != null) {
             outRect.bottom -= mApplicationBottomInsetSupplier.get().viewVisibleHeightInset;
         }
+
+        // mApplicationBottomInsetSupplier doesn't include browser controls.
+        if (mBrowserControlsManager != null) {
+            // All of these values are in pixels.
+            outRect.top += mBrowserControlsManager.getTopVisibleContentOffset();
+            float bottomControlOffset = mBrowserControlsManager.getBottomControlOffset();
+            outRect.bottom -= (getBottomControlsHeightPixels() - bottomControlOffset);
+        }
     }
 
     @Override
@@ -1160,6 +1200,10 @@ public class CompositorViewHolder extends FrameLayout
         if (mApplicationBottomInsetSupplier != null) {
             outRect.bottom -= mApplicationBottomInsetSupplier.get().viewVisibleHeightInset;
         }
+
+        // mApplicationBottomInsetSupplier doesn't include browser controls.
+        outRect.top += getTopControlsHeightPixels();
+        outRect.bottom -= getBottomControlsHeightPixels();
     }
 
     @Override

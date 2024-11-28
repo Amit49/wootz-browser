@@ -747,8 +747,11 @@ public class LayoutManagerImpl
                         resourceManager,
                         browserControlsManager);
 
-        // Always set offset to 0, because we don't have a top toolbar.
-        float offsetPx = 0;
+        // Always set offset, because we have a fixed bottom toolbar.
+        float offsetPx =
+                mBrowserControlsStateProvider == null
+                        ? 0
+                        : mBrowserControlsStateProvider.getTopControlOffset();
 
         for (int i = 0; i < mSceneOverlays.size(); i++) {
             // If the SceneOverlay is not showing, don't bother adding it to the tree.
@@ -1151,11 +1154,7 @@ public class LayoutManagerImpl
      */
 
     public void hideToolbar() {
-        if (mControlContainer.getVisibility() == View.VISIBLE) {
-            mControlContainer.setVisibility(View.INVISIBLE);
-        } else {
-            mControlContainer.setVisibility(View.VISIBLE);
-        }
+        return;
     }
 
     protected void startShowing(Layout layout, boolean animate) {
