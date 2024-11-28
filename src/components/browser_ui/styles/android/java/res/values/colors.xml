@@ -17,6 +17,7 @@ found in the LICENSE file.
     <!-- Toolbar colors -->
     <!-- Same as ?attr/colorSurface. -->
     <color name="toolbar_background_primary_dark">@color/default_bg_color_dark</color>
+    <color name="wootzapp_toolbar_static_color">#EFEFFF</color>
 
     <!-- Infobar colors -->
     <color name="infobar_icon_drawable_color">@color/default_icon_color_accent1_tint_list</color>
