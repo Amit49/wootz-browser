@@ -22,9 +22,7 @@ public class TabThemeColorHelper extends EmptyTabObserver {
 
     /** Notifies the listeners of the tab theme color change. */
     private void updateIfNeeded(Tab tab, boolean didWebContentsThemeColorChange) {
-        int themeColor = tab.getThemeColor();
-        if (didWebContentsThemeColorChange) themeColor = tab.getWebContents().getThemeColor();
-        mUpdateCallback.onResult(themeColor);
+        return;
     }
 
     // TabObserver

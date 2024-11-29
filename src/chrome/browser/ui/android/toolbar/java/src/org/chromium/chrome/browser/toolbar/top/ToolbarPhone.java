@@ -123,6 +123,8 @@ public class ToolbarPhone extends ToolbarLayout
                 @ViewDebug.IntToString(from = EXITING_TAB_SWITCHER, to = "EXITING_TAB_SWITCHER")
             })
     static final int LOCATION_BAR_TRANSPARENT_BACKGROUND_ALPHA = 51;
+    static final int LOCATION_BAR_STATIC_BACKGROUND = -1;
+    static final int LOCATION_BAR_INCOGNITO_BACKGROUND = -16777216;
 
     private final Callback<Integer> mTabCountSupplierObserver;
     private @Nullable ObservableSupplier<Integer> mTabCountSupplier;
@@ -446,7 +448,7 @@ public class ToolbarPhone extends ToolbarLayout
     private void updateModernLocationBarColor(@ColorInt int color) {
         if (mCurrentLocationBarColor == color) return;
         mCurrentLocationBarColor = color;
-        mLocationBarBackground.setTint(color);
+        mLocationBarBackground.setTint(isIncognito() ? LOCATION_BAR_INCOGNITO_BACKGROUND : LOCATION_BAR_STATIC_BACKGROUND);
         if (mOptionalButtonCoordinator != null) {
             mOptionalButtonCoordinator.setBackgroundColorFilter(color);
         }

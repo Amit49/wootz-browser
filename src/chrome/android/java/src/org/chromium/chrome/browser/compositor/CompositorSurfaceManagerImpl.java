@@ -49,7 +49,7 @@ class CompositorSurfaceManagerImpl implements SurfaceHolder.Callback2, Composito
         // Last PixelFormat that we received, or UNKNOWN if we don't know / don't want to cache it.
         public int format;
 
-        // Last known width, height for thsi surface.
+        // Last known width, height for this surface.
         public int width;
         public int height;
 

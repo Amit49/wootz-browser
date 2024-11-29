@@ -31,7 +31,7 @@ public class ChromeColors {
     public static @ColorInt int getDefaultThemeColor(Context context, boolean isIncognito) {
         return isIncognito
                 ? context.getColor(R.color.toolbar_background_primary_dark)
-                : MaterialColors.getColor(context, R.attr.colorSurface, TAG);
+                : context.getColor(R.color.wootzapp_toolbar_static_color);
     }
 
     /**

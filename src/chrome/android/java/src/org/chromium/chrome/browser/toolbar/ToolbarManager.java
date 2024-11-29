@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -52,6 +54,7 @@ import org.chromium.chrome.browser.bookmarks.BookmarkModelObserver;
 import org.chromium.chrome.browser.browser_controls.BrowserControlsSizer;
 import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider;
 import org.chromium.chrome.browser.browser_controls.BrowserStateBrowserControlsVisibilityDelegate;
+import org.chromium.chrome.browser.compositor.CompositorView;
 import org.chromium.chrome.browser.compositor.CompositorViewHolder;
 import org.chromium.chrome.browser.compositor.bottombar.OverlayPanelManager.OverlayPanelManagerObserver;
 import org.chromium.chrome.browser.compositor.bottombar.ephemeraltab.EphemeralTabCoordinator;
@@ -661,17 +664,17 @@ public class ToolbarManager
                         });
         mControlContainer = controlContainer;
         mToolbarHairline = mControlContainer.findViewById(R.id.toolbar_hairline);
-        if (true) {
-            ViewGroup.MarginLayoutParams layoutParamsCC =
-                ((ViewGroup.MarginLayoutParams) mControlContainer.getLayoutParams());
-                layoutParamsCC.bottomMargin = mToolbarHairline.getHeight();
-            mControlContainer.setLayoutParams(layoutParamsCC);
 
-            ViewGroup.MarginLayoutParams layoutParamsHR =
-                ((ViewGroup.MarginLayoutParams) mToolbarHairline.getLayoutParams());
-            layoutParamsHR.topMargin = 0;
-            mToolbarHairline.setLayoutParams(layoutParamsHR);
-        }
+        ViewGroup.MarginLayoutParams layoutParamsCC =
+            ((ViewGroup.MarginLayoutParams) mControlContainer.getLayoutParams());
+            layoutParamsCC.bottomMargin = mToolbarHairline.getHeight();
+        mControlContainer.setLayoutParams(layoutParamsCC);
+
+        ViewGroup.MarginLayoutParams layoutParamsHR =
+            ((ViewGroup.MarginLayoutParams) mToolbarHairline.getLayoutParams());
+        layoutParamsHR.topMargin = 0;
+        mToolbarHairline.setLayoutParams(layoutParamsHR);
+
         mBookmarkModelSupplier = bookmarkModelSupplier;
         // We need to capture a reference to setBookmarkModel/setCurrentProfile in order to remove
         // them later; there is no guarantee in the JLS that referencing the same method later will

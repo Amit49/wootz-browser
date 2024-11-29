@@ -19,6 +19,8 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+// import android.view.ViewParent; 
+// import android.view.ViewGroup; 
 import android.view.ViewStub;
 import android.view.Gravity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -80,6 +82,8 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
 
     private boolean mIsAppInUnfocusedDesktopWindow;
 
+    // private View toolbarView;
+
     /**
      * Constructs a new control container.
      *
@@ -138,23 +142,8 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
             // By DevJangid
             MarginLayoutParams params = (MarginLayoutParams) mToolbarContainer.getLayoutParams();
             // changed the top margin to 0 so that app menu and toolbar will not have any gap b/w them
-            int leftMargin = ViewUtils.dpToPx(getContext(), 16);
-            int rightMargin = ViewUtils.dpToPx(getContext(), 16);
-            int bottomMargin = ViewUtils.dpToPx(getContext(), 8);
-            params.setMargins(leftMargin, 0, rightMargin, bottomMargin); // left, top, right, bottom
+            params.setMargins(0, 0, 0, 0); // left, top, right, bottom
             mToolbarContainer.setLayoutParams(params);
-
-
-            // By Devendra(dkt)
-            // Add border radius
-            float borderRadius = 40f; // Adjusted by Sagar Jha
-            mToolbarContainer.setClipToOutline(true);
-            mToolbarContainer.setOutlineProvider(new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
-                }
-            });
         }
     }
 
@@ -724,6 +713,8 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
             return true;
         }
 
+        // if (!isToolbarFullyVisible()) return false;
+
         return mSwipeGestureListener.onTouchEvent(event);
     }
 
@@ -746,6 +737,15 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
         return Float.compare(0f, getTranslationY()) == 0
                 && mToolbarContainer.getVisibility() == VISIBLE;
     }
+
+    // private boolean isToolbarFullyVisible() {
+    //     return toolbarView.getVisibility() == VISIBLE;
+    // }
+
+    // private boolean isSwipeDownEvent(MotionEvent event, int mLastTapY) {
+    //     Log.d("ttx", "checking swipe down event " + event.getY() + "mLastTapY = " + mLastTapY);
+    //     return event.getActionMasked() == MotionEvent.ACTION_MOVE && event.getY() > mLastTapY;
+    // }
 
     private class SwipeGestureListenerImpl extends SwipeGestureListener {
         public SwipeGestureListenerImpl(Context context, SwipeHandler handler) {

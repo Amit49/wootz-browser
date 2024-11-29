@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.chrome.R;
 import org.chromium.base.ObserverList;
 import org.chromium.base.TraceEvent;
 import org.chromium.base.supplier.ObservableSupplier;
@@ -58,6 +59,7 @@ import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.tabmodel.TabModelSelectorObserver;
 import org.chromium.chrome.browser.tabmodel.TabModelSelectorTabObserver;
 import org.chromium.chrome.browser.tabmodel.TabModelUtils;
+import org.chromium.chrome.browser.theme.ThemeColorProvider;
 import org.chromium.chrome.browser.theme.ThemeUtils;
 import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
 import org.chromium.chrome.browser.toolbar.ControlContainer;
@@ -81,6 +83,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
 
 /**
  * A class that is responsible for managing an active {@link Layout} to show to the screen.  This
@@ -108,6 +111,7 @@ public class LayoutManagerImpl
     protected StaticLayout mStaticLayout;
 
     private final ViewGroup mContentContainer;
+    private ViewGroup mControlContainer;
 
     // External Dependencies
     private TabModelSelector mTabModelSelector;
@@ -368,6 +372,7 @@ public class LayoutManagerImpl
 
         assert contentContainer != null;
         mContentContainer = contentContainer;
+        mControlContainer = mContentContainer.findViewById(R.id.control_container);
 
         mAnimationHandler = new CompositorAnimationHandler(this::requestUpdate);
 
@@ -742,6 +747,7 @@ public class LayoutManagerImpl
                         resourceManager,
                         browserControlsManager);
 
+        // Always set offset, because we have a fixed bottom toolbar.
         float offsetPx =
                 mBrowserControlsStateProvider == null
                         ? 0
@@ -1146,6 +1152,11 @@ public class LayoutManagerImpl
      * @param layout  The new {@link Layout} to show.
      * @param animate Whether or not {@code layout} should animate as it shows.
      */
+
+    public void hideToolbar() {
+        return;
+    }
+
     protected void startShowing(Layout layout, boolean animate) {
         assert layout != null : "Can't show a null layout.";
 
@@ -1257,7 +1268,7 @@ public class LayoutManagerImpl
     /**
      * Creates a {@link SwipeHandler} instance.
      * @param supportSwipeDown Whether or not to the handler should support swipe down gesture.
-     * @return The {@link SwipeHandler} cerated.
+     * @return The {@link SwipeHandler} created.
      */
     public SwipeHandler createToolbarSwipeHandler(boolean supportSwipeDown) {
         return null;
