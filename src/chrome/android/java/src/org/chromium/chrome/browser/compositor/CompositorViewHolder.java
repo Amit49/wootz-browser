@@ -904,13 +904,16 @@ public class CompositorViewHolder extends FrameLayout
                             + mBrowserControlsManager.getBottomControlsHeight();
             controlsInsets = mControlsResizeView ? controlsHeight : controlsMinHeight;
         }
- 
-        int keyboardInset = 0;
+
+        int keyboardInset =
+                mApplicationBottomInsetSupplier != null
+                        ? mApplicationBottomInsetSupplier.get().webContentsHeightInset
+                        : 0;
 
         int viewportInsets = controlsInsets + keyboardInset;
 
         if (isAttachedToWindow(view)) {
-            webContents.setSize(width, height/* - viewportInsets*/);
+            webContents.setSize(width, height - viewportInsets);
 
             // Dispatch the geometrychange JavaScript event to the page.
             // TODO(bokan): This doesn't belong in updateWebContentsSize. Ideally the content/ layer
@@ -1058,6 +1061,8 @@ public class CompositorViewHolder extends FrameLayout
      * #updateWebContentsSize, this will make sure the renderer's properties are updated even if the
      * size didn't change.
      */
+
+    // Browser Controls height never change in Wootzapp.
     private void onBrowserControlsHeightChanged() {
         final WebContents webContents = getWebContents();
         if (webContents == null) return;

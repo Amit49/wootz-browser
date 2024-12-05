@@ -604,11 +604,6 @@ public class LayoutManagerChrome extends LayoutManagerImpl
             if (mScrollDirection == ScrollDirection.UP) { //enabled the swipe down feature by default - Sagar Jha
                 RecordUserAction.record("MobileToolbarSwipeOpenStackView");
                 showLayout(LayoutType.TAB_SWITCHER, true);
-            } else if (mSupportSwipeUp
-                       && mScrollDirection == ScrollDirection.UP
-                       && false) {
-            } else if (false) {
-                showLayout(LayoutType.TAB_SWITCHER, true);
             } else if (mScrollDirection == ScrollDirection.LEFT
                     || mScrollDirection == ScrollDirection.RIGHT) {
                 startShowing(mToolbarSwipeLayout, true);

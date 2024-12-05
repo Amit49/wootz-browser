@@ -233,7 +233,7 @@ public class HomepageManager
      * @see #isHomepageEnabled
      */
     private boolean getPrefHomepageEnabled() {
-        return mSharedPreferencesManager.readBoolean(ChromePreferenceKeys.HOMEPAGE_ENABLED, true);
+        return mSharedPreferencesManager.readBoolean(ChromePreferenceKeys.HOMEPAGE_ENABLED, false);
     }
 
     /** Sets the user preference for whether the homepage is enabled. */

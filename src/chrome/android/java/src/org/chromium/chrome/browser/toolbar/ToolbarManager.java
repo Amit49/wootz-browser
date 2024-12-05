@@ -661,17 +661,16 @@ public class ToolbarManager
                         });
         mControlContainer = controlContainer;
         mToolbarHairline = mControlContainer.findViewById(R.id.toolbar_hairline);
-        if (true) {
-            ViewGroup.MarginLayoutParams layoutParamsCC =
-                ((ViewGroup.MarginLayoutParams) mControlContainer.getLayoutParams());
-                layoutParamsCC.bottomMargin = mToolbarHairline.getHeight();
-            mControlContainer.setLayoutParams(layoutParamsCC);
+        ViewGroup.MarginLayoutParams layoutParamsCC =
+            ((ViewGroup.MarginLayoutParams) mControlContainer.getLayoutParams());
+            layoutParamsCC.bottomMargin = mToolbarHairline.getHeight();
+        mControlContainer.setLayoutParams(layoutParamsCC);
 
-            ViewGroup.MarginLayoutParams layoutParamsHR =
-                ((ViewGroup.MarginLayoutParams) mToolbarHairline.getLayoutParams());
-            layoutParamsHR.topMargin = 0;
-            mToolbarHairline.setLayoutParams(layoutParamsHR);
-        }
+        ViewGroup.MarginLayoutParams layoutParamsHR =
+            ((ViewGroup.MarginLayoutParams) mToolbarHairline.getLayoutParams());
+        layoutParamsHR.topMargin = 0;
+        mToolbarHairline.setLayoutParams(layoutParamsHR);
+        
         mBookmarkModelSupplier = bookmarkModelSupplier;
         // We need to capture a reference to setBookmarkModel/setCurrentProfile in order to remove
         // them later; there is no guarantee in the JLS that referencing the same method later will

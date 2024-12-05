@@ -231,12 +231,10 @@ public class AutocompleteCoordinator
 
                 // By DevJangid
                 // Add margin to the dropdown using ViewUtils
-                int leftMargin = ViewUtils.dpToPx(context, 16);
-                int rightMargin = ViewUtils.dpToPx(context, 16);
                 int bottomMargin = ViewUtils.dpToPx(context, 60); 
                 
                 ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) dropdown.getLayoutParams();
-                layoutParams.setMargins(leftMargin, 0, rightMargin, bottomMargin); // Set desired margins (left, top, right, bottom)
+                layoutParams.setMargins(0, 0, 0, bottomMargin); // Set desired margins (left, top, right, bottom)
                 dropdown.setLayoutParams(layoutParams);
                                 
                 dropdown.forcePhoneStyleOmnibox(forcePhoneStyleOmnibox);

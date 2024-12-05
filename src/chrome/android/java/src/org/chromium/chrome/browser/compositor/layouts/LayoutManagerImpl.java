@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.chrome.R;
 import org.chromium.base.ObserverList;
 import org.chromium.base.TraceEvent;
 import org.chromium.base.supplier.ObservableSupplier;
@@ -108,6 +109,7 @@ public class LayoutManagerImpl
     protected StaticLayout mStaticLayout;
 
     private final ViewGroup mContentContainer;
+    private ViewGroup mControlContainer;
 
     // External Dependencies
     private TabModelSelector mTabModelSelector;
@@ -368,6 +370,7 @@ public class LayoutManagerImpl
 
         assert contentContainer != null;
         mContentContainer = contentContainer;
+        mControlContainer = mContentContainer.findViewById(R.id.control_container);
 
         mAnimationHandler = new CompositorAnimationHandler(this::requestUpdate);
 
@@ -1257,7 +1260,7 @@ public class LayoutManagerImpl
     /**
      * Creates a {@link SwipeHandler} instance.
      * @param supportSwipeDown Whether or not to the handler should support swipe down gesture.
-     * @return The {@link SwipeHandler} cerated.
+     * @return The {@link SwipeHandler} created.
      */
     public SwipeHandler createToolbarSwipeHandler(boolean supportSwipeDown) {
         return null;

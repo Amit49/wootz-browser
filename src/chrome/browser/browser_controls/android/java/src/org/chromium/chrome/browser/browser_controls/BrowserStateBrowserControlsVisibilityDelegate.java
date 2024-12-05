@@ -130,7 +130,7 @@ public class BrowserStateBrowserControlsVisibilityDelegate extends BrowserContro
                 || (mTokenHolder.hasTokens() && !sDisableOverridesForTesting)) {
             return BrowserControlsState.SHOWN;
         }
-        return BrowserControlsState.BOTH;
+        return BrowserControlsState.SHOWN;
     }
 
     private void updateVisibilityConstraints() {
