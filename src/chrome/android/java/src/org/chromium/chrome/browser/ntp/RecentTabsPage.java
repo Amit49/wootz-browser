@@ -287,6 +287,7 @@ public class RecentTabsPage
         mSnapshotHeight = mView.getHeight();
     }
 
+    //No need to update margin as Wootzapp is in default full screen
     @Override
     public void onBottomControlsHeightChanged(
             int bottomControlsHeight, int bottomControlsMinHeight) {
@@ -314,6 +315,7 @@ public class RecentTabsPage
         final int contentOffset = mBrowserControlsStateProvider.getContentOffset();
         ViewGroup.MarginLayoutParams layoutParams =
                 (ViewGroup.MarginLayoutParams) recentTabsRoot.getLayoutParams();
+
         int topMargin = layoutParams.topMargin;
 
         // If the top controls are at the resting position or their height is decreasing, we want to
@@ -329,10 +331,8 @@ public class RecentTabsPage
 
             topMargin = 0;
             recentTabsRoot.setTranslationY(0);
-
-
         int bottomMargin = mBrowserControlsStateProvider.getBottomControlsHeight();
-       
+
             bottomMargin += mBrowserControlsStateProvider.getTopControlsHeight();
 
         if (topMargin != layoutParams.topMargin || bottomMargin != layoutParams.bottomMargin) {

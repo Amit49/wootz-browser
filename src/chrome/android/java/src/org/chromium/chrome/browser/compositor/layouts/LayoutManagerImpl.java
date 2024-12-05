@@ -59,6 +59,7 @@ import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.tabmodel.TabModelSelectorObserver;
 import org.chromium.chrome.browser.tabmodel.TabModelSelectorTabObserver;
 import org.chromium.chrome.browser.tabmodel.TabModelUtils;
+import org.chromium.chrome.browser.theme.ThemeColorProvider;
 import org.chromium.chrome.browser.theme.ThemeUtils;
 import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
 import org.chromium.chrome.browser.toolbar.ControlContainer;
@@ -82,6 +83,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
 
 /**
  * A class that is responsible for managing an active {@link Layout} to show to the screen.  This
@@ -745,6 +747,7 @@ public class LayoutManagerImpl
                         resourceManager,
                         browserControlsManager);
 
+        // Always set offset, because we have a fixed bottom toolbar.
         float offsetPx =
                 mBrowserControlsStateProvider == null
                         ? 0
@@ -1149,6 +1152,11 @@ public class LayoutManagerImpl
      * @param layout  The new {@link Layout} to show.
      * @param animate Whether or not {@code layout} should animate as it shows.
      */
+
+    public void hideToolbar() {
+        return;
+    }
+
     protected void startShowing(Layout layout, boolean animate) {
         assert layout != null : "Can't show a null layout.";
 

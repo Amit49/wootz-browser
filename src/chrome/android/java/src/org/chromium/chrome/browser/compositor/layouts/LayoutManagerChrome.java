@@ -37,6 +37,8 @@ import org.chromium.chrome.browser.theme.ThemeColorProvider;
 import org.chromium.chrome.browser.theme.ThemeColorProvider.ThemeColorObserver;
 import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
 import org.chromium.chrome.browser.toolbar.ControlContainer;
+import org.chromium.chrome.browser.toolbar.top.ToolbarLayout;
+import org.chromium.chrome.browser.toolbar.top.ToolbarPhone;
 import org.chromium.chrome.browser.ui.desktop_windowing.DesktopWindowStateProvider;
 import org.chromium.chrome.browser.util.ChromeAccessibilityUtil;
 import org.chromium.chrome.features.start_surface.StartSurface;
@@ -49,6 +51,8 @@ import org.chromium.ui.resources.dynamics.DynamicResourceLoader;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import javax.swing.text.View;
 
 /**
  * A {@link Layout} controller for the more complicated Chrome browser. This is currently a superset

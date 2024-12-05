@@ -19,6 +19,8 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+// import android.view.ViewParent; 
+// import android.view.ViewGroup; 
 import android.view.ViewStub;
 import android.view.Gravity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -79,6 +81,8 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
     private OnDragListener mToolbarContainerDragListener;
 
     private boolean mIsAppInUnfocusedDesktopWindow;
+
+    // private View toolbarView;
 
     /**
      * Constructs a new control container.
@@ -709,6 +713,8 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
             return true;
         }
 
+        // if (!isToolbarFullyVisible()) return false;
+
         return mSwipeGestureListener.onTouchEvent(event);
     }
 
@@ -731,6 +737,15 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
         return Float.compare(0f, getTranslationY()) == 0
                 && mToolbarContainer.getVisibility() == VISIBLE;
     }
+
+    // private boolean isToolbarFullyVisible() {
+    //     return toolbarView.getVisibility() == VISIBLE;
+    // }
+
+    // private boolean isSwipeDownEvent(MotionEvent event, int mLastTapY) {
+    //     Log.d("ttx", "checking swipe down event " + event.getY() + "mLastTapY = " + mLastTapY);
+    //     return event.getActionMasked() == MotionEvent.ACTION_MOVE && event.getY() > mLastTapY;
+    // }
 
     private class SwipeGestureListenerImpl extends SwipeGestureListener {
         public SwipeGestureListenerImpl(Context context, SwipeHandler handler) {
