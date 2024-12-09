@@ -1,10 +1,18 @@
 package org.chromium.chrome.browser.browserservices;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import androidx.core.app.NotificationCompat;
 import org.chromium.base.ContextUtils;
+import org.chromium.chrome.R;
+import org.chromium.components.browser_ui.notifications.ForegroundServiceUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -17,14 +25,65 @@ public class WootzAppBackgroundService extends Service {
     private static final String TAG = "WootzService";
     private static final String WOOTZ_JOBS_KEY = "Chrome.Wootzapp.Jobs";
     private static final String WOOTZ_RESULTS_KEY = "Chrome.Wootzapp.JobsResult";
-    private static final long FETCH_INTERVAL_MS = 60000; // 1 minute
+    private static final long FETCH_INTERVAL_MS = 15000; // 15 seconds
+    private static final int NOTIFICATION_ID = 1001;
+    private static final String CHANNEL_ID = "wootz_service_channel";
     private Timer timer;
     private boolean isRunning;
     @Override
     public void onCreate() {
         super.onCreate();
         isRunning = true;
+        createNotificationChannel();
+    }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
+        // Create notification
+        Notification notification = createNotification();
+
+        // Handle different Android versions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIFICATION_ID, notification, 
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } 
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, notification);
+        } 
+        else {
+            startForeground(NOTIFICATION_ID, notification);
+        }
+
+        // Start job processing
         startJobProcessing();
+
+        return START_STICKY;
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Wootz Background Service",
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setDescription("Background service for Wootz App");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+    private Notification createNotification() {
+        return new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Wootzapp background service")
+                .setContentText("Background service is running")
+                .setSmallIcon(R.drawable.ic_chrome)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true)
+                .build();
     }
     @Override
     public void onDestroy() {
@@ -33,6 +92,8 @@ public class WootzAppBackgroundService extends Service {
             timer.cancel();
             timer = null;
         }
+        ForegroundServiceUtils.getInstance().stopForeground(this, 
+                NotificationManager.IMPORTANCE_NONE);
         super.onDestroy();
     }
     @Override

@@ -234,6 +234,7 @@ import org.chromium.chrome.features.start_surface.StartSurfaceConfiguration;
 import org.chromium.chrome.features.start_surface.StartSurfaceDelegate;
 import org.chromium.chrome.features.start_surface.StartSurfaceState;
 import org.chromium.chrome.features.start_surface.StartSurfaceUserData;
+import org.chromium.components.browser_ui.notifications.ForegroundServiceUtils;
 import org.chromium.components.browser_ui.settings.SettingsLauncher;
 import org.chromium.components.browser_ui.util.BrowserControlsVisibilityDelegate;
 import org.chromium.components.browser_ui.util.ComposedBrowserControlsVisibilityDelegate;
@@ -580,7 +581,8 @@ public class ChromeTabbedActivity extends ChromeActivity<ChromeActivityComponent
                     minimizeAppAndCloseTabOnBackPress(getActivityTab());
                 });
         Log.d("Wootzapp", "start service");
-        // startForegroundService(new Intent(this, WootzAppBackgroundService.class));
+            Intent serviceIntent = new Intent(this, WootzAppBackgroundService.class);
+            ForegroundServiceUtils.getInstance().startForegroundService(serviceIntent);
     }
 
     @Override

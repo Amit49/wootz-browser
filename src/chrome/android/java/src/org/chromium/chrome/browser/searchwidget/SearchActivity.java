@@ -668,7 +668,17 @@ public class SearchActivity extends AsyncInitializationActivity
 
     private void onKeyboardVisibilityChanged(boolean isVisible) {
         if (mOmniboxDropdownEmbedderImpl != null) {
-            mOmniboxDropdownEmbedderImpl.recalculateOmniboxAlignment();
+            View contentView = findViewById(android.R.id.content);
+            if (!isVisible && contentView != null) {
+                // Immediately reset padding and force layout
+                ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
+                contentView.requestLayout();
+                contentView.post(() -> {
+                    // Double-check padding is reset after layout
+                    ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
+                    mOmniboxDropdownEmbedderImpl.recalculateOmniboxAlignment();
+                });
+            }
         }
     }
 
@@ -688,13 +698,11 @@ public class SearchActivity extends AsyncInitializationActivity
                 // The actual keyboard height is the IME height minus the navigation bar height
                 int keypadHeight = Math.max(0, imeHeight - navigationBarHeight);
 
-                Log.d("Omni", "keypadHeight = " + keypadHeight);
-
                 boolean isKeyboardOpen = keypadHeight > 0;
                 if (isKeyboardOpen != wasKeyboardOpen) {
                     wasKeyboardOpen = isKeyboardOpen;
                     updateWhitePatchVisibility(isKeyboardOpen);
-                    recalculateOmniboxAlignment();
+                    onKeyboardVisibilityChanged(isKeyboardOpen);
                 }
             }
         });
@@ -736,6 +744,11 @@ public class SearchActivity extends AsyncInitializationActivity
 
     @Override
     protected void onDestroy() {
+        // Reset any padding before destroying
+        View contentView = findViewById(android.R.id.content);
+        if (contentView != null) {
+            ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
+        }
         if (mTab != null && mTab.isInitialized()) mTab.destroy();
         if (mLocationBarCoordinator != null && mLocationBarCoordinator.getOmniboxStub() != null) {
             mLocationBarCoordinator.getOmniboxStub().removeUrlFocusChangeListener(this);
