@@ -265,6 +265,7 @@ if (current_toolchain == default_toolchain) {
       "//components/subresource_filter/android:java_resources",
       "//components/translate/content/android:java_resources",
       "//components/webapps/browser/android:java_resources",
+      "//content/public/android:content_java",
       "//content/public/android:content_java_resources",
       "//third_party/android_deps:material_design_java",
       "//third_party/androidx:androidx_gridlayout_gridlayout_java",

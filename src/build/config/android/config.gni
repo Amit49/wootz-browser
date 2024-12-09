@@ -223,10 +223,10 @@ if (is_android || is_chromeos) {
     android_default_version_name = "Developer Build"
 
     # Forced Android versionCode
-    android_override_version_code = "2"
+    android_override_version_code = "13"
 
     # Forced Android versionName
-    android_override_version_name = "0.2"
+    android_override_version_name = "0.13"
 
     # The path to the keystore to use for signing builds.
     android_keystore_path = default_android_keystore_path
@@ -261,7 +261,7 @@ if (is_android || is_chromeos) {
 
     # Controls whether proguard obfuscation is enabled for targets
     # configured to use it.
-    enable_proguard_obfuscation = true
+    enable_proguard_obfuscation = false
 
     # Controls whether |short_resource_paths| and |strip_resource_names| are
     # respected. Useful when trying to analyze APKs using tools that do not

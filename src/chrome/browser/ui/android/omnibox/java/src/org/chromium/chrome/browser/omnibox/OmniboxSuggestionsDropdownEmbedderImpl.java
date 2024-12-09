@@ -207,6 +207,11 @@ public class OmniboxSuggestionsDropdownEmbedderImpl
 
     @Override
     public void onDetachedFromWindow() {
+        // Reset padding when detached
+        View contentView = mAnchorView.getRootView().findViewById(android.R.id.content);
+        if (contentView != null) {
+            ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
+        }
         mKeyboardHeight = 0;
         recalculateOmniboxAlignment();
         mAnchorView.removeOnLayoutChangeListener(this);
@@ -299,6 +304,15 @@ public class OmniboxSuggestionsDropdownEmbedderImpl
      */
     public void recalculateOmniboxAlignment() {
         View contentView = mAnchorView.getRootView().findViewById(android.R.id.content);
+        
+        if(!mKeyboardVisibilityDelegate.isKeyboardShowing(mContext,contentView)) {
+            // Immediately reset everything if keyboard is hidden
+            mKeyboardHeight = 0;
+            ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
+            contentView.requestLayout();
+            return; // Exit early to prevent any delayed adjustments
+        }
+
         int contentViewTopPadding = contentView == null ? 0 : contentView.getPaddingTop();
 
         // If there is a base Chrome layout, calculate the relative position from it rather than
@@ -389,17 +403,20 @@ public class OmniboxSuggestionsDropdownEmbedderImpl
         " contentViewHeight: " + (contentView != null ? contentView.getMeasuredHeight() : "null"));
 
         if(mKeyboardVisibilityDelegate.isKeyboardShowing(mContext,contentView) || (mKeyboardHeight > 0)){
+            // Only add padding if keyboard is showing and there's a gap
             if(windowSpace - mKeyboardHeight - contentSpace < offset){
                 ViewCompat.setPaddingRelative(contentView, 0, 0, 0, mKeyboardHeight);
             }
-            else{
-                ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
-            }
-        }
-        else{
+        } else {
+            // Reset padding when keyboard is hidden
             ViewCompat.setPaddingRelative(contentView, 0, 0, 0, 0);
+            mKeyboardHeight = 0;
         }
 
+        // Force layout refresh
+        if (contentView != null) {
+            contentView.requestLayout();
+        }
 
         top = 0;
         OmniboxAlignment omniboxAlignment =
