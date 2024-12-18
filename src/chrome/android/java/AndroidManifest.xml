@@ -29,6 +29,8 @@ by a child template that "extends" this file.
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Android 10+ permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!--
       Enable runtime permissions as uses-permission in tip of tree builds
       only for ease of development on Android L and earlier. For consumer
@@ -811,6 +813,21 @@ by a child template that "extends" this file.
             android:excludeFromRecents="true"
             android:process=":launch_failed">
         </activity>
+
+         <service
+            android:name="org.chromium.chrome.browser.browserservices.WootzAppBackgroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync|shortService" 
+            android:stopWithTask="false"
+            android:directBootAware="true"
+            android:isolatedProcess="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </service>
 
         <!-- Components for Trusted Web Activities -->
         <receiver android:name="org.chromium.chrome.browser.browserservices.InstalledWebappBroadcastReceiver"

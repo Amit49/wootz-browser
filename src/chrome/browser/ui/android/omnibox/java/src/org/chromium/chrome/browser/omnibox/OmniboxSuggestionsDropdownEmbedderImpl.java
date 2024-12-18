@@ -160,7 +160,19 @@ public class OmniboxSuggestionsDropdownEmbedderImpl
     @Nullable
     @Override
     public OmniboxAlignment getCurrentAlignment() {
-        return mOmniboxAlignmentSupplier.get();
+        OmniboxAlignment currentAlignment = mOmniboxAlignmentSupplier.get();
+        if (currentAlignment == null) {
+            // Provide default alignment if none exists
+            return new OmniboxAlignment(
+                0,  // left
+                0,  // top
+                mAnchorView.getMeasuredWidth(),  // width
+                mAnchorView.getMeasuredHeight(), // height
+                0,  // paddingLeft
+                0   // paddingRight
+            );
+        }
+        return currentAlignment;
     }
 
     public void setWhitePatchVisible(boolean visible) {
