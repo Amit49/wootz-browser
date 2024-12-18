@@ -102,6 +102,11 @@ static ScopedJavaLocalRef<jstring> JNI_Extensions_GetExtensionsInfo(
             : "";
         extension_info.Set("popup_url", popup_url);
 
+        std::string widget_url = (action_info && !action_info->default_widget_url.is_empty())
+            ? action_info->default_widget_url.spec() 
+            : "";
+        extension_info.Set("widget_url", widget_url);
+
         std::string icon_base64 = extensions::IconLoaderJNI::GetIconBytesBase64(extension.get());
         extension_info.Set("icon_base64", icon_base64);
 

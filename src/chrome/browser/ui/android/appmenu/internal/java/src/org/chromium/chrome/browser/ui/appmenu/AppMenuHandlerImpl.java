@@ -21,7 +21,14 @@ import android.util.Log;
 import org.chromium.base.Callback;
 import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.supplier.Supplier;
+
+import org.chromium.chrome.browser.app.ChromeActivity;
+import org.chromium.chrome.browser.app.ChromeActivity.ChromeActivityNotFoundException;
 import org.chromium.chrome.browser.app.appmenu.AppMenuPropertiesDelegateImpl;
+import org.chromium.chrome.browser.extensions.ExtensionInfo;
+import org.chromium.chrome.browser.extensions.Extensions;
+import org.chromium.chrome.browser.app.appmenu.AppMenuPropertiesDelegateImpl;
+import org.chromium.chrome.browser.ui.appmenu.AppMenuExtensionOpener;
 import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
 import org.chromium.chrome.browser.lifecycle.ConfigurationChangedObserver;
 import org.chromium.chrome.browser.lifecycle.StartStopWithNativeObserver;
@@ -41,6 +48,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
+
 
 /**
  * Object responsible for handling the creation, showing, hiding of the AppMenu and notifying the
@@ -66,6 +75,8 @@ class AppMenuHandlerImpl
     private FragmentManager mFragmentManager;
     private final int mItemRowHeight;
     private WindowAndroid mWindowAndroid;
+
+    private AppMenuExtensionOpener mExtensionOpener;
     /**
      * The resource id of the menu item to highlight when the menu next opens. A value of {@code
      * null} means no item will be highlighted. This value will be cleared after the menu is opened.
@@ -112,6 +123,8 @@ class AppMenuHandlerImpl
         mFragmentManager = fragmentManager;
         mItemRowHeight = itemRowHeight;
         mWindowAndroid = windowAndroid;
+
+        mExtensionOpener = new AppMenuExtensionOpener(context, windowAndroid);
 
         mActivityLifecycleDispatcher = activityLifecycleDispatcher;
         mActivityLifecycleDispatcher.register(this);
@@ -261,6 +274,24 @@ class AppMenuHandlerImpl
             return false;
         }
 
+    }
+
+    public void openExtensionById(String extensionId) {
+        Log.d(TAG, "JANGID: AppMenuHandler openExtensionById " + extensionId);
+        if (mAppMenu != null) {
+            mAppMenu.showExtensionWebViewDirectly(extensionId, mExtensionOpener);
+        } else {
+            mExtensionOpener.openExtension(extensionId);
+        }
+    }
+
+    public void closeExtensionBottomSheet() {
+        Log.d(TAG, "JANGID: AppMenuHandler closeExtensionBottomSheet ");
+        if (mAppMenu != null) {
+            mAppMenu.closeExtensionBottomSheet(mExtensionOpener);
+        } else {
+            mExtensionOpener.closeBottomSheet();
+        }
     }
 
     void appMenuDismissed() {

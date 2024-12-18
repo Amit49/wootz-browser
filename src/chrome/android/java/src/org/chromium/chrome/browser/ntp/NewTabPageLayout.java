@@ -5,6 +5,7 @@
 package org.chromium.chrome.browser.ntp;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -42,7 +43,10 @@ import org.chromium.components.thinwebview.ThinWebView;
 import org.chromium.components.thinwebview.ThinWebViewConstraints;
 import org.chromium.components.thinwebview.ThinWebViewFactory;
 import org.chromium.chrome.R;
+import org.chromium.chrome.browser.extensions.OpenExtensionsById;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.extensions.Extensions;
+import org.chromium.chrome.browser.extensions.ExtensionInfo;
 import org.chromium.chrome.browser.feed.FeedSurfaceScrollDelegate;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.ui.base.IntentRequestTracker;
@@ -82,7 +86,9 @@ import org.chromium.ui.base.ViewAndroidDelegate;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.text.EmptyTextWatcher;
 import org.chromium.chrome.browser.content.WebContentsFactory;
-
+// import org.chromium.chrome.browser.ui.appmenu.AppMenuCoordinator;
+// import org.chromium.chrome.browser.ui.appmenu.AppMenu;
+// import org.chromium.base.activity.ActivityUtils;
 /**
  * Layout for the new tab page. This positions the page elements in the correct vertical positions.
  * There are no separate phone and tablet UIs; this layout adapts based on the available space.
@@ -1097,6 +1103,7 @@ public class NewTabPageLayout extends LinearLayout {
 
         if (Extensions.getExtensionsInfo().size() > 1) {
             initializeExtensionWebView(1);
+            setupExtensionWebViewClick();
         }
     }
 
@@ -1450,27 +1457,58 @@ public class NewTabPageLayout extends LinearLayout {
         });
 
 
-        String popupUrl = Extensions.getExtensionsInfo().get(i).getPopupUrl();
+        String widgetUrl = Extensions.getExtensionsInfo().get(i).getWidgetUrl();
         webContents.getNavigationController().loadUrl(
-                new LoadUrlParams(popupUrl));
+                new LoadUrlParams(widgetUrl));
+
+        // Create a FrameLayout to hold both the WebView and the overlay
+    FrameLayout container = new FrameLayout(getContext());
+        container.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         
         View view = thinWebView.getView();
         view.setTag(webContents);
 
         mCurrentWebContents = webContents;
         // setupFloatingBackButton();
+        container.addView(view);
 
-        return view;
+    // Add a transparent overlay View
+    View overlay = new View(getContext());
+        overlay.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        overlay.setBackgroundColor(Color.TRANSPARENT);
+        overlay.setOnClickListener(v -> {
+            ExtensionInfo extension = Extensions.getExtensionsInfo().get(i);
+            String extensionId = extension.getId();
+            OpenExtensionsById.openExtensionById(extensionId);
+        });
+        container.addView(overlay);
+
+        return container;
     }
 
     private void initializeExtensionWebView(int index) {
-        FrameLayout webViewContainer = findViewById(R.id.ntp_web_view_container);
+        LinearLayout webViewContainer = findViewById(R.id.ntp_web_view_container);
         FrameLayout webViewFrame = findViewById(R.id.ntp_web_view);
         webViewFrame.removeAllViews();
         View webView = createWebView(index);
         webViewFrame.addView(webView);
     }
     
+    private void setupExtensionWebViewClick() {
+        FrameLayout webViewFrame = findViewById(R.id.ntp_web_view);
+        if (webViewFrame != null) {
+            webViewFrame.setOnClickListener(v -> {
+                // Get the extension ID from the Extensions list
+                ExtensionInfo extensions = Extensions.getExtensionsInfo().get(1);
+                String extensionId = extensions.getId();
+                OpenExtensionsById.openExtensionById(extensionId);
+            });
+        }
+    }
 
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;

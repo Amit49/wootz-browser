@@ -95,18 +95,19 @@ found in the LICENSE file.
         android:layout_weight="1"
         android:visibility="gone" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/ntp_web_view_container"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:orientation="vertical"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
         android:visibility="visible">
 
         <FrameLayout
             android:id="@+id/ntp_web_view"
             android:layout_width="match_parent"
-            android:layout_height="200dp"/>
-    </FrameLayout>
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 </org.chromium.chrome.browser.ntp.NewTabPageLayout>

@@ -7,14 +7,16 @@ public class ExtensionInfo {
     private String name;
     private String description;
     private String popupUrl;
+    private String widgetUrl;
     private Bitmap iconBitmap;
 
     // Constructor
-    public ExtensionInfo(String id, String name, String description, String popupUrl, Bitmap iconBitmap) {
+    public ExtensionInfo(String id, String name, String description, String popupUrl, String widgetUrl, Bitmap iconBitmap) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.popupUrl = popupUrl;
+        this.widgetUrl = widgetUrl;
         this.iconBitmap = iconBitmap;
     }
 
@@ -46,8 +48,16 @@ public class ExtensionInfo {
         return popupUrl;
     }
 
+    public String getWidgetUrl() {
+        return widgetUrl;
+    }
+
     public void setPopupUrl(String popupUrl) {
         this.popupUrl = popupUrl;
+    }
+
+    public void setWidgetUrl(String widgetUrl) {
+        this.widgetUrl = widgetUrl;
     }
 
     public Bitmap getIconBitmap() {
@@ -63,6 +73,7 @@ public class ExtensionInfo {
         return "ExtensionInfo:\n" +
             "  Name: '" + name + "'\n" +
             "  Description: '" + description + "'\n" +
-            "  Popup URL: '" + popupUrl + "'\n";
+            "  Popup URL: '" + popupUrl + "'\n" +
+            "  Widget URL: '" + widgetUrl + "'\n";
     }
 }

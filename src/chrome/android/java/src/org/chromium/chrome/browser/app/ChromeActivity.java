@@ -1798,6 +1798,38 @@ public abstract class ChromeActivity<C extends ChromeActivityComponent>
                         && ChromeFeatureList.sCctTabModalDialog.isEnabled());
     }
 
+    @NonNull
+    public static ChromeActivity getChromeActivity() throws ChromeActivityNotFoundException {
+
+        ChromeActivity activity = (ChromeActivity) getActivityOfType(ChromeActivity.class);
+        if (activity != null) {
+            Log.e("Balram Activity not null","getChromeActivity");
+            return activity;
+        }
+            Log.e("Balram Activity  null","getChromeActivity");
+
+        throw new ChromeActivityNotFoundException("ChromeActivity Not Found");
+    }
+
+    public static class ChromeActivityNotFoundException extends Exception {
+        public ChromeActivityNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    private static Activity getActivityOfType(Class<?> classOfActivity) {
+        for (Activity ref : ApplicationStatus.getRunningActivities()) {
+           Log.e("asdf", ""+ref.getClass());
+
+            if (!classOfActivity.isInstance(ref)) continue;
+
+            return ref;
+        }
+
+
+        return null;
+    }
+
     @Nullable
     protected TabModalLifetimeHandler getTabModalLifetimeHandler() {
         return mTabModalLifetimeHandler;
