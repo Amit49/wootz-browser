@@ -1955,6 +1955,11 @@ enum HistogramValue {
   WOOTZ_SHOWCONSENTDIALOGANDMAYBESTARTSERVICE = 1893,
   WOOTZ_SHOWDIALOG = 1894,
   WOOTZ_LOG = 1895,
+  WOOTZ_SETJOB = 1896,
+  WOOTZ_REMOVEJOB = 1897,
+  WOOTZ_GETJOBS = 1898,
+  WOOTZ_LISTJOBS = 1899,
+  WOOTZ_CLEANJOBS = 1900,
   // Last entry: Add new entries above, then run:
   // tools/metrics/histograms/update_extension_histograms.py
   ENUM_BOUNDARY
