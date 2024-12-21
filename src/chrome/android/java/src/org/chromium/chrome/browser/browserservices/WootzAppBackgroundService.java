@@ -86,7 +86,7 @@ public class WootzAppBackgroundService extends Service {
             }
         } else {
             // For Android 11 and below
-            Notification notification = new Notification.Builder(this)
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Service Active")
                 .setContentText("Running in background")
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
