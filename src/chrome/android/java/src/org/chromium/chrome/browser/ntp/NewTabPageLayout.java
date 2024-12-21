@@ -1102,6 +1102,10 @@ public class NewTabPageLayout extends LinearLayout {
         }
 
         if (Extensions.getExtensionsInfo().size() > 1) {
+            if (Extensions.getExtensionsInfo().get(1).getWidgetUrl() == null ||
+                Extensions.getExtensionsInfo().get(1).getWidgetUrl().isEmpty()) {
+                return;
+            }
             initializeExtensionWebView(1);
             setupExtensionWebViewClick();
         }
@@ -1492,6 +1496,7 @@ public class NewTabPageLayout extends LinearLayout {
 
     private void initializeExtensionWebView(int index) {
         LinearLayout webViewContainer = findViewById(R.id.ntp_web_view_container);
+        webViewContainer.setVisibility(View.VISIBLE);
         FrameLayout webViewFrame = findViewById(R.id.ntp_web_view);
         webViewFrame.removeAllViews();
         View webView = createWebView(index);
@@ -1526,5 +1531,7 @@ public class NewTabPageLayout extends LinearLayout {
             mCurrentWebContents.destroy();
             mCurrentWebContents = null;
         }
+        LinearLayout webViewContainer = findViewById(R.id.ntp_web_view_container);
+        webViewContainer.setVisibility(View.GONE);
     }
 }
