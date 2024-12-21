@@ -31,6 +31,7 @@ by a child template that "extends" this file.
 
     <!-- Android 10+ permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <!--
       Enable runtime permissions as uses-permission in tip of tree builds
       only for ease of development on Android L and earlier. For consumer

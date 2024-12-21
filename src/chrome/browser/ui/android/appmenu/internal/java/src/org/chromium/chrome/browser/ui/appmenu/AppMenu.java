@@ -150,6 +150,11 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
     private BottomSheetBehavior<View> mBehavior;
     private ImageButton mFloatingBackButton;
     private WebContents mCurrentWebContents;
+    private WebContents mWebContents;
+    private ContentView mContentView;
+    private ThinWebView mThinWebView;
+    private View mWebViewContainer;
+
     /**
      * Creates and sets up the App Menu.
      * @param itemRowHeight Desired height for each app menu row.
@@ -183,23 +188,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         mNegativeVerticalOffsetNotTopAnchored = res.getDimensionPixelSize(R.dimen.menu_negative_vertical_offset_not_top_anchored);
         mChipHighlightExtension = res.getDimensionPixelOffset(R.dimen.menu_chip_highlight_extension);
     }
-    // AppMenu(int itemRowHeight, AppMenuHandlerImpl handler, Resources res) {
-    //     Log.d(TAG, "AppMenu constructor called with itemRowHeight: " + itemRowHeight);
-    //     mItemRowHeight = itemRowHeight;
-    //     assert mItemRowHeight > 0;
-
-    //     mHandler = handler;
-
-    //     mNegativeSoftwareVerticalOffset =
-    //             res.getDimensionPixelSize(R.dimen.menu_negative_software_vertical_offset);
-    //     mVerticalFadeDistance = res.getDimensionPixelSize(R.dimen.menu_vertical_fade_distance);
-    //     mNegativeVerticalOffsetNotTopAnchored =
-    //             res.getDimensionPixelSize(R.dimen.menu_negative_vertical_offset_not_top_anchored);
-    //     mChipHighlightExtension =
-    //             res.getDimensionPixelOffset(R.dimen.menu_chip_highlight_extension);
-
-    //     mTempLocation = new int[2];
-    // }
 
     /**
      * Notifies the menu that the contents of the menu item specified by {@code menuRowId} have
@@ -241,11 +229,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // the next 4 lines should not be removed as it is part of working code
-        // BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-        // View contentView = createContentView();
-        // dialog.setContentView(contentView);
-        // return dialog;
 
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
         View view = createContentView(true);
@@ -269,105 +252,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         return dialog;
     }
 
-    // this function below is not really used right now but should not be deleted
-    // private void setupTouchListener() {
-    //     mScrollView.setOnTouchListener(new View.OnTouchListener() {
-    //         private float startY;
-    //         private float startX;
-    //         private static final int CLICK_ACTION_THRESHOLD = 5;
-
-    //         @Override
-    //         public boolean onTouch(View v, MotionEvent event) {
-    //             switch (event.getAction()) {
-    //                 case MotionEvent.ACTION_DOWN:
-    //                     startY = event.getY();
-    //                     startX = event.getX();
-    //                     break;
-    //                 case MotionEvent.ACTION_UP:
-    //                     float endY = event.getY();
-    //                     float endX = event.getX();
-    //                     if (!isAClick(startX, endX, startY, endY)) {
-    //                         if (startY < endY && !mScrollView.canScrollVertically(-1)) {
-    //                             // Swiping down and scroll view is at the top
-    //                             mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    //                             return true;
-    //                         } else if (startY > endY && !mScrollView.canScrollVertically(1)) {
-    //                             // Swiping up and scroll view is at the bottom
-    //                             dismiss();
-    //                             return true;
-    //                         }
-    //                     }
-    //                     break;
-    //             }
-    //             return false;
-    //         }
-
-    //         private boolean isAClick(float startX, float endX, float startY, float endY) {
-    //             float differenceX = Math.abs(startX - endX);
-    //             float differenceY = Math.abs(startY - endY);
-    //             return !(differenceX > CLICK_ACTION_THRESHOLD || differenceY > CLICK_ACTION_THRESHOLD);
-    //         }
-    //     });
-    // }
-
     private View createContentView(boolean test) {
-        // Context context = getContext();
-        // View contentView = LayoutInflater.from(context).inflate(R.layout.app_menu_bottom_sheet_layout, null);
-        // mGridView = contentView.findViewById(R.id.app_menu_grid);
-        // mGridView.setNumColumns(GRID_COLUMNS);
-        // mGridView.setAdapter(mAdapter);
-        // mGridView.setOnItemClickListener(this);
-
-        // inflateHeader(mHeaderResourceId, contentView);
-        // inflateFooter(mFooterResourceId, contentView);
-
-        // return contentView;
-
-
-        // Context context = getContext();
-        // CoordinatorLayout coordinatorLayout = new CoordinatorLayout(context);
-        // coordinatorLayout.setLayoutParams(new ViewGroup.LayoutParams(
-        //         ViewGroup.LayoutParams.MATCH_PARENT,
-        //         ViewGroup.LayoutParams.MATCH_PARENT));
-
-        // mGridView = new GridView(context);
-        // mGridView.setLayoutParams(new ViewGroup.LayoutParams(
-        //         ViewGroup.LayoutParams.MATCH_PARENT,
-        //         ViewGroup.LayoutParams.WRAP_CONTENT));
-        // mGridView.setNumColumns(3); // Adjust as needed
-        // mGridAdapter = new GridAdapter(context, mModelList);
-        // mGridView.setAdapter(mGridAdapter);
-        // mGridView.setOnItemClickListener(this);
-
-        // coordinatorLayout.addView(mGridView);
-
-        // coordinatorLayout.setOnTouchListener(new CustomTouchListener());
-
-        // return coordinatorLayout;
-
-        
-        // NestedScrollView scrollView = new NestedScrollView(getContext());
-        // scrollView.setLayoutParams(new ViewGroup.LayoutParams(
-        //         ViewGroup.LayoutParams.MATCH_PARENT,
-        //         ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        // mGridView = new GridView(getContext());
-        // mGridView.setLayoutParams(new ViewGroup.LayoutParams(
-        //         ViewGroup.LayoutParams.MATCH_PARENT,
-        //         ViewGroup.LayoutParams.WRAP_CONTENT));
-        // mGridView.setNumColumns(3); // Adjust as needed
-        // mGridAdapter = new GridAdapter(getContext(), mModelList);
-        // mGridView.setAdapter(mGridAdapter);
-        // mGridView.setOnItemClickListener(this);
-
-        // // Disable GridView scrolling
-        // mGridView.setNestedScrollingEnabled(true);
-
-        // scrollView.addView(mGridView);
-
-        // return scrollView;
-
-
         NestedScrollView scrollView = new NestedScrollView(getContext());
         scrollView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -389,136 +274,77 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         );
         gridViewWrapper.setLayoutParams(wrapperParams);
         
-        // if (!test) {
-        //     mGridView = new GridView(getContext());
-        //     mGridView.setLayoutParams(new ViewGroup.LayoutParams(
-        //             ViewGroup.LayoutParams.MATCH_PARENT,
-        //             ViewGroup.LayoutParams.WRAP_CONTENT));
-        //     mGridView.setNumColumns(3); // Adjust as needed
-        //     mGridAdapter = new GridAdapter(getContext(), mModelList);
-        //     mGridView.setAdapter(mGridAdapter);
-        //     mGridView.setOnItemClickListener(this);
-            
-        //     // Disable GridView scrolling
-        //     mGridView.setNestedScrollingEnabled(true);
-            
-        //     // Add GridView to the wrapper
-        //     gridViewWrapper.addView(mGridView);
-            
-        //     // Add the wrapper to the scrollView
-        //     scrollView.addView(gridViewWrapper);
-        // } else {
-        //     Profile profile = ProfileManager.getLastUsedRegularProfile();
-        //     WebContents webContents = WebContentsFactory.createWebContents(profile, true, true);
-        //     ContentView contentView = ContentView.createContentView(getContext(), null, webContents);
-    
-        //     gridViewWrapper.addView(contentView);
-    
-        //     webContents.getNavigationController().loadUrl(
-        //             new LoadUrlParams("chrome-extension://nooifbgheppjhcogpnlegfapppjlinno/src/pages/popup/index.html"));
-        // }
-        
-        return scrollView;  
-
-        // Context context = getContext();
-        // View contentView = LayoutInflater.from(context).inflate(R.layout.app_menu_bottom_sheet_layout, null);
-    
-        // // Find the GridView in the inflated layout
-        // mGridView = contentView.findViewById(R.id.app_menu_grid);
-        
-        // // Check if the GridView already has a parent
-        // // if (mGridView.getParent() != null) {
-        // //     ((ViewGroup) mGridView.getParent()).removeView(mGridView); // Remove it from its current parent
-        // // }
-    
-        // // Set up the GridView adapter
-        // mGridAdapter = new GridAdapter(context, mModelList);
-        // mGridView.setAdapter(mGridAdapter);
-        // mGridView.setOnItemClickListener(this);
-    
-        // // Create a NestedScrollView to wrap the GridView
-        // // mScrollView = new NestedScrollView(context);
-        // // mScrollView.setLayoutParams(new ViewGroup.LayoutParams(
-        // //         ViewGroup.LayoutParams.MATCH_PARENT,
-        // //         ViewGroup.LayoutParams.WRAP_CONTENT));
-    
-        // // // Add the GridView to the NestedScrollView
-        // // mScrollView.addView(mGridView);
-    
-        // // Inflate header and footer if needed
-        // inflateHeader(mHeaderResourceId, contentView);
-        // inflateFooter(mFooterResourceId, contentView);
-    
-        // return mScrollView; // Return the NestedScrollViewew; // Return the NestedScrollView
-
-
-
+        return scrollView;
     }
 
-// In the code below we are setting the margin respective to parent i think
-
-    private View createWebView(int i) {
-        Log.d(TAG, "EXTS: " + Extensions.getExtensionsInfo().get(i).toString());
-
-        NestedScrollView scrollView = new NestedScrollView(getContext());
-        scrollView.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        
-        // Create a FrameLayout to wrap the GridView
+    private View createWebViewContainer() {
         FrameLayout viewWrapper = new FrameLayout(getContext());
         FrameLayout.LayoutParams wrapperParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         
-        // Set margins for the wrapper (adjust these values as needed)
-        int margin = dpToPx(32); // Convert 16dp to pixels
-        wrapperParams.setMargins(
-            0,
-            -margin, 
-            0, 
-            margin
-        );
+        // Set horizontal margins to create padding from screen edges
+        int horizontalMargin = dpToPx(0);
+        int verticalMargin = dpToPx(0);
+        wrapperParams.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
         viewWrapper.setLayoutParams(wrapperParams);
-
-        Profile profile = ProfileManager.getLastUsedRegularProfile();
-        WebContents webContents = WebContentsFactory.createWebContents(profile, true, false);
-        ContentView contentView = ContentView.createContentView(getContext(), null, webContents);
-        webContents.setDelegates(
-            VersionInfo.getProductVersion(),
-            ViewAndroidDelegate.createBasicDelegate(contentView),
-            contentView,
-            mHandler.getWindowAndroid(),
-            WebContents.createDefaultInternalsHolder());
-
-        Log.d(TAG, "contentview " + contentView.toString());
-        // viewWrapper.addView(contentView);
     
-        IntentRequestTracker intentRequestTracker = mHandler.getWindowAndroid().getIntentRequestTracker();
-        ThinWebView thinWebView = ThinWebViewFactory.create(
-            getContext(), new ThinWebViewConstraints(), intentRequestTracker);
-        thinWebView.attachWebContents(webContents, contentView, null);
-        float borderRadius = dpToPx(24); // You can adjust this value as needed
-        thinWebView.getView().setClipToOutline(true);
-        thinWebView.getView().setOutlineProvider(new ViewOutlineProvider() {
+        // Initialize WebView components only once
+        if (mWebContents == null) {
+            Profile profile = ProfileManager.getLastUsedRegularProfile();
+            mWebContents = WebContentsFactory.createWebContents(profile, true, false);
+            mContentView = ContentView.createContentView(getContext(), null, mWebContents);
+            mWebContents.setDelegates(
+                VersionInfo.getProductVersion(),
+                ViewAndroidDelegate.createBasicDelegate(mContentView),
+                mContentView,
+                mHandler.getWindowAndroid(),
+                WebContents.createDefaultInternalsHolder());
+    
+            IntentRequestTracker intentRequestTracker = mHandler.getWindowAndroid().getIntentRequestTracker();
+            mThinWebView = ThinWebViewFactory.create(
+                getContext(), new ThinWebViewConstraints(), intentRequestTracker);
+            mThinWebView.attachWebContents(mWebContents, mContentView, null);
+            
+            // Apply corner radius to the ThinWebView
+            View webView = mThinWebView.getView();
+            float cornerRadius = dpToPx(16); // Adjust this value for desired roundness
+            webView.setClipToOutline(true);
+            webView.setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadius);
+                }
+            });
+
+            // Set minimal padding on the WebView itself
+            webView.setPadding(0, 0, 0, 0);
+        
+            // Ensure the WebView fills its container
+            webView.setLayoutParams(new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+
+            // Set background color to match the design
+            // webView.setBackgroundColor(Color.parseColor("#1C1E21")); // Dark background color
+        }
+    
+        viewWrapper.addView(mThinWebView.getView());
+        
+        // Apply same corner radius to the wrapper for consistency
+        float wrapperCornerRadius = dpToPx(16);
+        viewWrapper.setClipToOutline(true);
+        viewWrapper.setOutlineProvider(new ViewOutlineProvider() {
             @Override
             public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), wrapperCornerRadius);
             }
         });
-
-
-        String popupUrl = Extensions.getExtensionsInfo().get(i).getPopupUrl();
-        webContents.getNavigationController().loadUrl(
-                new LoadUrlParams(popupUrl));
         
-        View view = thinWebView.getView();
-        view.setTag(webContents);
-
-        mCurrentWebContents = webContents;
-        // setupFloatingBackButton();
-
-        return view;
+        // Set background color to wrapper as well
+        // viewWrapper.setBackgroundColor(Color.parseColor("#1C1E21"));
+    
+        return viewWrapper;
     }
 
     private void returnToAppMenu() {
@@ -533,40 +359,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
             }
         }
     }
-
-    /* This function is not used anymore since we are removing the back button from the extension webview
-    private void setupFloatingBackButton() {
-        View view = getView();
-        if (view != null) {
-            mFloatingBackButton = view.findViewById(R.id.floating_back_button);
-            mFloatingBackButton.setVisibility(View.VISIBLE);
-            updateFloatingBackButtonState();
-
-            // Set up a runnable to periodically check and update the back button state
-            final Handler handler = new Handler();
-            final Runnable updateBackButton = new Runnable() {
-                @Override
-                public void run() {
-                    updateFloatingBackButtonState();
-                    handler.postDelayed(this, 500); // Check every 500ms
-                }
-            };
-            handler.post(updateBackButton);
-        }
-    }
-
-    private void updateFloatingBackButtonState() {
-        if (mCurrentWebContents != null && mFloatingBackButton != null) {
-            if (mCurrentWebContents.getNavigationController().canGoBack()) {
-                mFloatingBackButton.setOnClickListener(v -> mCurrentWebContents.getNavigationController().goBack());
-                mFloatingBackButton.setVisibility(View.VISIBLE);
-            } else {
-                mFloatingBackButton.setOnClickListener(v -> returnToAppMenu());
-                mFloatingBackButton.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-*/
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -624,43 +416,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                 // Not needed for this implementation
             }
         });
-
-        // super.onActivityCreated(savedInstanceState);
-    
-        // View parent = (View) getView().getParent();
-        // parent.setBackgroundColor(Color.TRANSPARENT);
-    
-        // CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) parent.getLayoutParams();
-        
-        // // Set fixed margins
-        // int marginInPixels = dpToPx(32);
-        // layoutParams.setMargins(marginInPixels, -marginInPixels, marginInPixels, marginInPixels);
-        // parent.setLayoutParams(layoutParams);
-    
-        // // Set up BottomSheetBehavior
-        // mBehavior = BottomSheetBehavior.from(parent);
-        // mBehavior.setSkipCollapsed(true);
-        // mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        
-        // // Disable dragging on the BottomSheetBehavior
-        // mBehavior.setDraggable(false);
-    
-        // // Add a callback to maintain the bottom margin when expanded
-        // mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-        //     @Override
-        //     public void onStateChanged(@NonNull View bottomSheet, int newState) {
-        //         if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-        //             bottomSheet.setPadding(0, 0, 0, marginInPixels);
-        //         } else {
-        //             bottomSheet.setPadding(0, 0, 0, 0);
-        //         }
-        //     }
-    
-        //     @Override
-        //     public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-        //         // Not needed for this implementation
-        //     }
-        // });
     }
 
     private int dpToPx(int dp) {
@@ -679,49 +434,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         LinearLayout parent = view.findViewById(R.id.app_menu_extensions);
 
         extensionsContainer.removeAllViews();
-
-        // ImageButton moreExtensionsButton = new ImageButton(context);
-        // moreExtensionsButton.setImageResource(R.drawable.ic_add_extensions); // Use an appropriate icon
-        // moreExtensionsButton.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(48), dpToPx(48)));
-        // moreExtensionsButton.setOnClickListener(v -> openWebsite("https://devt75.github.io/extensions_test/"));
-        // extensionsContainer.addView(moreExtensionsButton);
-
-        // int extensionsCount = 1;
-        // for(int i = 0; i < Extensions.getExtensionsInfo().size(); i++) {
-        //     ExtensionInfo extension = Extensions.getExtensionsInfo().get(i);
-        //     ImageButton extensionIcon = new ImageButton(context);
-
-        //     if (extension.getName().equals("Web Store")) {
-        //         continue;
-        //     }
-
-        //     if(extension.getIconBitmap() != null){
-        //         extensionIcon.setImageBitmap(extension.getIconBitmap());
-        //     } else {
-        //         extensionIcon.setImageResource(R.drawable.test_extension_logo);
-        //     }
-
-        //     extensionIcon.setLayoutParams(new LinearLayout.LayoutParams(
-        //         dpToPx(48), dpToPx(48)));
-        //     final int index = i;
-        //     extensionIcon.setOnClickListener(v -> openExtensionWebView(index));
-        //     extensionIcon.setOnLongClickListener(v -> {
-        //         showDeleteExtensionDialog(index);
-        //         return true;
-        //     });
-        //     extensionsContainer.addView(extensionIcon);
-        //     extensionsCount ++;
-        // }
-
-        // if (extensionsCount == 0) {
-        //     parent.setVisibility(View.GONE);
-        //     extensionsDivider.setVisibility(View.GONE);
-        //     scrollView.setVisibility(View.GONE);
-        // } else {
-        //     parent.setVisibility(View.VISIBLE);
-        //     extensionsDivider.setVisibility(View.VISIBLE);
-        //     scrollView.setVisibility(View.VISIBLE);
-        // }
 
         List<ExtensionInfo> extensionsInfo = Extensions.getExtensionsInfo();
         int extensionCount = extensionsInfo.size();
@@ -840,14 +552,35 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
             view.findViewById(R.id.app_menu_grid).setVisibility(View.GONE);
             view.findViewById(R.id.app_menu_extensions).setVisibility(View.GONE);
             view.findViewById(R.id.extensions_divider).setVisibility(View.GONE);
+            
             FrameLayout webViewContainer = view.findViewById(R.id.web_view_container);
             webViewContainer.setVisibility(View.VISIBLE);
+            
             FrameLayout webViewFrame = view.findViewById(R.id.web_view);
             webViewFrame.removeAllViews();
             webViewFrame.setVisibility(View.VISIBLE);
-            View webView = createWebView(index);
-            webViewFrame.addView(webView);
+            
+            if (mWebViewContainer == null) {
+                mWebViewContainer = createWebViewContainer();
+            }
+            webViewFrame.addView(mWebViewContainer);
+    
+            // Load the extension URL
+            String popupUrl = Extensions.getExtensionsInfo().get(index).getPopupUrl();
+            mWebContents.getNavigationController().loadUrl(new LoadUrlParams(popupUrl));
         }
+    }
+    
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mWebContents != null) {
+            mWebContents.destroy();
+            mWebContents = null;
+        }
+        mContentView = null;
+        mThinWebView = null;
+        mWebViewContainer = null;
     }
 
     public boolean onBackPressed() {
@@ -907,7 +640,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
 
         int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
         mSelectedItemBeforeDismiss = true;
-        // dismiss();
+        // dismiss();f
         if (mHandler != null) {
             Log.d(TAG,"Entering the onItemClick for " + id);
             mHandler.onOptionsItemSelected(id);
