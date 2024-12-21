@@ -11,7 +11,7 @@
 
 namespace base {
 
-class ActionSpecJson {
+class BASE_EXPORT ActionSpecJson {
  public:
   // Enum to represent different element types
   enum class ElementType {
