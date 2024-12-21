@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "base/base_export.h"
+
 namespace base {
 
 class BASE_EXPORT ActionSpecJson {
