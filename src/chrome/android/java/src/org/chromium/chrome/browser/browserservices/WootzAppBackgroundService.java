@@ -50,7 +50,7 @@ public class WootzAppBackgroundService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // requestIgnoreBatteryOptimizations();
+        requestIgnoreBatteryOptimizations();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
@@ -99,13 +99,13 @@ public class WootzAppBackgroundService extends Service {
         return START_STICKY;
     }
 
-    // private void requestIgnoreBatteryOptimizations() {
-    //     Intent batteryIntent = new Intent();
-    //     batteryIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-    //     batteryIntent.setData(Uri.parse("package:" + getPackageName()));
-    //     batteryIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    //     startActivity(batteryIntent);
-    // }
+    private void requestIgnoreBatteryOptimizations() {
+        Intent batteryIntent = new Intent();
+        batteryIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+        batteryIntent.setData(Uri.parse("package:" + getPackageName()));
+        batteryIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(batteryIntent);
+    }
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
