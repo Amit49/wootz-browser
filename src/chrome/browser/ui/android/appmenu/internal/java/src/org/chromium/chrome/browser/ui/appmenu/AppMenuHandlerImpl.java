@@ -27,10 +27,6 @@ import org.chromium.chrome.browser.app.ChromeActivity.ChromeActivityNotFoundExce
 import org.chromium.chrome.browser.app.appmenu.AppMenuPropertiesDelegateImpl;
 import org.chromium.chrome.browser.extensions.ExtensionInfo;
 import org.chromium.chrome.browser.extensions.Extensions;
-import org.chromium.chrome.browser.app.ChromeActivity;
-import org.chromium.chrome.browser.app.ChromeActivity.ChromeActivityNotFoundException;
-import org.chromium.chrome.browser.extensions.ExtensionInfo;
-import org.chromium.chrome.browser.extensions.Extensions;
 import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
 import org.chromium.chrome.browser.lifecycle.ConfigurationChangedObserver;
 import org.chromium.chrome.browser.lifecycle.StartStopWithNativeObserver;

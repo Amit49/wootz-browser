@@ -5,20 +5,25 @@
 package org.chromium.chrome.browser.ntp;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
@@ -26,15 +31,25 @@ import android.view.Gravity;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.widget.NestedScrollView;
 
 import org.chromium.base.Callback;
 import org.chromium.base.CallbackController;
 import org.chromium.base.MathUtils;
 import org.chromium.base.TraceEvent;
 import org.chromium.base.supplier.ObservableSupplier;
+import org.chromium.components.embedder_support.view.ContentView;
+import org.chromium.components.thinwebview.ThinWebView;
+import org.chromium.components.thinwebview.ThinWebViewConstraints;
+import org.chromium.components.thinwebview.ThinWebViewFactory;
 import org.chromium.chrome.R;
+import org.chromium.chrome.browser.extensions.OpenExtensionsById;
+import org.chromium.chrome.browser.app.ChromeActivity;
+import org.chromium.chrome.browser.extensions.Extensions;
+import org.chromium.chrome.browser.extensions.ExtensionInfo;
 import org.chromium.chrome.browser.feed.FeedSurfaceScrollDelegate;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
+import org.chromium.ui.base.IntentRequestTracker;
 import org.chromium.chrome.browser.lens.LensEntryPoint;
 import org.chromium.chrome.browser.lens.LensMetrics;
 import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
@@ -47,6 +62,7 @@ import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
 import org.chromium.chrome.browser.ntp.NewTabPage.OnSearchBoxScrollListener;
 import org.chromium.chrome.browser.ntp.search.SearchBoxCoordinator;
 import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.chrome.browser.profiles.ProfileManager;
 import org.chromium.chrome.browser.suggestions.tile.MostVisitedTilesCoordinator;
 import org.chromium.chrome.browser.suggestions.tile.TileGroup;
 import org.chromium.chrome.browser.suggestions.tile.TileGroup.Delegate;
@@ -55,6 +71,7 @@ import org.chromium.chrome.browser.ui.native_page.TouchEnabledDelegate;
 import org.chromium.chrome.browser.util.BrowserUiUtils;
 import org.chromium.chrome.browser.util.BrowserUiUtils.HostSurface;
 import org.chromium.chrome.browser.util.BrowserUiUtils.ModuleTypeOnStartAndNtp;
+import org.chromium.base.version_info.VersionInfo;
 import org.chromium.chrome.features.start_surface.StartSurfaceConfiguration;
 import org.chromium.components.browser_ui.styles.ChromeColors;
 import org.chromium.components.browser_ui.widget.displaystyle.DisplayStyleObserver;
@@ -62,10 +79,16 @@ import org.chromium.components.browser_ui.widget.displaystyle.HorizontalDisplayS
 import org.chromium.components.browser_ui.widget.displaystyle.UiConfig;
 import org.chromium.components.omnibox.OmniboxFeatures;
 import org.chromium.content_public.browser.LoadUrlParams;
+import org.chromium.content_public.browser.WebContents;
+import org.chromium.content_public.browser.WebContentsObserver;
 import org.chromium.ui.base.MimeTypeUtils;
+import org.chromium.ui.base.ViewAndroidDelegate;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.text.EmptyTextWatcher;
-
+import org.chromium.chrome.browser.content.WebContentsFactory;
+// import org.chromium.chrome.browser.ui.appmenu.AppMenuCoordinator;
+// import org.chromium.chrome.browser.ui.appmenu.AppMenu;
+// import org.chromium.base.activity.ActivityUtils;
 /**
  * Layout for the new tab page. This positions the page elements in the correct vertical positions.
  * There are no separate phone and tablet UIs; this layout adapts based on the available space.
@@ -92,6 +115,7 @@ public class NewTabPageLayout extends LinearLayout {
     private MostVisitedTilesCoordinator mMostVisitedTilesCoordinator;
 
     private OnSearchBoxScrollListener mSearchBoxScrollListener;
+    private WebContents mCurrentWebContents;
 
     private NewTabPageManager mManager;
     private Activity mActivity;
@@ -1068,12 +1092,22 @@ public class NewTabPageLayout extends LinearLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        Log.d(TAG, "onAttachedToWindow called");
         assert mManager != null;
 
         if (!mHasShownView) {
             mHasShownView = true;
             onInitializationProgressChanged();
             TraceEvent.instant("NewTabPageSearchAvailable)");
+        }
+
+        if (Extensions.getExtensionsInfo().size() > 1) {
+            if (Extensions.getExtensionsInfo().get(1).getWidgetUrl() == null ||
+                Extensions.getExtensionsInfo().get(1).getWidgetUrl().isEmpty()) {
+                return;
+            }
+            initializeExtensionWebView(1);
+            setupExtensionWebViewClick();
         }
     }
 
@@ -1374,5 +1408,130 @@ public class NewTabPageLayout extends LinearLayout {
 
     public Callback<Logo> getOnLogoAvailableCallback() {
         return mOnLogoAvailableCallback;
+    }
+
+    private View createWebView(int i) {
+        Log.d(TAG, "EXTS: " + Extensions.getExtensionsInfo().get(i).toString());
+
+        NestedScrollView scrollView = new NestedScrollView(getContext());
+        scrollView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        
+        // Create a FrameLayout to wrap the GridView
+        FrameLayout viewWrapper = new FrameLayout(getContext());
+        FrameLayout.LayoutParams wrapperParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        
+        // Set margins for the wrapper (adjust these values as needed)
+        int margin = dpToPx(32); // Convert 16dp to pixels
+        wrapperParams.setMargins(
+            0,
+            -margin, 
+            0, 
+            margin
+        );
+        viewWrapper.setLayoutParams(wrapperParams);
+
+        Profile profile = ProfileManager.getLastUsedRegularProfile();
+        WebContents webContents = WebContentsFactory.createWebContents(profile, true, false);
+        ContentView contentView = ContentView.createContentView(getContext(), null, webContents);
+        webContents.setDelegates(
+            VersionInfo.getProductVersion(),
+            ViewAndroidDelegate.createBasicDelegate(contentView),
+            contentView,
+            mWindowAndroid,
+            WebContents.createDefaultInternalsHolder());
+
+        Log.d(TAG, "contentview " + contentView.toString());
+        // viewWrapper.addView(contentView);
+    
+        IntentRequestTracker intentRequestTracker = mWindowAndroid.getIntentRequestTracker();
+        ThinWebView thinWebView = ThinWebViewFactory.create(
+            getContext(), new ThinWebViewConstraints(), intentRequestTracker);
+        thinWebView.attachWebContents(webContents, contentView, null);
+        float borderRadius = dpToPx(24); // You can adjust this value as needed
+        thinWebView.getView().setClipToOutline(true);
+        thinWebView.getView().setOutlineProvider(new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
+            }
+        });
+
+
+        String widgetUrl = Extensions.getExtensionsInfo().get(i).getWidgetUrl();
+        webContents.getNavigationController().loadUrl(
+                new LoadUrlParams(widgetUrl));
+
+        // Create a FrameLayout to hold both the WebView and the overlay
+    FrameLayout container = new FrameLayout(getContext());
+        container.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        
+        View view = thinWebView.getView();
+        view.setTag(webContents);
+
+        mCurrentWebContents = webContents;
+        // setupFloatingBackButton();
+        container.addView(view);
+
+    // Add a transparent overlay View
+    View overlay = new View(getContext());
+        overlay.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        overlay.setBackgroundColor(Color.TRANSPARENT);
+        overlay.setOnClickListener(v -> {
+            ExtensionInfo extension = Extensions.getExtensionsInfo().get(i);
+            String extensionId = extension.getId();
+            OpenExtensionsById.openExtensionById(extensionId);
+        });
+        container.addView(overlay);
+
+        return container;
+    }
+
+    private void initializeExtensionWebView(int index) {
+        LinearLayout webViewContainer = findViewById(R.id.ntp_web_view_container);
+        webViewContainer.setVisibility(View.VISIBLE);
+        FrameLayout webViewFrame = findViewById(R.id.ntp_web_view);
+        webViewFrame.removeAllViews();
+        View webView = createWebView(index);
+        webViewFrame.addView(webView);
+    }
+    
+    private void setupExtensionWebViewClick() {
+        FrameLayout webViewFrame = findViewById(R.id.ntp_web_view);
+        if (webViewFrame != null) {
+            webViewFrame.setOnClickListener(v -> {
+                // Get the extension ID from the Extensions list
+                ExtensionInfo extensions = Extensions.getExtensionsInfo().get(1);
+                String extensionId = extensions.getId();
+                OpenExtensionsById.openExtensionById(extensionId);
+            });
+        }
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        cleanupWebContents();
+    }
+
+    private void cleanupWebContents() {
+        if (mCurrentWebContents != null) {
+            mCurrentWebContents.destroy();
+            mCurrentWebContents = null;
+        }
+        LinearLayout webViewContainer = findViewById(R.id.ntp_web_view_container);
+        webViewContainer.setVisibility(View.GONE);
     }
 }

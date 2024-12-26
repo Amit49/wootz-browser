@@ -54,14 +54,14 @@ wootz_wallet::KeyringService* GetKeyringService(
 
 void OpenExtensionsById(const std::string& extensionId) {
   JNIEnv* env = base::android::AttachCurrentThread();
-  Java_OpenExtensionsById_openExtensionById(
+  Java_OpenExtensionsById_openExtensionByIdNative(
       env, 
       base::android::ConvertUTF8ToJavaString(env, extensionId));
 }
 
 void closeExtensionBottomSheet() {
   JNIEnv* env = base::android::AttachCurrentThread();
-  Java_OpenExtensionsById_closeExtensionBottomSheet(
+  Java_OpenExtensionsById_closeExtensionBottomSheetNative(
       env);
 }
 
