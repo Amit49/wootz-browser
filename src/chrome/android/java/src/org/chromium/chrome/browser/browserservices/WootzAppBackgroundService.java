@@ -1,10 +1,19 @@
 package org.chromium.chrome.browser.browserservices;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import androidx.core.app.NotificationCompat;
 import org.chromium.base.ContextUtils;
+// import org.chromium.chrome.R;
+import org.chromium.components.browser_ui.notifications.ForegroundServiceUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -13,25 +22,128 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.app.PendingIntent;
+import android.Manifest;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings; 
+import android.net.Uri;     
+
 public class WootzAppBackgroundService extends Service {
     private static final String TAG = "WootzService";
     private static final String WOOTZ_JOBS_KEY = "Chrome.Wootzapp.Jobs";
     private static final String WOOTZ_RESULTS_KEY = "Chrome.Wootzapp.JobsResult";
-    private static final long FETCH_INTERVAL_MS = 60000; // 1 minute
+    private static final long FETCH_INTERVAL_MS = 15000; // 15 seconds
+    private static final int NOTIFICATION_ID = 1001;
+    private static final String CHANNEL_ID = "wootz_service_channel";
     private Timer timer;
     private boolean isRunning;
+    private static final String[] REQUIRED_PERMISSIONS = {
+        Manifest.permission.FOREGROUND_SERVICE,
+        Manifest.permission.POST_NOTIFICATIONS
+    };
     @Override
     public void onCreate() {
         super.onCreate();
         isRunning = true;
-        startJobProcessing();
+        createNotificationChannel();
+    }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        requestIgnoreBatteryOptimizations();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID,
+                "Background Service",
+                NotificationManager.IMPORTANCE_LOW
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+
+        // For Android 12 (API 31) and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                // Request foreground service permission if needed
+                if (checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) 
+                        != PackageManager.PERMISSION_GRANTED) {
+                    return START_NOT_STICKY;
+                }
+                
+                // Create notification with proper flags for Android 12+
+                Notification.Builder builder = new Notification.Builder(this, CHANNEL_ID)
+                    .setContentTitle("Service Active")
+                    .setContentText("Running in background")
+                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+
+                startForeground(NOTIFICATION_ID, builder.build());
+            } catch (Exception e) {
+                Log.e(TAG, "Error starting foreground service on Android 12+", e);
+                return START_NOT_STICKY;
+            }
+        } else {
+            // For Android 11 and below
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Service Active")
+                .setContentText("Running in background")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setOngoing(true)
+                .build();
+
+            startForeground(NOTIFICATION_ID, notification);
+        }
+
+        return START_STICKY;
+    }
+
+    private void requestIgnoreBatteryOptimizations() {
+        Intent batteryIntent = new Intent();
+        batteryIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+        batteryIntent.setData(Uri.parse("package:" + getPackageName()));
+        batteryIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(batteryIntent);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Wootz Background Service",
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setDescription("Background service for Wootz App");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+    private Notification createNotification() {
+        return new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Wootzapp background service")
+                .setContentText("Background service is running")
+                // .setSmallIcon(R.drawable.ic_chrome)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true)
+                .build();
     }
     @Override
     public void onDestroy() {
-        isRunning = false;
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
+        try {
+            // Save state before destruction
+            saveCurrentState();
+            
+            // Ensure we're still in foreground mode
+            startForeground(NOTIFICATION_ID, createNotification());
+            
+            // Try to restart service
+            Intent restartService = new Intent(getApplicationContext(), this.getClass());
+            startService(restartService);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onDestroy", e);
         }
         super.onDestroy();
     }
@@ -106,6 +218,50 @@ public class WootzAppBackgroundService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "Error fetching URL: " + urlString, e);
             return "Error: " + e.getMessage();
+        }
+    }
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        try {
+            // Keep the service alive
+            startForeground(NOTIFICATION_ID, createNotification());
+            
+            // Save state before potential restart
+            saveCurrentState();
+            
+            // Create restart intent with proper flags
+            Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+            restartServiceIntent.setPackage(getPackageName());
+            
+            // Use FLAG_IMMUTABLE for Android 12+
+            int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? 
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_ONE_SHOT : 
+                PendingIntent.FLAG_ONE_SHOT;
+                
+            PendingIntent restartServicePendingIntent = PendingIntent.getService(
+                getApplicationContext(), 1, restartServiceIntent, flags);
+            
+            // Ensure service stays alive
+            startService(restartServiceIntent);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onTaskRemoved", e);
+        }
+        super.onTaskRemoved(rootIntent);
+    }
+
+    private void saveCurrentState() {
+        try {
+            SharedPreferences prefs = ContextUtils.getAppSharedPreferences();
+            SharedPreferences.Editor editor = prefs.edit();
+            
+            // Save any important state atomically
+            editor.putLong("last_sync_time", System.currentTimeMillis())
+                  .putBoolean("service_running", true)
+                  .apply();
+                  
+        } catch (Exception e) {
+            Log.e(TAG, "Error saving state", e);
         }
     }
 }

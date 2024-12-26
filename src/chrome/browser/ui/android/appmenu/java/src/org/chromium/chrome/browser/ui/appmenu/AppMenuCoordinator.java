@@ -26,6 +26,17 @@ public interface AppMenuCoordinator {
     AppMenuPropertiesDelegate getAppMenuPropertiesDelegate();
 
     /**
+     * Open the extensions Bottom Sheet.
+     */
+    void openExtensionById(String extensionId);
+    
+    /**
+     * Close the extensions Bottom Sheet.
+     */
+    void closeExtensionBottomSheet();
+
+
+    /**
      * Registers an {@link AppMenuBlocker} used to help determine whether the app menu can be shown.
      * @param blocker An {@link AppMenuBlocker} to check before attempting to show the app menu.
      */

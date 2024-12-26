@@ -35,6 +35,7 @@ public class Extensions {
                     obj.getString("name"),
                     obj.getString("description"),
                     obj.getString("popup_url"),
+                    obj.getString("widget_url"),
                     icon
                 ));
             }

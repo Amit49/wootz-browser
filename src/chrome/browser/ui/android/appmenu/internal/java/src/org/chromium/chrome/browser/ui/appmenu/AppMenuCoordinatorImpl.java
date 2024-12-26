@@ -8,7 +8,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewConfiguration;
-
+import android.util.Log;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.Callback;
@@ -113,6 +113,20 @@ class AppMenuCoordinatorImpl implements AppMenuCoordinator {
                         : ViewConfiguration.get(mContext).hasPermanentMenuKey();
         mAppMenuHandler.showAppMenu(
                 hasPermanentMenuKey ? null : mButtonDelegate.getMenuButtonView(), false);
+    }
+
+    @Override
+    public void openExtensionById(String extensionId) {
+        if (mAppMenuHandler != null) {
+            mAppMenuHandler.openExtensionById(extensionId);
+        } 
+    }
+
+    @Override
+    public void closeExtensionBottomSheet() {
+        if (mAppMenuHandler != null) {
+            mAppMenuHandler.closeExtensionBottomSheet();
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -50,6 +51,10 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
      * virtual keyboard may actually cause throttling of the Accessibility events.
      */
     private static final long LIST_COMPOSITION_ACCESSIBILITY_ANNOUNCEMENT_DELAY_MS = 300;
+
+    private static final String TAG = "OmniboxDropdown";
+    private static final int DEFAULT_WIDTH = ViewGroup.LayoutParams.MATCH_PARENT;
+    private static final int DEFAULT_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT;
 
     private final SuggestionLayoutScrollListener mLayoutScrollListener;
     private final RecyclerViewSelectionController mSelectionController;
@@ -470,26 +475,53 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
         try (TraceEvent tracing = TraceEvent.scoped("OmniboxSuggestionsList.Measure");
                 TimingMetric metric = OmniboxMetrics.recordSuggestionListMeasureTime();
                 TimingMetric metric2 = OmniboxMetrics.recordSuggestionListMeasureWallTime()) {
-            OmniboxAlignment omniboxAlignment = mEmbedder.getCurrentAlignment();
-            maybeUpdateLayoutParams(omniboxAlignment.top);
-            int availableViewportHeight = omniboxAlignment.height;
-            int desiredWidth = omniboxAlignment.width;
-            adjustHorizontalPosition();
-            notifyObserversIfViewportHeightChanged(availableViewportHeight);
+            
+            if (mEmbedder == null) {
+                Log.w(TAG, "Measuring without embedder - using default dimensions");
+                setDefaultMeasureSpec(widthMeasureSpec, heightMeasureSpec);
+                return;
+            }
 
-            widthMeasureSpec = MeasureSpec.makeMeasureSpec(desiredWidth, MeasureSpec.EXACTLY);
-            heightMeasureSpec =
-                    MeasureSpec.makeMeasureSpec(
-                            availableViewportHeight,
-                            mEmbedder.isTablet() ? MeasureSpec.AT_MOST : MeasureSpec.EXACTLY);
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            if (mEmbedder.isTablet()) {
-                setRoundBottomCorners(
-                        getMeasuredHeight() < availableViewportHeight
-                                || !KeyboardVisibilityDelegate.getInstance()
-                                        .isKeyboardShowing(getContext(), this));
+            OmniboxAlignment omniboxAlignment = mEmbedder.getCurrentAlignment();
+            if (omniboxAlignment == null) {
+                Log.w(TAG, "No alignment available - using default dimensions");
+                setDefaultMeasureSpec(widthMeasureSpec, heightMeasureSpec);
+                return;
+            }
+
+            try {
+                maybeUpdateLayoutParams(omniboxAlignment.top);
+                int availableViewportHeight = omniboxAlignment.height;
+                int desiredWidth = omniboxAlignment.width;
+                adjustHorizontalPosition();
+                notifyObserversIfViewportHeightChanged(availableViewportHeight);
+
+                widthMeasureSpec = MeasureSpec.makeMeasureSpec(
+                        desiredWidth > 0 ? desiredWidth : DEFAULT_WIDTH,
+                        MeasureSpec.EXACTLY);
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(
+                        availableViewportHeight > 0 ? availableViewportHeight : DEFAULT_HEIGHT,
+                        mEmbedder.isTablet() ? MeasureSpec.AT_MOST : MeasureSpec.EXACTLY);
+                
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+                
+                if (mEmbedder.isTablet()) {
+                    setRoundBottomCorners(
+                            getMeasuredHeight() < availableViewportHeight
+                                    || !KeyboardVisibilityDelegate.getInstance()
+                                            .isKeyboardShowing(getContext(), this));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error during measurement", e);
+                setDefaultMeasureSpec(widthMeasureSpec, heightMeasureSpec);
             }
         }
+    }
+
+    private void setDefaultMeasureSpec(int widthMeasureSpec, int heightMeasureSpec) {
+        widthMeasureSpec = MeasureSpec.makeMeasureSpec(DEFAULT_WIDTH, MeasureSpec.EXACTLY);
+        heightMeasureSpec = MeasureSpec.makeMeasureSpec(DEFAULT_HEIGHT, MeasureSpec.AT_MOST);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     private void maybeUpdateLayoutParams(int topMargin) {
@@ -585,9 +617,9 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
      * @param embedder the embedder of this list.
      */
     public void setEmbedder(@NonNull OmniboxSuggestionsDropdownEmbedder embedder) {
-        assert mEmbedder == null;
         mEmbedder = embedder;
-        mOmniboxAlignment = mEmbedder.getCurrentAlignment();
+        // Request a layout to ensure proper measurement with new embedder
+        post(() -> requestLayout());
     }
 
     private void onOmniboxAlignmentChanged(@NonNull OmniboxAlignment omniboxAlignment) {

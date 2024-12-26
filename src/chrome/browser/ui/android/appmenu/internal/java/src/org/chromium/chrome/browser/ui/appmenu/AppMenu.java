@@ -505,6 +505,14 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         return button;
     }
 
+    public void showExtensionWebViewDirectly(String extensionId, AppMenuExtensionOpener extensionOpener) {
+        extensionOpener.openExtension(extensionId);
+    }
+    
+    public void closeExtensionBottomSheet(AppMenuExtensionOpener extensionOpener) {
+        extensionOpener.closeBottomSheet();
+    }
+
     private void openWebsite(String url) {
         if (mHandler != null) {
             LoadUrlParams params = new LoadUrlParams(url);
