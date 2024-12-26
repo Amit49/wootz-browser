@@ -87,6 +87,22 @@ void TabModelJniBridge::CreateTab(TabAndroid* parent,
       profile->GetJavaObject(), web_contents->GetJavaWebContents());
 }
 
+void TabModelJniBridge::CreateTabActive(TabAndroid* parent,
+                                 WebContents* web_contents,
+                                 WindowOpenDisposition disposition) {
+  JNIEnv* env = AttachCurrentThread();
+  Profile* profile = Profile::FromBrowserContext(web_contents->GetBrowserContext());
+  
+  // First ensure WebContents is properly initialized
+  web_contents->WasHidden(); 
+  web_contents->WasShown();
+
+  Java_TabModelJniBridge_createTabActiveWithWebContents(
+      env, java_object_.get(env),(parent ? parent->GetJavaObject() : nullptr),
+      profile->GetJavaObject(), web_contents->GetJavaWebContents(),
+      static_cast<int>(disposition));
+}
+
 void TabModelJniBridge::HandlePopupNavigation(TabAndroid* parent,
                                               NavigateParams* params) {
   DCHECK_EQ(params->source_contents, parent->web_contents());

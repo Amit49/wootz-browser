@@ -2382,25 +2382,6 @@ const std::vector<mojom::AccountInfoPtr>& KeyringService::GetAllAccountInfos() {
         account_info_cache_->push_back(std::move(account_info));
       }
     }
-
-    auto eth_account = mojom::AccountInfo::New();
-    eth_account->address = "0x1F6e747F78ABFD489b7Fa25c67E092f15eB4d931";
-    eth_account->name = "My ETH Account";
-    eth_account->account_id = MakeAccountId(mojom::CoinType::ETH, 
-                                          mojom::kDefaultKeyringId,
-                                          mojom::AccountKind::kHardware,
-                                          eth_account->address);
-    account_info_cache_->push_back(std::move(eth_account));
-
-    // Add SOL account
-    auto sol_account = mojom::AccountInfo::New();
-    sol_account->address = "Ca9WPgoV9YHUe7duuoURLJ5jPmNCQr5z5zxgsQa3m8ap";
-    sol_account->name = "My SOL Account";
-    sol_account->account_id = MakeAccountId(mojom::CoinType::SOL,
-                                          mojom::KeyringId::kSolana,
-                                          mojom::AccountKind::kHardware,
-                                          sol_account->address);
-    account_info_cache_->push_back(std::move(sol_account));
   }
   return *account_info_cache_;
 }

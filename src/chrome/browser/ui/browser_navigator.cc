@@ -982,9 +982,10 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     //     params->transition, params->tabstrip_add_types, params->group);
     LOG(ERROR) << "INSERTING: " << singleton_index;
     TabModel* tab_model = TabModelList::GetCurrentTabModel();
-    tab_model->CreateTab(
+    tab_model->CreateTabActive(
         tab_model->GetTabAt(tab_model->GetActiveIndex()),
-        contents_to_insert.release());
+        contents_to_insert.release(),
+        params->disposition);
   }
 
   if (singleton_index >= 0) {

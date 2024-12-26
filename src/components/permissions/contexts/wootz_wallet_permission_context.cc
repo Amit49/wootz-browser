@@ -406,8 +406,34 @@ void WootzWalletPermissionContext::ResetAllPermissions(
     content::BrowserContext* context) {
   HostContentSettingsMap* map =
       PermissionsClient::Get()->GetSettingsMap(context);
-  map->ClearSettingsForOneType(ContentSettingsType::WOOTZ_ETHEREUM);
-  map->ClearSettingsForOneType(ContentSettingsType::WOOTZ_SOLANA);
+
+  // map->ClearSettingsForOneType(ContentSettingsType::WOOTZ_ETHEREUM);
+  // map->ClearSettingsForOneType(ContentSettingsType::WOOTZ_SOLANA);
+  // Get all settings for each type
+  auto ethereum_settings = map->GetSettingsForOneType(ContentSettingsType::WOOTZ_ETHEREUM);
+  auto solana_settings = map->GetSettingsForOneType(ContentSettingsType::WOOTZ_SOLANA);
+
+  // Clear settings except for chrome-extension URLs
+  for (const auto& setting : ethereum_settings) {
+    const GURL url(setting.primary_pattern.ToString());
+    if (!url.SchemeIs("chrome-extension")) {
+      map->SetContentSettingDefaultScope(
+          url,
+          GURL(),
+          ContentSettingsType::WOOTZ_ETHEREUM,
+          CONTENT_SETTING_DEFAULT);
+    }
+  }
+  for (const auto& setting : solana_settings) {
+    const GURL url(setting.primary_pattern.ToString());
+    if (!url.SchemeIs("chrome-extension")) {
+      map->SetContentSettingDefaultScope(
+          url,
+          GURL(),
+          ContentSettingsType::WOOTZ_SOLANA,
+          CONTENT_SETTING_DEFAULT);
+    }
+  }
 }
 
 }  // namespace permissions

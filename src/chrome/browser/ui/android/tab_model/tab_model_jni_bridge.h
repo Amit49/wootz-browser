@@ -12,6 +12,7 @@
 #include "base/android/scoped_java_ref.h"
 #include "chrome/browser/flags/android/chrome_session_state.h"
 #include "chrome/browser/ui/android/tab_model/tab_model.h"
+#include "ui/base/window_open_disposition.h"
 
 class TabAndroid;
 class TabModelObserverJniBridge;
@@ -54,6 +55,8 @@ class TabModelJniBridge : public TabModel {
 
   void CreateTab(TabAndroid* parent,
                  content::WebContents* web_contents) override;
+  void CreateTabActive(TabAndroid* parent,
+                 content::WebContents* web_contents, WindowOpenDisposition disposition) override;
   void HandlePopupNavigation(TabAndroid* parent,
                              NavigateParams* params) override;
 
