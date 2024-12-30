@@ -143,8 +143,6 @@ extern const char kChromeUIThrottleHost[];
 extern const char kChromeUIThrottleURL[];
 extern const char kChromeUIReactHost[];
 extern const char kChromeUIReactURL[];
-extern const char kChromeUIRewardsHost[];
-extern const char kChromeUIRewardsURL[];
 extern const char kChromeUINewTabHost[];
 extern const char kChromeUINewTabPageHost[];
 extern const char kChromeUINewTabPageURL[];

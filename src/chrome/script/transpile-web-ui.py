@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2018 The Brave Authors. All rights reserved.
+# Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -124,7 +124,7 @@ def transpile_web_uis(options):
     # points. As webpack-cli no longer supports named entries, we provide them
     # via in a custom variable, comma-separated and with
     # "[name]=[path]" syntax.
-    args.append("--env=brave_entries=" + ",".join(options['entry_points']))
+    args.append("--env=wootzapp_entries=" + ",".join(options['entry_points']))
 
     # We should use webpack-cli env param to not pollute environment
     env["ROOT_GEN_DIR"] = options['root_gen_dir']

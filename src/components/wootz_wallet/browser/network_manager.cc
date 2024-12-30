@@ -1,4 +1,4 @@
-/* Copyright (c) 2024 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -245,7 +245,7 @@ const mojom::NetworkInfo* GetGoerliTestNetwork() {
        {"https://goerli.etherscan.io"},
        {},
        0,
-       {GURL("https://goerli-infura.brave.com")},
+       {GURL("")},
        "ETH",
        "Ethereum",
        18,

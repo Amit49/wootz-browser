@@ -34,17 +34,6 @@
   },
 
   # This file is generated during the build.
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_page/wootz_wallet_page.grd": {
-    "META": {"sizes": {"includes": [200]}},
-    "includes": [62760],
-  },
-  # This file is generated during the build.
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_panel/wootz_wallet_panel.grd": {
-    "META": {"sizes": {"includes": [200]}},
-    "includes": [62970],
-  },
-
-  # This file is generated during the build.
   "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_script/wootz_wallet_script.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [63320],
@@ -78,22 +67,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-commands/commands.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [63610],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_swap_page/wootz_wallet_swap_page.grd": {
-    "META": {"sizes": {"includes": [150]}},
-    "includes": [63620],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_send_page/wootz_wallet_send_page.grd": {
-    "META": {"sizes": {"includes": [100]}},
-    "includes": [63770],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_deposit_page/wootz_wallet_deposit_page.grd": {
-    "META": {"sizes": {"includes": [100]}},
-    "includes": [63870],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/web-ui-wootz_wallet_fund_wallet_page/wootz_wallet_fund_wallet_page.grd": {
-    "META": {"sizes": {"includes": [100]}},
-    "includes": [63970],
   },
 
 }

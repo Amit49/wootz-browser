@@ -1,4 +1,4 @@
-// Copyright (c) 2019 The Brave Authors. All rights reserved.
+// Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
 // you can obtain one at https://mozilla.org/MPL/2.0/.
@@ -34,17 +34,17 @@ module.exports = async function (env, argv) {
   // webpack-cli no longer allows specifying entry name in cli args, so use
   // a custom env param and parse ourselves.
   const entry = {}
-  if (!env.brave_entries) {
+  if (!env.wootzapp_entries) {
     throw new Error(
-      "Entry point(s) must be provided via env.brave_entries param."
+      "Entry point(s) must be provided via env.wootzapp_entries param."
     )
   }
-  const entryInput = env.brave_entries.split(',').sort()
+  const entryInput = env.wootzapp_entries.split(',').sort()
   for (const entryInputItem of entryInput) {
     const entryInputItemParts = entryInputItem.split('=')
     if (entryInputItemParts.length !== 2) {
       throw new Error(
-        'Brave Webpack config could not parse entry env param item: ' +
+        'Wootzapp Webpack config could not parse entry env param item: ' +
         entryInputItem
       )
     }
@@ -114,7 +114,7 @@ module.exports = async function (env, argv) {
       }),
       // Generate module IDs relative to the gen dir since we want identical
       // output per-platform for mac Universal builds. If they remain relative
-      // to the src/brave working directory then the paths could include the
+      // to the src working directory then the paths could include the
       // platform architecture and therefore be different,
       // e.g. ../out/Release_arm64/gen
       // We can't use DeterministicModuleIdsPlugin because the
@@ -199,15 +199,6 @@ module.exports = async function (env, argv) {
         {
           test: /\.(ttf|eot|ico|svg|png|jpg|jpeg|gif|webp)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
           loader: 'file-loader'
-        },
-        // Unfortunately, brave-ui is compiled as a "module" so Webpack5 expects
-        // it to provide file extensions (which it does not), so we need to
-        // special case it here.
-        {
-          test: p => p.includes(path.join('@brave', 'brave-ui')) && p.endsWith('.js'),
-          resolve: {
-              fullySpecified: false,
-          },
         }
       ]
     }

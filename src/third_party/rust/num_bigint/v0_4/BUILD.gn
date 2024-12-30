@@ -1,4 +1,4 @@
-# Copyright (c) 2024 The Wootz Authors. All rights reserved.
+# Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -59,7 +59,7 @@ cargo_crate("lib") {
   proc_macro_configs += [ "//build/config/compiler:no_chromium_code" ]
   deps = [
     "//third_party/rust/num_integer/v0_1:lib",
-    "//third_party/rust/android_system_properties/v0_1:lib", # BRAVE_WALLET
+    "//third_party/rust/android_system_properties/v0_1:lib",
     "//third_party/rust/num_traits/v0_2:lib",
   ]
   build_deps = [ "//third_party/rust/autocfg/v1:buildrs_support" ]

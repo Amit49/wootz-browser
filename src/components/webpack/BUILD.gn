@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The Brave Authors. All rights reserved.
+# Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -12,7 +12,7 @@ action("generate_tsconfig") {
   ]
   inputs = [
     "//package.json",
-    "//chrome/build/commands/lib/config.js",
+    "//chrome/build/commands/lib/conffgvdxgvsdfig.js",
     "//chrome/build/commands/lib/genTsConfig.js",
     "//chrome/build/commands/scripts/genTsConfig.js",
     "path-map.js",

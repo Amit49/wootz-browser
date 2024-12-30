@@ -49,7 +49,6 @@
 #include "chrome/browser/ui/webui/net_export_ui.h"
 #include "chrome/browser/ui/webui/net_internals/net_internals_ui.h"
 #include "chrome/browser/ui/webui/throttle/throttle_ui.h"
-#include "chrome/browser/ui/webui/rewards/rewards_ui.h"
 #include "chrome/browser/ui/webui/ntp_tiles_internals_ui.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
 #include "chrome/browser/ui/webui/policy/policy_ui.h"
@@ -109,12 +108,6 @@
 #include "ui/web_dialogs/web_dialog_ui.h"
 #include "url/gurl.h"
 #include "url/url_constants.h"
-#include "components/constants/webui_url_constants.h"
-#include "chrome/browser/ui/webui/wootz_wallet/android/android_wallet_page_ui.h"
-#include "chrome/browser/wootz_wallet/wootz_wallet_service_factory.h"
-#include "chrome/browser/ui/webui/wootz_wallet/android/android_wallet_page_ui.h"
-#include "components/wootz_wallet/browser/wootz_wallet_service.h"
-#include "components/wootz_wallet/browser/keyring_service.h"
 
 #if BUILDFLAG(ENABLE_NACL)
 #include "chrome/browser/ui/webui/nacl_ui.h"
@@ -315,10 +308,6 @@ WebUIController* NewComponentUI(WebUI* web_ui, const GURL& url) {
   return new WEB_UI_CONTROLLER(web_ui, std::move(delegate));
 }
 
-template <>
-WebUIController* NewWebUI<AndroidWalletPageUI>(WebUI* web_ui, const GURL& url) {
-  return new AndroidWalletPageUI(web_ui, url);
-}
 
 #if !BUILDFLAG(IS_ANDROID)
 template <>
@@ -456,10 +445,6 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<NetInternalsUI>;
   if (url.host_piece() == chrome::kChromeUIThrottleHost)
     return &NewWebUI<ThrottleUI>;
-  if (url.host_piece() == chrome::kChromeUIRewardsHost)
-    return &NewWebUI<RewardsUI>;
-  if (url.host_piece() == kWalletPageHost)
-    return &NewWebUI<AndroidWalletPageUI>;
   if (url.host_piece() == chrome::kChromeUINTPTilesInternalsHost)
     return &NewWebUI<NTPTilesInternalsUI>;
   if (url.host_piece() == chrome::kChromeUIOmniboxHost)
@@ -918,9 +903,7 @@ bool ChromeWebUIControllerFactory::IsWebUIAllowedToMakeNetworkRequests(
       // https://crbug.com/831813
       origin.host() == chrome::kChromeUIInspectHost ||
       // https://crbug.com/859345
-      origin.host() == chrome::kChromeUIDownloadsHost ||
-      
-      origin.host() == chrome::kChromeUIRewardsHost;
+      origin.host() == chrome::kChromeUIDownloadsHost;
 }
 
 ChromeWebUIControllerFactory::ChromeWebUIControllerFactory() = default;
