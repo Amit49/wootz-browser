@@ -106,6 +106,25 @@
           }
         },
         {
+          "name": "isWalletCreated",
+          "type": "function", 
+          "description": "Checks if a wallet has been created",
+          "parameters": [],
+          "returns_async": {
+            "name": "callback",
+            "parameters": [
+              {
+                "type": "object",
+                "name": "result",
+                "properties": {
+                  "isCreated": {"type": "boolean"},
+                  "error": {"type": "string", "optional": true}
+                }
+              }
+            ]
+          }
+        },
+        {
           "name": "unlockWallet",
           "type": "function",
           "description": "Unlocks the wallet",

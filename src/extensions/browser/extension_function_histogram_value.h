@@ -1967,6 +1967,7 @@ enum HistogramValue {
   WOOTZ_IS_LOCKED = 1905,
   WOOTZ_GET_ALL_ACCOUNTS = 1906,
   WOOTZ_SIGN_MESSAGE = 1907,
+  WOOTZ_IS_WALLET_CREATED = 1908,
     
   // Last entry: Add new entries above, then run:
   // tools/metrics/histograms/update_extension_histograms.py

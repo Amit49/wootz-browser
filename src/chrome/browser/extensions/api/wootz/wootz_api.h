@@ -113,6 +113,14 @@ class WootzCreateWalletFunction : public ExtensionFunction {
   void OnWalletCreated(const std::optional<std::string>& recovery_phrase);
 };
 
+class WootzIsWalletCreatedFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.isWalletCreated", WOOTZ_IS_WALLET_CREATED)
+ protected:
+  ~WootzIsWalletCreatedFunction() override {}
+  ResponseAction Run() override;
+};
+
 class WootzUnlockWalletFunction : public ExtensionFunction {
  public:
   DECLARE_EXTENSION_FUNCTION("wootz.unlockWallet", WOOTZ_UNLOCK_WALLET)

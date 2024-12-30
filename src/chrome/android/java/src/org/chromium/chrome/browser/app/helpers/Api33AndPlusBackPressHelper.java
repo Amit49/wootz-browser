@@ -20,7 +20,6 @@ import java.lang.ref.WeakReference;
 /**
  * Helper class for back press event handling via {@link OnBackInvokedDispatcher}.
  * This should only be used to resolve Android 13+ back press issue
- * {@link https://github.com/brave/brave-browser/issues/27787}.
  */
 public final class Api33AndPlusBackPressHelper {
     private final WeakReference<FragmentActivity> mActivity;

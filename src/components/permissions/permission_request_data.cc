@@ -19,10 +19,6 @@ std::optional<RequestType> ContentSettingsTypeToRequestTypeIfExists_WootzImpl(
       return RequestType::kWootzEthereum;
     case ContentSettingsType::WOOTZ_SOLANA:
       return RequestType::kWootzSolana;
-    // case ContentSettingsType::BRAVE_GOOGLE_SIGN_IN:
-    //   return RequestType::kBraveGoogleSignInPermission;
-    // case ContentSettingsType::BRAVE_LOCALHOST_ACCESS:
-    //   return RequestType::kBraveLocalhostAccessPermission;
     default:
       return ContentSettingsTypeToRequestTypeIfExists(content_settings_type);
   }

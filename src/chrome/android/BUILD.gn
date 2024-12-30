@@ -3855,7 +3855,6 @@ generate_jni("chrome_jni_headers") {
   public_deps = [
     ":base_module_jni",
     "//chrome/browser/webid:jni_headers",
-    # "//chrome/browser/wootz_wallet", #BRAVE_WALLET   
   ]
 }
 

@@ -19,10 +19,6 @@
 #include "ui/base/webui/resource_path.h"
 #include "ui/base/webui/web_ui_util.h"
 
-// #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-// #include "brave/components/brave_rewards/resources/grit/brave_rewards_resources.h"
-// #endif
-
 namespace wootz {
 
 base::span<const webui::ResourcePath> GetWebUIResources(

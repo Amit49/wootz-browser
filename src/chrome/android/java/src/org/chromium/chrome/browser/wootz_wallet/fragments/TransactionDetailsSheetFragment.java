@@ -207,7 +207,7 @@ public class TransactionDetailsSheetFragment extends WalletBottomSheetDialogFrag
         items.add(new TwoLineItemRecyclerViewAdapter.TwoLineItemDivider());
         items.add(
                 new TwoLineItemRecyclerViewAdapter.TwoLineItemText(
-                        getString(R.string.status),
+                        getString(R.string.date_text),
                         mAccountSelectorItemModel.getTxStatus(),
                         (title, subtitle) -> {
                             subtitle.setCompoundDrawablesRelativeWithIntrinsicBounds(

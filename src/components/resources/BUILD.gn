@@ -190,11 +190,11 @@ wootz_grit("static_resources") {
 repack("resources_repack") {
   deps = [
     ":static_resources",
-    "//components/wootz_wallet_ui:resources",
+    # "//components/wootz_wallet_ui:resources",
   ]
   sources = [
     "$root_gen_dir/components/wootz_components_static.pak",
-    "$root_gen_dir/components/wootz_wallet/resources/wootz_wallet.pak",
+    # "$root_gen_dir/components/wootz_wallet/resources/wootz_wallet.pak",
   ]
 
   deps += [ "//components/wootz_wallet/resources:ethereum_provider_generated_resources" ]

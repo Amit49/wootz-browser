@@ -1,86 +1,86 @@
 {
-  "name": "brave-browser",
+  "name": "Wootzapp-browser",
   "version": "1.70.57",
-  "description": "Brave Core is a set of changes, APIs and scripts used for customizing Chromium to make Brave.",
+  "description": "Integration of APIs and scripts for adding a wootzapp crypto wallet into wootzapp browser",
   "main": "index.js",
   "scripts": {
-    "audit_deps": "node chrome/build/commands/scripts/audit.js -- --audit_dev_deps",
-    "cibuild": "node chrome/build/commands/scripts/commands.js cibuild",
-    "init": "cd ../../ && npm run --prefix src/brave sync -- --init",
-    "delete_string_translations": "node chrome/build/commands/scripts/commands.js delete_string_translations",
-    "create_dist": "node chrome/build/commands/scripts/commands.js build --target=create_dist",
-    "sync": "node chrome/build/commands/scripts/sync.js",
-    "gclient": "node chrome/build/commands/scripts/gclient.js",
-    "build": "node chrome/build/commands/scripts/commands.js build",
-    "build_chromium_release": "node chrome/build/commands/scripts/commands.js build_chromium_release",
-    "gn_check": "node chrome/build/commands/scripts/commands.js gn_check",
-    "versions": "node chrome/build/commands/scripts/commands.js versions",
-    "upload": "node chrome/build/commands/scripts/commands.js upload",
-    "update_patches": "node chrome/build/commands/scripts/commands.js update_patches",
-    "apply_patches": "node chrome/build/commands/scripts/commands.js apply_patches",
-    "start": "node chrome/build/commands/scripts/commands.js start",
-    "network-audit": "npm run test brave_network_audit_tests -- --ui-test-action-timeout=320000 --test-launcher-timeout=2200000",
-    "push_l10n": "node chrome/build/commands/scripts/commands.js push_l10n",
-    "pull_l10n": "node chrome/build/commands/scripts/commands.js pull_l10n",
-    "chromium_rebase_l10n": "node chrome/build/commands/scripts/commands.js chromium_rebase_l10n",
-    "presubmit": "node chrome/build/commands/scripts/commands.js presubmit",
-    "format": "node chrome/build/commands/scripts/commands.js format",
-    "mass_rename": "node chrome/build/commands/scripts/commands.js mass_rename",
-    "test": "node chrome/build/commands/scripts/commands.js test",
+    // "audit_deps": "node chrome/build/commands/scripts/audit.js -- --audit_dev_deps",
+    // "cibuild": "node chrome/build/commands/scripts/commands.js cibuild",
+    // "init": "cd ../../ && npm run --prefix src/brave sync -- --init",
+    // "delete_string_translations": "node chrome/build/commands/scripts/commands.js delete_string_translations",
+    // "create_dist": "node chrome/build/commands/scripts/commands.js build --target=create_dist",
+    // "sync": "node chrome/build/commands/scripts/sync.js",
+    // "gclient": "node chrome/build/commands/scripts/gclient.js",
+    // "build": "node chrome/build/commands/scripts/commands.js build",
+    // "build_chromium_release": "node chrome/build/commands/scripts/commands.js build_chromium_release",
+    // "gn_check": "node chrome/build/commands/scripts/commands.js gn_check",
+    // "versions": "node chrome/build/commands/scripts/commands.js versions",
+    // "upload": "node chrome/build/commands/scripts/commands.js upload",
+    // "update_patches": "node chrome/build/commands/scripts/commands.js update_patches",
+    // "apply_patches": "node chrome/build/commands/scripts/commands.js apply_patches",
+    // "start": "node chrome/build/commands/scripts/commands.js start",
+    // "network-audit": "npm run test brave_network_audit_tests -- --ui-test-action-timeout=320000 --test-launcher-timeout=2200000",
+    // "push_l10n": "node chrome/build/commands/scripts/commands.js push_l10n",
+    // "pull_l10n": "node chrome/build/commands/scripts/commands.js pull_l10n",
+    // "chromium_rebase_l10n": "node chrome/build/commands/scripts/commands.js chromium_rebase_l10n",
+    // "presubmit": "node chrome/build/commands/scripts/commands.js presubmit",
+    // "format": "node chrome/build/commands/scripts/commands.js format",
+    // "mass_rename": "node chrome/build/commands/scripts/commands.js mass_rename",
+    // "test": "node chrome/build/commands/scripts/commands.js test",
     "test:scripts": "cross-env NODE_OPTIONS=--no-experimental-fetch jest build/commands/lib build/commands/scripts",
     "tslint": "npm run eslint",
     "eslint": "eslint ./components",
     "pep8": "pycodestyle --max-line-length 120 -r script",
     "web-ui-gen-grd": "node components/webpack/gen-webpack-grd",
-    "web-ui-gen-tsconfig": "node chrome/build/commands/scripts/genTsConfig",
+    // "web-ui-gen-tsconfig": "node chrome/build/commands/scripts/genTsConfig",
     "web-ui": "webpack --config components/webpack/webpack.config.js",
-    "build-storybook": "npm run build -- --target=brave:storybook && storybook build -c .storybook -o .storybook-out",
-    "storybook": "storybook dev",
-    "test-unit": "cross-env NODE_OPTIONS=--no-experimental-fetch jest -t",
-    "test-unit:wallet": "cross-env NODE_OPTIONS=--no-experimental-fetch jest --coverage=false components/wootz_wallet_ui",
-    "test-python-scripts": "npm run pep8 && PYTHONPATH=./script python -m unittest discover -s ./script/test",
-    "update_symlink": "node chrome/build/commands/scripts/commands.js update_symlink",
-    "build_fuzzer": "node chrome/build/commands/scripts/commands.js build_fuzzer",
-    "fuzzer": "node chrome/build/commands/scripts/commands.js run_fuzzer",
-    "perf_tests": "node chrome/build/commands/scripts/commands.js run_perf_tests",
-    "gen_env": "node chrome/build/commands/scripts/genEnv.js",
-    "gen_gradle": "node chrome/build/commands/scripts/commands.js gen_gradle",
-    "ios_pack_js": "webpack --config ios/brave-ios/webpack.config.js",
-    "ios_bootstrap": "node chrome/build/commands/scripts/iosCommands.js ios_bootstrap"
+    // "build-storybook": "npm run build -- --target=brave:storybook && storybook build -c .storybook -o .storybook-out",
+    // "storybook": "storybook dev",
+    // "test-unit": "cross-env NODE_OPTIONS=--no-experimental-fetch jest -t",
+    // "test-unit:wallet": "cross-env NODE_OPTIONS=--no-experimental-fetch jest --coverage=false components/wootz_wallet_ui",
+    // "test-python-scripts": "npm run pep8 && PYTHONPATH=./script python -m unittest discover -s ./script/test",
+    // "update_symlink": "node chrome/build/commands/scripts/commands.js update_symlink",
+    // "build_fuzzer": "node chrome/build/commands/scripts/commands.js build_fuzzer",
+    // "fuzzer": "node chrome/build/commands/scripts/commands.js run_fuzzer",
+    // "perf_tests": "node chrome/build/commands/scripts/commands.js run_perf_tests",
+    // "gen_env": "node chrome/build/commands/scripts/genEnv.js",
+    // "gen_gradle": "node chrome/build/commands/scripts/commands.js gen_gradle",
+    // "ios_pack_js": "webpack --config ios/brave-ios/webpack.config.js",
+    // "ios_bootstrap": "node chrome/build/commands/scripts/iosCommands.js ios_bootstrap"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/brave/brave-core.git"
-  },
-  "author": {
-    "name": "Brave Software <support@brave.com>"
-  },
+  // "repository": {
+  //   "type": "git",
+  //   "url": "git+https://github.com/brave/brave-core.git"
+  // },
+  // "author": {
+  //   "name": "Brave Software <support@brave.com>"
+  // },
   "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/brave/brave-browser/issues"
-  },
+  // "bugs": {
+  //   "url": "https://github.com/brave/brave-browser/issues"
+  // },
   "engines": {
     "node": ">=20.0.0 <22.0.0",
     "npm": ">=10.0.0"
   },
-  "homepage": "https:/github.com/brave/brave-core#readme",
-  "config": {
-    "projects": {
-      "chrome": {
-        "dir": "src",
-        "tag": "128.0.6613.18",
-        "repository": {
-          "url": "https://github.com/brave/chromium"
-        }
-      },
-      "depot_tools": {
-        "dir": "vendor/depot_tools",
-        "repository": {
-          "url": "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
-        }
-      }
-    }
-  },
+  // "homepage": "https:/github.com/brave/brave-core#readme",
+  // "config": {
+  //   "projects": {
+  //     "chrome": {
+  //       "dir": "src",
+  //       "tag": "128.0.6613.18",
+  //       "repository": {
+  //         "url": "https://github.com/brave/chromium"
+  //       }
+  //     },
+  //     "depot_tools": {
+  //       "dir": "vendor/depot_tools",
+  //       "repository": {
+  //         "url": "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
+  //       }
+  //     }
+  //   }
+  // },
   "devDependencies": {
     "@storybook/addon-essentials": "8.0.1",
     "@storybook/addon-knobs": "8.0.1",
@@ -173,10 +173,10 @@
     "webpack-cli": "5.1.4"
   },
   "dependencies": {
-    "@brave/brave-ui": "0.40.6",
-    "@brave/leo": "github:brave/leo#63e98a1bb14cf87dcb8cbd4436e9e38615840447",
-    "@brave/leo-sf-symbols": "github:brave/leo-sf-symbols#8685eec0851afa96d23dd424cd152854476e585d",
-    "@brave/wallet-standard-brave": "0.0.13",
+    // "@brave/brave-ui": "0.40.6",
+    // "@brave/leo": "github:brave/leo#63e98a1bb14cf87dcb8cbd4436e9e38615840447",
+    // "@brave/leo-sf-symbols": "github:brave/leo-sf-symbols#8685eec0851afa96d23dd424cd152854476e585d",
+    // "@brave/wallet-standard-brave": "0.0.13",
     "@dnd-kit/core": "6.0.5",
     "@dnd-kit/sortable": "7.0.1",
     "@glif/filecoin-wallet-provider": "2.0.0-beta.12",

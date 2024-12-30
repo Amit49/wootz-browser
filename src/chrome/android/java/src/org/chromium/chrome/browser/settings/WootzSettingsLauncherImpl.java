@@ -13,11 +13,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-// import org.chromium.chrome.browser.browsing_data.BraveClearBrowsingDataFragmentAdvanced;
 import org.chromium.chrome.browser.browsing_data.ClearBrowsingDataFragmentAdvanced;
-// import org.chromium.chrome.browser.download.settings.BraveDownloadSettings;
 import org.chromium.chrome.browser.download.settings.DownloadSettings;
-// import org.chromium.chrome.browser.safe_browsing.settings.BraveStandardProtectionSettingsFragment;
 import org.chromium.chrome.browser.safe_browsing.settings.StandardProtectionSettingsFragment;
 
 public class WootzSettingsLauncherImpl extends SettingsLauncherImpl {
@@ -31,13 +28,10 @@ public class WootzSettingsLauncherImpl extends SettingsLauncherImpl {
         if (fragment != null) {
             // Substitute with our version of class
             if (fragment.equals(StandardProtectionSettingsFragment.class)) {
-                // fragment = BraveStandardProtectionSettingsFragment.class;
                 fragment = StandardProtectionSettingsFragment.class;
             } else if (fragment.equals(DownloadSettings.class)) {
-                // fragment = BraveDownloadSettings.class;
                 fragment = DownloadSettings.class;
             } else if (fragment.equals(ClearBrowsingDataFragmentAdvanced.class)) {
-                // fragment = BraveClearBrowsingDataFragmentAdvanced.class;
                 fragment = ClearBrowsingDataFragmentAdvanced.class;
             }
         }
@@ -50,7 +44,6 @@ public class WootzSettingsLauncherImpl extends SettingsLauncherImpl {
             @Nullable Class<? extends Fragment> fragment,
             @Nullable Bundle fragmentArgs) {
         Intent intent = super.createSettingsActivityIntent(context, fragment, fragmentArgs);
-        // intent.setClass(context, BraveSettingsActivity.class);
         intent.setClass(context, SettingsActivity.class);
         if (!(context instanceof Activity)) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

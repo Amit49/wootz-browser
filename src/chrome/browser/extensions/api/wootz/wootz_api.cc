@@ -237,6 +237,19 @@ void WootzCreateWalletFunction::OnWalletCreated(
   Respond(ArgumentList(std::move(result_list)));
 }
 
+ExtensionFunction::ResponseAction WootzIsWalletCreatedFunction::Run() {
+  auto* keyring_service = GetKeyringService(browser_context());
+
+  if (!keyring_service) {
+    return RespondNow(Error("KeyringService not available"));
+  }
+
+  base::Value::Dict result;
+  result.Set("isCreated", keyring_service->IsWalletCreatedSync());
+
+  return RespondNow(WithArguments(std::move(result)));
+}
+
 ExtensionFunction::ResponseAction WootzUnlockWalletFunction::Run() {
   if (args().empty() || !args()[0].is_string()) {
     return RespondNow(Error("Invalid arguments"));

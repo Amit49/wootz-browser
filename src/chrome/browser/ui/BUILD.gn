@@ -1128,12 +1128,6 @@ static_library("ui") {
       "//components/wootz_wallet/browser:hd_keyring",
       "//components/wootz_wallet/common",
       "//components/wootz_wallet/common:mojom",
-      "//components/wootz_wallet_ui:resources",
-      "//components/wootz_wallet_ui/page:wootz_wallet_page_generated",
-      "//components/wootz_wallet_ui/page/screens/android-buy/android:wootz_wallet_fund_wallet_page_generated",
-      "//components/wootz_wallet_ui/page/screens/fund-wallet/android:wootz_wallet_deposit_page_generated",
-      "//components/wootz_wallet_ui/page/screens/send/android:wootz_wallet_send_page_generated",
-      "//components/wootz_wallet_ui/page/screens/swap/android:wootz_wallet_swap_page_generated",
     ]
 
     # TODO(b/335257259): Resolve circular deps.
