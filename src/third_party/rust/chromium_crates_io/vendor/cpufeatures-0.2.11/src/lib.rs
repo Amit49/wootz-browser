@@ -147,7 +147,8 @@ mod miri;
     target_arch = "aarch64",
     target_arch = "loongarch64",
     target_arch = "x86",
-    target_arch = "x86_64"
+    target_arch = "x86_64",
+    target_arch = "arm"
 )))]
 compile_error!("This crate works only on `aarch64`, `loongarch64`, `x86`, and `x86-64` targets.");
 

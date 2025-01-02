@@ -2741,6 +2741,10 @@ if (current_toolchain == default_toolchain) {
       "//components/background_task_scheduler:background_task_scheduler_java",
       "//components/payments/content/android:service_java",
       "//third_party/androidx:androidx_browser_browser_java",
+      "//third_party/androidx:androidx_core_core_java",
+      "//third_party/androidx:androidx_lifecycle_lifecycle_livedata_core_java",
+      "//third_party/androidx:androidx_lifecycle_lifecycle_livedata_java",
+      "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_java",
     ]
 
     # More deps for DFMs.
