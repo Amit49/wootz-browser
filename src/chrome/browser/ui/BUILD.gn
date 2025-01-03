@@ -325,8 +325,6 @@ static_library("ui") {
     "webui/throttle/throttle_prefs.h",
     "webui/throttle/throttle_ui.cc",
     "webui/throttle/throttle_ui.h",
-    "webui/rewards/rewards_ui.cc",
-    "webui/rewards/rewards_ui.h",
     "webui/ntp_tiles_internals_ui.cc",
     "webui/ntp_tiles_internals_ui.h",
     "webui/omnibox/omnibox_page_handler.cc",
@@ -379,6 +377,8 @@ static_library("ui") {
     "webui/version/version_ui.h",
     "webui/webui_load_timer.cc",
     "webui/webui_load_timer.h",
+    "webui/wootz_webui_source.cc",
+    "webui/wootz_webui_source.h",
     "zoom/chrome_zoom_level_otr_delegate.cc",
     "zoom/chrome_zoom_level_otr_delegate.h",
     "zoom/chrome_zoom_level_prefs.cc",
@@ -685,6 +685,7 @@ static_library("ui") {
     "//components/webapps/browser",
     "//components/webapps/common",
     "//components/webrtc_logging/browser",
+    "//components/webui",
     "//components/zoom",
     "//content/public/common",
     "//crypto",
@@ -1013,6 +1014,7 @@ static_library("ui") {
       "webui/webapks/webapks_handler.h",
       "webui/webapks/webapks_ui.cc",
       "webui/webapks/webapks_ui.h",
+
       "global_error/global_error.cc",
       "global_error/global_error.h",
       "global_error/global_error_service.cc",
@@ -1109,6 +1111,10 @@ static_library("ui") {
       "//third_party/jni_zero",
       "//ui/android",
       "//url",
+      "//chrome/browser/wootz_wallet",
+      "//components/wootz_wallet/browser:hd_keyring",
+      "//components/wootz_wallet/common",
+      "//components/wootz_wallet/common:mojom",
     ]
 
     # TODO(b/335257259): Resolve circular deps.

@@ -29,7 +29,6 @@ public class Extensions {
                     byte[] iconBytes = Base64.decode(iconBase64, Base64.DEFAULT);
                     icon = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
                 }
-
                 result.add(new ExtensionInfo(
                     obj.getString("id"),
                     obj.getString("name"),

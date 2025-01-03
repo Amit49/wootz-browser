@@ -18,8 +18,6 @@ import org.chromium.base.cached_flags.StringCachedFieldTrialParameter;
 import java.util.List;
 import java.util.Map;
 
-import android.util.Log;
-
 /**
  * A list of feature flags exposed to Java.
  *

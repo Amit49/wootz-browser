@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -7,9 +7,9 @@
 #include "base/android/jni_string.h"
 #include "base/logging.h"
 #include "chrome/browser/wootz_wallet/wootz_wallet_service_factory.h"
-#include "chrome/build/android/jni_headers/WalletNativeUtils_jni.h"
-#include "chrome/components/wootz_wallet/browser/wootz_wallet_service.h"
-#include "chrome/components/decentralized_dns/core/utils.h"
+#include "chrome/android/chrome_jni_headers/WalletNativeUtils_jni.h"
+#include "components/wootz_wallet/browser/wootz_wallet_service.h"
+#include "components/decentralized_dns/core/utils.h"
 #include "chrome/browser/profiles/profile.h"
 
 namespace chrome {

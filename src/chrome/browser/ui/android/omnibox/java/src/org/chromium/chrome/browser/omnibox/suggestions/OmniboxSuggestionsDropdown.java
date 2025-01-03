@@ -55,7 +55,7 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
     private static final String TAG = "OmniboxDropdown";
     private static final int DEFAULT_WIDTH = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final int DEFAULT_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT;
-
+    
     private final SuggestionLayoutScrollListener mLayoutScrollListener;
     private final RecyclerViewSelectionController mSelectionController;
 
@@ -477,14 +477,12 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
                 TimingMetric metric2 = OmniboxMetrics.recordSuggestionListMeasureWallTime()) {
             
             if (mEmbedder == null) {
-                Log.w(TAG, "Measuring without embedder - using default dimensions");
                 setDefaultMeasureSpec(widthMeasureSpec, heightMeasureSpec);
                 return;
             }
 
             OmniboxAlignment omniboxAlignment = mEmbedder.getCurrentAlignment();
             if (omniboxAlignment == null) {
-                Log.w(TAG, "No alignment available - using default dimensions");
                 setDefaultMeasureSpec(widthMeasureSpec, heightMeasureSpec);
                 return;
             }
@@ -512,7 +510,6 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
                                             .isKeyboardShowing(getContext(), this));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error during measurement", e);
                 setDefaultMeasureSpec(widthMeasureSpec, heightMeasureSpec);
             }
         }

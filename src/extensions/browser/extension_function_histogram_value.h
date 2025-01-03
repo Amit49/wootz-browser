@@ -1960,6 +1960,15 @@ enum HistogramValue {
   WOOTZ_GETJOBS = 1898,
   WOOTZ_LISTJOBS = 1899,
   WOOTZ_CLEANJOBS = 1900,
+  WOOTZ_SELECT_CHAIN = 1901,
+  WOOTZ_CREATE_WALLET = 1902,
+  WOOTZ_UNLOCK_WALLET = 1903,
+  WOOTZ_LOCK_WALLET = 1904,
+  WOOTZ_IS_LOCKED = 1905,
+  WOOTZ_GET_ALL_ACCOUNTS = 1906,
+  WOOTZ_SIGN_MESSAGE = 1907,
+  WOOTZ_IS_WALLET_CREATED = 1908,
+    
   // Last entry: Add new entries above, then run:
   // tools/metrics/histograms/update_extension_histograms.py
   ENUM_BOUNDARY

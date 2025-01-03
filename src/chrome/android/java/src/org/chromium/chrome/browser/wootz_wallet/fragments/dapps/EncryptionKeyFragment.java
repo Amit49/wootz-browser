@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -26,7 +26,7 @@ import org.chromium.wootz_wallet.mojom.DecryptRequest;
 import org.chromium.wootz_wallet.mojom.GetEncryptionPublicKeyRequest;
 import org.chromium.wootz_wallet.mojom.NetworkInfo;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.app.WootzActivity;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.app.domain.WalletModel;
 import org.chromium.chrome.browser.wootz_wallet.activities.WootzWalletDAppsActivity;
 import org.chromium.chrome.browser.wootz_wallet.util.AndroidUtils;
@@ -35,6 +35,7 @@ import org.chromium.chrome.browser.wootz_wallet.util.Utils;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 public class EncryptionKeyFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ConnectAccount";
 
@@ -77,9 +78,10 @@ public class EncryptionKeyFragment extends Fragment implements View.OnClickListe
         mExecutor = Executors.newSingleThreadExecutor();
         mHandler = new Handler(Looper.getMainLooper());
         try {
-            WootzActivity activity = WootzActivity.getWootzActivity();
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
             mWalletModel = activity.getWalletModel();
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
+            Log.e("WOOTZAPP ANKITIVAN", "getWalletModel: " + mWalletModel);
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
             Log.e(TAG, "onCreate " + e);
         }
     }
@@ -128,7 +130,7 @@ public class EncryptionKeyFragment extends Fragment implements View.OnClickListe
         if (mWalletModel == null) {
             return;
         }
-
+        Log.e("WOOTZAPP ANKIT", "initState: mWalletModel " + mWalletModel);
         mWalletModel.getCryptoModel().getNetworkModel().mPairChainAndNetwork.observe(
                 getViewLifecycleOwner(), chainIdAndInfosPair -> {
                     String chainId = chainIdAndInfosPair.first;

@@ -145,7 +145,7 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
                 //                 bottomSheetController,
                 //                 omniboxSuggestionsVisualState,
                 //                 insetObserver)
-                        null);
+                null);
     }
 
     @VisibleForTesting
@@ -302,7 +302,7 @@ class TabbedNavigationBarColorController implements BottomAttachedUiObserver.Obs
     }
 
     private void updateActiveTab() {
-        // if (ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) return;
+        // if (!ChromeFeatureList.sNavBarColorMatchesTabBackground.isEnabled()) return;
 
         @Nullable Tab activeTab = mTabModelSelector.getCurrentTab();
         if (activeTab == mActiveTab) return;

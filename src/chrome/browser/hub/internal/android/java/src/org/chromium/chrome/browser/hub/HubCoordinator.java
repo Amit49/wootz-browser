@@ -12,15 +12,9 @@ import android.graphics.Outline;
 import android.view.ViewOutlineProvider;
 import android.util.TypedValue;
 import android.graphics.Path;  
-
-
-
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-// import gen._chrome._android._chrome_java__assetres.srcjar.R;
-
-//import java.nio.file.Path;
 
 import org.chromium.base.Callback;
 import org.chromium.base.supplier.ObservableSupplier;
@@ -35,7 +29,6 @@ import org.chromium.components.browser_ui.widget.gesture.BackPressHandler.BackPr
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.view.ViewOutlineProvider;
-
 
 /** Root coordinator of the Hub. */
 public class HubCoordinator implements PaneHubController, BackPressHandler {
@@ -98,15 +91,6 @@ public class HubCoordinator implements PaneHubController, BackPressHandler {
         mContainerView.addView(mMainHubParent);
 
         hubToolbarView = mContainerView.findViewById(R.id.hub_toolbar);
-        // This might be causing crash whenever you click on Tabswitcher on a native incognito new tab page
-        // float borderRadius = 80f;
-        // hubToolbarView.setClipToOutline(true);
-        // hubToolbarView.setOutlineProvider(new ViewOutlineProvider() {
-        //     @Override
-        //     public void getOutline(View view, Outline outline) {
-        //         outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), borderRadius);
-        //     }
-        // });
 
         mHubToolbarCoordinator =
                 new HubToolbarCoordinator(hubToolbarView, paneManager, menuButtonCoordinator);

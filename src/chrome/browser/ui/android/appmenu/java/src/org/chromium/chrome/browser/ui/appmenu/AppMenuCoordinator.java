@@ -21,20 +21,20 @@ public interface AppMenuCoordinator {
     AppMenuHandler getAppMenuHandler();
 
     /**
-     * @return The {@link AppMenuPropertiesDelegate} associated with this activity.
-     */
-    AppMenuPropertiesDelegate getAppMenuPropertiesDelegate();
-
-    /**
      * Open the extensions Bottom Sheet.
      */
     void openExtensionById(String extensionId);
-    
+
     /**
      * Close the extensions Bottom Sheet.
      */
     void closeExtensionBottomSheet();
+    
 
+    /**
+     * @return The {@link AppMenuPropertiesDelegate} associated with this activity.
+     */
+    AppMenuPropertiesDelegate getAppMenuPropertiesDelegate();
 
     /**
      * Registers an {@link AppMenuBlocker} used to help determine whether the app menu can be shown.

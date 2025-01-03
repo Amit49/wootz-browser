@@ -916,7 +916,6 @@ ExtensionTabUtil::GetAllActiveWebContentsForContext(
       include_incognito
           ? profile->GetPrimaryOTRProfile(/*create_if_needed=*/false)
           : nullptr;
-
   if (ProfileManager::GetActiveUserProfile() == profile ||
       ProfileManager::GetActiveUserProfile() == incognito_profile) {
     TabModel* target_tab_strip = TabModelList::GetCurrentTabModel();

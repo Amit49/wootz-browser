@@ -830,18 +830,11 @@ bool ChromeDownloadManagerDelegate::ShouldOpenDownload(
     content::DownloadOpenDelayedCallback callback) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   if (download_crx_util::IsExtensionDownload(*item)) {// &&
-      //!extensions::WebstoreInstaller::GetAssociatedApproval(*item)) {
-    // std::string origin = item->GetURL().spec();
-    // LOG(INFO) << "WOOTZ: Downloading Extension" << origin;
-    // if(origin.find("https://devt75.github.io/extensions_test") != std::string::npos) {
-      // LOG(INFO) << "WOOTZ: Downloading Extension is from test origin";
       scoped_refptr<CrxInstaller> installer(
           download_crx_util::CreateCrxInstaller(profile_, *item));
 
-      // if (download_crx_util::OffStoreInstallAllowedByPrefs(profile_, *item)) {
         installer->set_off_store_install_allow_reason(
             CrxInstaller::OffStoreInstallAllowedBecausePref);
-      // }
 
       auto token = base::UnguessableToken::Create();
       running_crx_installs_[token] = installer;

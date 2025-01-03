@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -14,7 +14,7 @@ import org.chromium.base.Log;
 import org.chromium.wootz_wallet.mojom.AccountInfo;
 import org.chromium.wootz_wallet.mojom.AccountKind;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.app.WootzActivity;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.app.domain.KeyringModel;
 import org.chromium.chrome.browser.wootz_wallet.adapters.AccountSelectorRecyclerView;
 import org.chromium.chrome.browser.wootz_wallet.listeners.AccountSelectorItemListener;
@@ -38,9 +38,9 @@ public class AccountSelectorActivity extends WootzWalletBaseActivity
     protected void triggerLayoutInflation() {
         setContentView(R.layout.activity_account_selector);
         try {
-            WootzActivity activity = WootzActivity.getWootzActivity();
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
             mKeyringModel = activity.getWalletModel().getKeyringModel();
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
             Log.e(TAG, "triggerLayoutInflation " + e);
         }
         assert mKeyringModel != null;

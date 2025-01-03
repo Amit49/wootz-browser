@@ -101,8 +101,6 @@ import android.view.ViewOutlineProvider;
 import android.os.Build;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
-import org.chromium.base.task.PostTask;
-import org.chromium.base.task.TaskTraits;
 import org.chromium.chrome.browser.tab.Tab;
 import androidx.appcompat.content.res.AppCompatResources;
 
@@ -446,10 +444,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         int buttonMargin = dpToPx(4);
         int containerWidth = buttonSize * 5 + buttonMargin * 10; // Adjusted for new margins
 
-        // LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
-        //         ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        // extensionsContainer.setLayoutParams(containerParams);
-
         // Add "Add Extension" button
         ImageButton addExtensionButton = createRoundButton(context);
         addExtensionButton.setImageResource(R.drawable.ic_add_extensions);
@@ -503,14 +497,6 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         button.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
     
         return button;
-    }
-
-    public void showExtensionWebViewDirectly(String extensionId, AppMenuExtensionOpener extensionOpener) {
-        extensionOpener.openExtension(extensionId);
-    }
-    
-    public void closeExtensionBottomSheet(AppMenuExtensionOpener extensionOpener) {
-        extensionOpener.closeBottomSheet();
     }
 
     private void openWebsite(String url) {
@@ -640,7 +626,7 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
 
         int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
         mSelectedItemBeforeDismiss = true;
-        // dismiss();f
+        // dismiss();
         if (mHandler != null) {
             Log.d(TAG,"Entering the onItemClick for " + id);
             mHandler.onOptionsItemSelected(id);
@@ -801,6 +787,16 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
         return mGridView;
     }
 
+    public void showExtensionWebViewDirectly(String extensionId, AppMenuExtensionOpener extensionOpener) {
+        Log.d(TAG, "JANGID: Showing extension WebView directly for ID: " + extensionId);
+        extensionOpener.openExtension(extensionId);
+    }
+    
+    public void closeExtensionBottomSheet(AppMenuExtensionOpener extensionOpener) {
+        extensionOpener.closeBottomSheet();
+    }
+    
+
     private class GridAdapter extends BaseAdapter {
         private ModelList mModelList;
         private LayoutInflater mInflater;
@@ -893,6 +889,12 @@ public class AppMenu extends BottomSheetDialogFragment implements OnItemClickLis
                             .toUpperCase() + title.toString().substring(1);
                 }
             
+                if (title != null) {
+                    title = title.toString()
+                            .substring(0, 1)
+                            .toUpperCase() + title.toString().substring(1);
+                }
+                
                 titleView.setText(title);
             
                 boolean isEnabled = model.get(AppMenuItemProperties.ENABLED);

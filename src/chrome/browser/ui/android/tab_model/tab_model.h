@@ -15,6 +15,7 @@
 #include "components/omnibox/browser/location_bar_model_delegate.h"
 #include "components/sessions/core/session_id.h"
 #include "components/sync_sessions/synced_window_delegate.h"
+#include "ui/base/window_open_disposition.h"
 
 struct NavigateParams;
 
@@ -184,6 +185,10 @@ class TabModel {
   // Used for restoring tabs from synced foreign sessions.
   virtual void CreateTab(TabAndroid* parent,
                          content::WebContents* web_contents) = 0;
+
+  virtual void CreateTabActive(TabAndroid* parent,
+                         content::WebContents* web_contents,
+                         WindowOpenDisposition disposition ) = 0;
 
   virtual void HandlePopupNavigation(TabAndroid* parent,
                                      NavigateParams* params) = 0;

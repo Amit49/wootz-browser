@@ -6,7 +6,6 @@ import("//build/config/chromeos/ui_mode.gni")
 import("//crypto/features.gni")
 import("//ui/webui/resources/include_polymer.gni")
 import("//ui/webui/resources/tools/generate_grd.gni")
-
 if (use_blink) {
   import("//chrome/common/features.gni")
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -232,9 +232,10 @@ public class WootzPermissionAccountsListAdapter
                             if (CoinType.SOL == accountInfo.accountId.coin) {
                                 if (hasPermission) {
                                     mDelegate.disconnectAccount(accountInfo);
-                                } else {
-                                    mDelegate.connectAccount(accountInfo);
                                 }
+                                //  else {
+                                //     mDelegate.connectAccount(accountInfo);
+                                // }
                             } else {
                                 if (hasPermission) {
                                     if (isConnected) {
@@ -242,9 +243,10 @@ public class WootzPermissionAccountsListAdapter
                                     } else {
                                         mDelegate.switchAccount(accountInfo);
                                     }
-                                } else {
-                                    mDelegate.connectAccount(accountInfo);
                                 }
+                                //  else {
+                                //     mDelegate.connectAccount(accountInfo);
+                                // }
                             }
                         });
             }

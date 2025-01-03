@@ -183,7 +183,6 @@ public class HubManagerImpl implements HubManager, HubController {
         if (mHubCoordinator != null) return;
         ensureHubCoordinatorIsInitialized();
     }
-
     private void ensureHubCoordinatorIsInitialized() {
         if (mHubCoordinator != null) return;
 

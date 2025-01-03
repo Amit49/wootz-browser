@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -8,10 +8,10 @@
 #include "base/android/jni_android.h"
 #include "base/android/jni_string.h"
 #include "base/version.h"
-#include "chrome/build/android/jni_headers/BlockchainRegistryFactory_jni.h"
-#include "chrome/components/wootz_wallet/browser/blockchain_registry.h"
-#include "chrome/components/wootz_wallet/browser/wootz_wallet_constants.h"
-#include "chrome/components/wootz_wallet/browser/wallet_data_files_installer.h"
+#include "chrome/android/chrome_jni_headers/BlockchainRegistryFactory_jni.h"
+#include "components/wootz_wallet/browser/blockchain_registry.h"
+#include "components/wootz_wallet/browser/wootz_wallet_constants.h"
+#include "components/wootz_wallet/browser/wallet_data_files_installer.h"
 #include "chrome/browser/profiles/profile.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 

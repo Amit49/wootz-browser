@@ -101,7 +101,7 @@ void ViewportData::UpdateViewportDescription() {
 
   if (force_stop_display_cutout_)
     current_viewport_fit = mojom::ViewportFit::kContain;
-
+  
   if (viewport_fit_ != current_viewport_fit) {
     if (AssociatedInterfaceProvider* provider =
             document_->GetFrame()

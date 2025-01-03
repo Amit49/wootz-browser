@@ -92,7 +92,8 @@ using WebExposedIsolationLevel = content::WebExposedIsolationLevel;
 class BrowserNavigatorWebContentsAdoption {
  public:
   static void AttachTabHelpers(content::WebContents* contents) {
-    TabHelpers::AttachTabHelpers(contents);
+    // TabHelpers::AttachTabHelpers(contents);
+    TabAndroid::AttachTabHelpers(contents);
 
     // Make the tab show up in the task manager.
     task_manager::WebContentsTags::CreateForTabContents(contents);
@@ -800,7 +801,6 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
   // if (!params->browser) {
   //   return nullptr;
   // }
-
   if (singleton_index != -1) {
     contents_to_navigate_or_insert =
         // params->browser->tab_strip_model()->GetWebContentsAt(singleton_index);
@@ -874,7 +874,6 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
 
   // Some dispositions need coercion to base types.
   NormalizeDisposition(params);
-
 #if 0
   // If a new window has been created, it needs to be shown.
   if (params->window_action == NavigateParams::NO_ACTION &&
@@ -896,7 +895,6 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
       params->transition & ui::PAGE_TRANSITION_FROM_ADDRESS_BAR ||
       !ui::PageTransitionIsWebTriggerable(params->transition);
 #endif
-
   base::WeakPtr<content::NavigationHandle> navigation_handle;
 
   // If no target WebContents was specified (and we didn't seek and find a
@@ -984,9 +982,10 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     //     params->transition, params->tabstrip_add_types, params->group);
     LOG(ERROR) << "INSERTING: " << singleton_index;
     TabModel* tab_model = TabModelList::GetCurrentTabModel();
-    tab_model->CreateTab(
+    tab_model->CreateTabActive(
         tab_model->GetTabAt(tab_model->GetActiveIndex()),
-        contents_to_insert.release());
+        contents_to_insert.release(),
+        params->disposition);
   }
 
   if (singleton_index >= 0) {

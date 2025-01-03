@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -17,8 +17,8 @@ import org.chromium.wootz_wallet.mojom.AccountId;
 import org.chromium.wootz_wallet.mojom.AccountInfo;
 import org.chromium.wootz_wallet.mojom.CoinType;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.app.WootzActivity;
-import org.chromium.chrome.browser.util.TabUtils;
+import org.chromium.chrome.browser.app.ChromeActivity;
+import org.chromium.chrome.browser.tab.TabUtils;
 import org.chromium.mojo_base.mojom.TimeDelta;
 
 import java.nio.ByteBuffer;
@@ -106,12 +106,12 @@ public class WalletUtils {
         return AccountInfo.deserialize(ByteBuffer.wrap(bytes));
     }
 
-    public static void openWebWallet() {
+    public static void openWebWallet(final boolean forceNewTab) {
         try {
-            WootzActivity activity = WootzActivity.getWootzActivity();
-            activity.openNewOrSelectExistingTab(WootzActivity.WOOTZ_WALLET_URL, true);
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
+            activity.openNewOrSelectExistingTab(ChromeActivity.WOOTZ_WALLET_URL, true);
             TabUtils.bringChromeTabbedActivityToTheTop(activity);
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
             Log.e(TAG, "Error while opening wallet tab.", e);
         }
     }

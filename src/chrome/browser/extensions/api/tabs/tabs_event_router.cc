@@ -303,7 +303,6 @@ void TabsEventRouter::OnTabModelAdded() {
 void TabsEventRouter::OnTabModelRemoved() {
     if (!observed_tab_model_)
         return;
-      
     for (TabModel* model : TabModelList::models()) {
         if (observed_tab_model_ == model)
             return;
@@ -319,7 +318,6 @@ void TabsEventRouter::DidSelectTab(TabAndroid* tab, TabModel::TabSelectionType t
     LOG(INFO) << "tabs_event_router.cc: DidSelectTab: web_contents: nullptr";
     return;
   }
-  
   last_tab_id_ = tab->GetAndroidId();
 
   if (!GetTabEntry(tab)) {
@@ -474,6 +472,7 @@ void TabsEventRouter::DispatchTabInsertedAt(TabModel* tab_model,
 void TabsEventRouter::DispatchTabClosingAt(TabModel* tab_model,
                                            TabAndroid* tab,
                                            int index) {
+  WebContents* contents = tab->web_contents();
   int tab_id = ExtensionTabUtil::GetTabId(contents);
 
   base::Value::List args;
@@ -482,8 +481,7 @@ void TabsEventRouter::DispatchTabClosingAt(TabModel* tab_model,
   base::Value::Dict object_args;
   object_args.Set(tabs_constants::kWindowIdKey,
                   ExtensionTabUtil::GetWindowIdOfTab(contents));
-  object_args.Set(tabs_constants::kWindowClosing,
-                  tab_strip_model->closing_all());
+  object_args.Set(tabs_constants::kWindowClosing, false);
   args.Append(std::move(object_args));
 
   Profile* profile = GetProfileFromBrowserContext(contents);
@@ -497,7 +495,7 @@ void TabsEventRouter::DispatchTabClosingAt(TabModel* tab_model,
 void TabsEventRouter::DispatchTabDetachedAt(TabAndroid* tab,
                                             int index,
                                             bool was_active) {
- WebContents* contents = tab->web_contents();
+  WebContents* contents = tab->web_contents();
   if (!GetTabEntry(tab)) {
     // The tab was removed. Don't send detach event.
     return;

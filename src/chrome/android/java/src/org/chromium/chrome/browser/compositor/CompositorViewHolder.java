@@ -904,6 +904,7 @@ public class CompositorViewHolder extends FrameLayout
                             + mBrowserControlsManager.getBottomControlsHeight();
             controlsInsets = mControlsResizeView ? controlsHeight : controlsMinHeight;
         }
+
         int keyboardInset =
                 mApplicationBottomInsetSupplier != null
                         ? mApplicationBottomInsetSupplier.get().webContentsHeightInset

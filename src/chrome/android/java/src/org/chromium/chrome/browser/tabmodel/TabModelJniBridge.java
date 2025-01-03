@@ -151,6 +151,10 @@ public abstract class TabModelJniBridge implements TabModel {
             Tab parent, Profile profile, WebContents webContents);
 
     @CalledByNative
+    protected abstract boolean createTabActiveWithWebContents(
+            Tab parent, Profile profile, WebContents webContents, int deposition);
+
+    @CalledByNative
     protected abstract void openNewTab(
             Tab parent,
             GURL url,

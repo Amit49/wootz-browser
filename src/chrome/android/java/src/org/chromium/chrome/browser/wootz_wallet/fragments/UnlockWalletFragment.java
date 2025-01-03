@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -51,9 +51,9 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.Executor;
 
-import javax.wootz.BadPaddingException;
-import javax.wootz.IllegalBlockSizeException;
-import javax.wootz.NoSuchPaddingException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class UnlockWalletFragment extends BaseWalletNextPageFragment {
 
@@ -128,7 +128,7 @@ public class UnlockWalletFragment extends BaseWalletNextPageFragment {
                                         Utils.clearClipboard(
                                                 mUnlockWalletPassword.getText().toString());
                                         mUnlockWalletPassword.setText(null);
-                                        onNextPage.showWallet();
+                                        onNextPage.showWallet(true);
                                     } else {
                                         mUnlockWalletPasswordLayout.setError(
                                                 getString(R.string.incorrect_password_error));
@@ -209,7 +209,7 @@ public class UnlockWalletFragment extends BaseWalletNextPageFragment {
                                 unlockResult -> {
                                     if (unlockResult) {
                                         if (mOnNextPage != null) {
-                                            mOnNextPage.showWallet();
+                                            mOnNextPage.showWallet(true);
                                         }
                                     } else {
                                         showBiometricAuthenticationButton();

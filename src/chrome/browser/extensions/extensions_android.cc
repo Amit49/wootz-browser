@@ -30,7 +30,6 @@ class IconLoaderJNI {
 public:
     static std::string GetIconBytesBase64(const extensions::Extension* extension) {
         const int kPreferredSize = 128;
-
         const ExtensionIconSet& icons = IconsInfo::GetIcons(extension);
         if (icons.empty()) {
             return "";
@@ -70,7 +69,6 @@ public:
     }
 };
 }
-
 
 static ScopedJavaLocalRef<jstring> JNI_Extensions_GetExtensionsInfo(
     JNIEnv* env) {

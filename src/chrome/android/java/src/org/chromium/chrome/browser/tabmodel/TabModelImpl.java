@@ -868,6 +868,25 @@ public class TabModelImpl extends TabModelJniBridge {
                 .createTabWithWebContents(parent, webContents, TabLaunchType.FROM_RECENT_TABS);
     }
 
+    protected boolean createTabActiveWithWebContents(
+        Tab parent, Profile profile, WebContents webContents, int disposition) {
+        // Ensure WebContents is properly initialized before tab creation
+        if (webContents != null) {
+            webContents.onShow();
+        }
+        
+        @TabLaunchType int launchType = TabLaunchType.FROM_RECENT_TABS;
+        
+        if (disposition == WindowOpenDisposition.NEW_FOREGROUND_TAB) {
+            launchType = TabLaunchType.FROM_SPECULATIVE_BACKGROUND_CREATION;
+        } else if (disposition == WindowOpenDisposition.NEW_BACKGROUND_TAB) {
+            launchType = TabLaunchType.FROM_RECENT_TABS;
+        }
+                
+        return getTabCreator(profile.isOffTheRecord())
+                .createTabWithWebContents(parent, webContents, launchType);
+    }
+
     @Override
     public void openNewTab(
             Tab parent,

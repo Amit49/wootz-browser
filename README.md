@@ -37,17 +37,17 @@ Create a chromium directory for the checkout and change to it (you can call this
 mkdir ~/chromium && cd ~/chromium
 fetch --nohooks --no-history android
 
-gclient sync --nohooks --revision src@refs/tags/127.0.6489.0 --reset --upstream -D --force --no-history
-
+gclient sync --nohooks --revision src@refs/tags/127.0.6489.0 --reset --upstream -D --force --no-history --shallow
+```
 
 When fetch completes, it will have created a hidden .gclient file and a directory called src in the working directory. The remaining instructions assume you have switched to the src directory:
-```
+```bash
 cd src
 ```
 
 #### Install additional build dependencies
 Once you have checked out the code, run
-```
+```bash
 build/install-build-deps.sh --android
 ```
 Once you've run install-build-deps at least once, you can now run the Chromium-specific hooks, which will download additional binaries and other things you might need:
@@ -58,20 +58,16 @@ gclient runhooks
 
 #### Setting up the build
 
-#### Build Options:
-
 ##### Option 1: Generate the default Chromium APK
 Run following command in ```chromium/src``` directory 
-```
+```bash
 gn args out/Default
 ```
 
 and add following arguments:
-
-
 ```bash
 target_os = "android"
-target_cpu = "arm64"
+target_cpu = "arm64" # or x64
 ```
 
 ##### Option 2: Generate an optimized APK (approximately 131 MB)
@@ -82,10 +78,9 @@ gn args out/Default
 ```
  and add following arguments:
 
-
 ```bash
 target_os = "android"
-target_cpu = "arm"
+target_cpu = "arm64" # or x64
 is_official_build = true
 is_debug = false
 symbol_level = 0
@@ -97,21 +92,55 @@ remove_webcore_debug_symbols = true
 
 #### Build Chromium
 Build Chromium with Ninja using the command:
-```
+```bash
 autoninja -C out/Default chrome_public_apk
 ```
+
 ### Installation Steps (building wootzapp):
-change path to root directory or parent directory of your chromium build.
-```
-cd ..
+Change path to root directory or parent directory of your chromium build.
+```bash
+cd ../..
 git clone --depth 1 https://github.com/wootzapp/wootz-browser.git
 ```
-Final Step
-```
+Adding Wootzapp on the top of chromium build.
+```bash
 sudo chmod -R u+w chromium/src/
 cp -r wootz-browser/src/* chromium/src/
+cd ~/chromium
+```
+#### Build Options: Add ` checkout_pgo_profiles ` in .gclient which is present in chromium directory.
 
-cd ~/chromium/src
+##### Reference .gclient
+```gn
+solutions = [
+  {
+    "name": "src",
+    "url": "https://chromium.googlesource.com/chromium/src.git",
+    "managed": False,
+    "custom_deps": {},
+    "custom_vars": {
+        "checkout_pgo_profiles": True
+    },
+  },
+]
+target_os = ["android"]
+```
+#### Run Hooks
+```bash
+gclient runhooks
+```
+
+### Final Step
+
+```bash
+cd src
+
+#### Install WebUI deps With node v18
+npm i --legacy-peer-deps
+```
+
+#### Build Wootzapp
+```bash
 autoninja -C out/Default chrome_public_apk
 ```
 
@@ -121,7 +150,6 @@ Learn how to [Get Around the Chromium Source Code Directory
 Structure](https://www.chromium.org/developers/how-tos/getting-around-the-chrome-source-code).
 
 This project is tested with BrowserStack.
-
 
 ## License
 

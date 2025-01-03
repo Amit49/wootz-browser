@@ -8,8 +8,10 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.util.Log;
+
 import androidx.annotation.VisibleForTesting;
+
+import android.util.Log;
 
 import org.chromium.base.Callback;
 import org.chromium.base.ResettersForTesting;
@@ -19,6 +21,9 @@ import org.chromium.ui.base.WindowAndroid;
 import androidx.fragment.app.FragmentManager;
 /** A UI coordinator the app menu. */
 class AppMenuCoordinatorImpl implements AppMenuCoordinator {
+    
+    private static final String TAG = "AppMenuCoordintorImpl";
+    
     private static Boolean sHasPermanentMenuKeyForTesting;
 
     /** Factory which creates the AppMenuHandlerImpl. */
@@ -117,13 +122,17 @@ class AppMenuCoordinatorImpl implements AppMenuCoordinator {
 
     @Override
     public void openExtensionById(String extensionId) {
+        Log.e(TAG, "JANGID: openExtensionById " + extensionId);
         if (mAppMenuHandler != null) {
             mAppMenuHandler.openExtensionById(extensionId);
-        } 
+        } else {
+            Log.e(TAG, "JANGID: AppMenuHandler is null, cannot openExtensionById");
+        }
     }
 
     @Override
     public void closeExtensionBottomSheet() {
+        Log.e(TAG, "JANGID: closeExtensionBottomSheet ");
         if (mAppMenuHandler != null) {
             mAppMenuHandler.closeExtensionBottomSheet();
         }

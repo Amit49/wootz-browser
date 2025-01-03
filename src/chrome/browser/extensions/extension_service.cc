@@ -1219,22 +1219,24 @@ void ExtensionService::PostActivateExtension(
   // ExtensionRegistryObserver. See http://crbug.com/355029.
   UpdateActiveExtensionsInCrashReporter();
 
+#if 0
   const PermissionsData* permissions_data = extension->permissions_data();
 
   // If the extension has permission to load chrome://favicon/ resources we need
   // to make sure that the FaviconSource is registered with the
   // ChromeURLDataManager.
-  // if (permissions_data->HasHostPermission(GURL(chrome::kChromeUIFaviconURL))) {
-  //   content::URLDataSource::Add(
-  //       profile_, std::make_unique<FaviconSource>(
-  //                     profile_, chrome::FaviconUrlFormat::kFaviconLegacy));
-  // }
+  if (permissions_data->HasHostPermission(GURL(chrome::kChromeUIFaviconURL))) {
+    content::URLDataSource::Add(
+        profile_, std::make_unique<FaviconSource>(
+                      profile_, chrome::FaviconUrlFormat::kFaviconLegacy));
+  }
 
-  // Same for chrome://theme/ resources.
-  // if (permissions_data->HasHostPermission(GURL(chrome::kChromeUIThemeURL))) {
-  //   content::URLDataSource::Add(profile_,
-  //                               std::make_unique<ThemeSource>(profile_));
-  // }
+  Same for chrome://theme/ resources.
+  if (permissions_data->HasHostPermission(GURL(chrome::kChromeUIThemeURL))) {
+    content::URLDataSource::Add(profile_,
+                                std::make_unique<ThemeSource>(profile_));
+  }
+#endif
 }
 
 // TODO(michaelpg): Group with other ExtensionRegistrar::Delegate overrides
@@ -2185,6 +2187,7 @@ void ExtensionService::RenderProcessHostDestroyed(
 }
 
 int ExtensionService::GetDisableReasonsOnInstalled(const Extension* extension) {
+#if 0
   bool is_update_from_same_type = false;
   {
     const Extension* existing_extension =
@@ -2218,7 +2221,7 @@ int ExtensionService::GetDisableReasonsOnInstalled(const Extension* extension) {
                ? disable_reason::DISABLE_USER_ACTION
                : disable_reasons;
   }
-#if 0
+  
   if (ExternalInstallManager::IsPromptingEnabled()) {
     // External extensions are initially disabled. We prompt the user before
     // enabling them. Hosted apps are excepted because they are not dangerous

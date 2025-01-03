@@ -6,7 +6,9 @@
 package org.chromium.chrome.browser.extensions;
 
 import org.chromium.chrome.browser.app.ChromeActivity;
-
+import org.jni_zero.CalledByNative;
+import org.jni_zero.JNINamespace;
+import org.jni_zero.NativeMethods;
 
 import android.content.Context;
 import androidx.appcompat.app.AlertDialog;
@@ -15,6 +17,7 @@ import android.util.Log;
 
 public class OpenExtensionsById {
     private static final String TAG ="OpenExtensionsById";
+
     public static void openExtensionById(String extensionId){
         Log.d(TAG," Extension id by "+extensionId);
 
@@ -29,6 +32,32 @@ public class OpenExtensionsById {
     }
 
     public static void closeExtensionBottomSheet(){
+        try {
+            Log.d(TAG, "JANGID: CALLING closeExtensionBottomSheet");
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
+            activity.getRootUiCoordinatorForTesting().getAppMenuCoordinatorForTesting()
+                    .closeExtensionBottomSheet();
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
+            Log.e(TAG, "JANGID: closeExtensionBottomSheet " + e);
+        }
+    }
+    
+    @CalledByNative
+    public static void openExtensionByIdNative(String extensionId){
+        Log.d(TAG," Extension id by "+extensionId);
+
+        try {
+            Log.d(TAG, "JANGID: CALLING openExtensionById");
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
+            activity.getRootUiCoordinatorForTesting().getAppMenuCoordinatorForTesting()
+                    .openExtensionById(extensionId);
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
+            Log.e(TAG, "JANGID: openExtensionById " + e);
+        }
+    }
+
+    @CalledByNative
+    public static void closeExtensionBottomSheetNative(){
         try {
             Log.d(TAG, "JANGID: CALLING closeExtensionBottomSheet");
             ChromeActivity activity = ChromeActivity.getChromeActivity();

@@ -1,4 +1,4 @@
-/* Copyright (c) 2024 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -24,7 +24,7 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.app.helpers.Api33AndPlusBackPressHelper;
 import org.chromium.chrome.browser.wootz_wallet.util.Utils;
-import org.chromium.chrome.browser.util.TabUtils;
+import org.chromium.chrome.browser.tab.TabUtils;
 
 /** Onboarding fragment showing terms and conditions to accept before using Wootz Wallet. */
 public class OnboardingTermsOfUseFragment extends BaseOnboardingWalletFragment

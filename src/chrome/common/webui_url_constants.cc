@@ -151,8 +151,6 @@ const char kChromeUIThrottleHost[] = "throttle";
 const char kChromeUIThrottleURL[] = "wootzapp://throttle/";
 const char kChromeUIReactHost[] = "react";
 const char kChromeUIReactURL[] = "wootzapp://react/";
-const char kChromeUIRewardsHost[] = "rewards";
-const char kChromeUIRewardsURL[] = "wootzapp://rewards/";
 const char kChromeUINewTabHost[] = "newtab";
 const char kChromeUINewTabPageHost[] = "new-tab-page";
 const char kChromeUINewTabPageURL[] = "wootzapp://new-tab-page/";
@@ -331,7 +329,6 @@ const char kChromeUIWebAppInternalsHost[] = "web-app-internals";
 const char kChromeUIWebAppInternalsURL[] = "chrome://web-app-internals";
 const char kChromeUIUntrustedWebUITestURL[] = "chrome-untrusted://webui-test/";
 #endif
-const char kChromeUIWebUITestHost[] = "webui-test";
 
 #if BUILDFLAG(IS_CHROMEOS_ASH)
 // Keep alphabetized.

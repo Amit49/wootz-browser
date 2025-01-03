@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -22,7 +22,7 @@ import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.ChromeTabbedActivity;
-import org.chromium.chrome.browser.app.WootzActivity;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.app.helpers.Api33AndPlusBackPressHelper;
 import org.chromium.chrome.browser.wootz_wallet.activities.WootzWalletActivity;
 
@@ -70,7 +70,7 @@ public class OnboardingInitWalletFragment extends BaseOnboardingWalletFragment {
                     }
                     mButtonClicked = true;
 
-                    checkOnWootzActivity(true, false);
+                    checkOnChromeActivity(true, false);
                     if (mOnNextPage != null) {
                         // Add a little delay for a smooth ripple effect animation.
                         PostTask.postDelayedTask(
@@ -86,7 +86,7 @@ public class OnboardingInitWalletFragment extends BaseOnboardingWalletFragment {
                     }
                     mButtonClicked = true;
 
-                    checkOnWootzActivity(false, true);
+                    checkOnChromeActivity(false, true);
                     if (mOnNextPage != null) {
                         // Add a little delay for a smooth ripple effect animation.
                         PostTask.postDelayedTask(
@@ -125,13 +125,12 @@ public class OnboardingInitWalletFragment extends BaseOnboardingWalletFragment {
     }
 
     // We need to remove that check and restart once
-    // https://github.com/wootz/wootz-browser/issues/27887
     // is done.
-    private void checkOnWootzActivity(boolean setupAction, boolean restoreAction) {
+    private void checkOnChromeActivity(boolean setupAction, boolean restoreAction) {
         try {
-            WootzActivity.getWootzActivity();
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
-            Log.e(TAG, "checkOnWootzActivity " + e);
+            ChromeActivity.getChromeActivity();
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
+            Log.e(TAG, "checkOnChromeActivity ANKITANKITIVAN" + e);
             Intent intent = new Intent(getActivity(), ChromeTabbedActivity.class);
             intent.putExtra(WootzWalletActivity.RESTART_WALLET_ACTIVITY, true);
             intent.putExtra(WootzWalletActivity.RESTART_WALLET_ACTIVITY_SETUP, setupAction);

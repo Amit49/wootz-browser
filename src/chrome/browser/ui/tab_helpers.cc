@@ -110,6 +110,7 @@
 #include "chrome/browser/user_notes/user_notes_tab_helper.h"
 #include "chrome/browser/v8_compile_hints/v8_compile_hints_tab_helper.h"
 #include "chrome/browser/vr/vr_tab_helper.h"
+#include "chrome/browser/wootz_wallet/wootz_wallet_tab_helper.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_isolated_world_ids.h"
@@ -448,6 +449,9 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents) {
         CreateForWebContents(web_contents);
 
 #if BUILDFLAG(IS_ANDROID)
+
+    wootz_wallet::WootzWalletTabHelper::CreateForWebContents(web_contents);
+
     // If enabled, save sensitivity data for each non-incognito non-custom
     // android tab
     // TODO(crbug.com/40276584): Consider moving check conditions or the

@@ -1,4 +1,4 @@
-/* Copyright (c) 2023 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chromium.base.Log;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.app.WootzActivity;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.wootz_wallet.adapters.TwoLineItemRecyclerViewAdapter;
 import org.chromium.chrome.browser.wootz_wallet.adapters.TwoLineItemRecyclerViewAdapter.TwoLineItem;
 
@@ -53,9 +53,9 @@ public class TwoLineItemBottomSheetFragment extends WalletBottomSheetDialogFragm
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            WootzActivity activity = WootzActivity.getWootzActivity();
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
             registerKeyringObserver(activity.getWalletModel().getKeyringModel());
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
             Log.e(TAG, "onCreate ", e);
         }
     }

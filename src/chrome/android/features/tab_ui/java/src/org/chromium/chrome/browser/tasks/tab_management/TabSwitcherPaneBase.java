@@ -299,7 +299,6 @@ public abstract class TabSwitcherPaneBase implements Pane, TabSwitcherResetHandl
                         Log.d(TAG, "Geometry not ready using fallback animation.");
                         useFallbackAnimation = true;
                     }
-
                     animationDataSupplier.set(
                             new ShrinkExpandAnimationData(
                                     initialRect,

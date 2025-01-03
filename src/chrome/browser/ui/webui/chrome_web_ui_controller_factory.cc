@@ -49,7 +49,6 @@
 #include "chrome/browser/ui/webui/net_export_ui.h"
 #include "chrome/browser/ui/webui/net_internals/net_internals_ui.h"
 #include "chrome/browser/ui/webui/throttle/throttle_ui.h"
-#include "chrome/browser/ui/webui/rewards/rewards_ui.h"
 #include "chrome/browser/ui/webui/ntp_tiles_internals_ui.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
 #include "chrome/browser/ui/webui/policy/policy_ui.h"
@@ -309,6 +308,7 @@ WebUIController* NewComponentUI(WebUI* web_ui, const GURL& url) {
   return new WEB_UI_CONTROLLER(web_ui, std::move(delegate));
 }
 
+
 #if !BUILDFLAG(IS_ANDROID)
 template <>
 WebUIController* NewWebUI<PageNotAvailableForGuestUI>(WebUI* web_ui,
@@ -445,8 +445,6 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<NetInternalsUI>;
   if (url.host_piece() == chrome::kChromeUIThrottleHost)
     return &NewWebUI<ThrottleUI>;
-  if (url.host_piece() == chrome::kChromeUIRewardsHost)
-    return &NewWebUI<RewardsUI>;
   if (url.host_piece() == chrome::kChromeUINTPTilesInternalsHost)
     return &NewWebUI<NTPTilesInternalsUI>;
   if (url.host_piece() == chrome::kChromeUIOmniboxHost)

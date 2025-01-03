@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 import org.chromium.base.Log;
 import org.chromium.wootz_wallet.mojom.KeyringService;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.app.WootzActivity;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.wootz_wallet.WootzWalletServiceFactory;
 import org.chromium.chrome.browser.wootz_wallet.util.AndroidUtils;
 import org.chromium.chrome.browser.wootz_wallet.util.WalletConstants;
@@ -109,9 +109,9 @@ public class DAppsDialog extends Dialog implements ConnectionErrorHandler {
 
     private void openWallet() {
         try {
-            WootzActivity activity = WootzActivity.getWootzActivity();
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
             activity.openWootzWallet(true, false, false);
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
             Log.e(TAG, "openWallet " + e);
         }
     }

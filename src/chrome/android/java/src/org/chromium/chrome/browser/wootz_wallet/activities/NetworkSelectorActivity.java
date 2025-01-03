@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 The Wootz Authors. All rights reserved.
+/* Copyright (c) 2024 The Wootzapp Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -23,7 +23,7 @@ import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
 import org.chromium.wootz_wallet.mojom.NetworkInfo;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.app.WootzActivity;
+import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.app.domain.NetworkModel;
 import org.chromium.chrome.browser.app.domain.WalletModel;
 import org.chromium.chrome.browser.wootz_wallet.adapters.NetworkSelectorAdapter;
@@ -85,9 +85,9 @@ public class NetworkSelectorActivity extends WootzWalletBaseActivity
 
     private void initState() {
         try {
-            WootzActivity activity = WootzActivity.getWootzActivity();
+            ChromeActivity activity = ChromeActivity.getChromeActivity();
             mWalletModel = activity.getWalletModel();
-        } catch (WootzActivity.WootzActivityNotFoundException e) {
+        } catch (ChromeActivity.ChromeActivityNotFoundException e) {
             Log.e(TAG, "initState", e);
             return;
         }
@@ -97,7 +97,6 @@ public class NetworkSelectorActivity extends WootzWalletBaseActivity
         NetworkModel.NetworkLists networkLists = mNetworkModel.mNetworkLists.getValue();
         NetworkInfo selectedNetwork =
                 mWalletModel.getCryptoModel().getNetworkModel().mDefaultNetwork.getValue();
-        // See GitHub issue https://github.com/wootz/wootz-browser/issues/37399.
         // When live data will be refactored this check can be removed.
         if (networkLists == null || selectedNetwork == null) {
             Log.w(TAG, "Network lists and selected network must not be null.");

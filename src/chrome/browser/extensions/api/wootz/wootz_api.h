@@ -15,10 +15,12 @@
 #include "components/search_engines/template_url_service.h"
 #include "extensions/browser/browser_context_keyed_api_factory.h"
 #include "extensions/browser/extension_function.h"
+#include "extensions/browser/extension_function_histogram_value.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_registry_observer.h"
 #include "extensions/common/extension_id.h"
 #include "ui/base/window_open_disposition.h"
+#include "components/wootz_wallet/common/wootz_wallet.mojom.h"
 #include "base/android/jni_array.h"
 #include "base/android/jni_string.h"
 
@@ -27,7 +29,7 @@ class Profile;
 namespace content {
 class BrowserContext;
 class WebContents;
-}  // namespace content
+}
 
 namespace extensions {
 class WootzInfoFunction : public ExtensionFunction {
@@ -36,8 +38,10 @@ class WootzInfoFunction : public ExtensionFunction {
 
   WootzInfoFunction() = default;
 
-  WootzInfoFunction(const WootzInfoFunction&) = delete;
-  WootzInfoFunction& operator=(const WootzInfoFunction&) = delete;
+  WootzInfoFunction(
+      const WootzInfoFunction&) = delete;
+  WootzInfoFunction& operator=(
+      const WootzInfoFunction&) = delete;
 
  protected:
   ~WootzInfoFunction() override {}
@@ -67,15 +71,15 @@ class WootzShowDialogFunction : public ExtensionFunction {
     WootzShowDialogFunction(const WootzShowDialogFunction&) = delete;
     WootzShowDialogFunction& operator=(const WootzShowDialogFunction&) = delete;
 
-    ResponseAction Run() override;
   protected:
     ~WootzShowDialogFunction() override {}
+
+    ResponseAction Run() override;
 };
 
 class WootzLogFunction : public ExtensionFunction {
  public:
   DECLARE_EXTENSION_FUNCTION("wootz.log", WOOTZ_LOG)
-
   WootzLogFunction() = default;
 
   WootzLogFunction(
@@ -89,6 +93,88 @@ class WootzLogFunction : public ExtensionFunction {
   ResponseAction Run() override;
 };
 
+class WootzSetSelectedChainsFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.setSelectedChains", WOOTZ_SELECT_CHAIN)
+  WootzSetSelectedChainsFunction() = default;
+
+ protected:
+  ~WootzSetSelectedChainsFunction() override = default;
+  ResponseAction Run() override;
+};
+
+class WootzCreateWalletFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.createWallet", WOOTZ_CREATE_WALLET)
+ protected:
+  ~WootzCreateWalletFunction() override {}
+  ResponseAction Run() override;
+ private:
+  void OnWalletCreated(const std::optional<std::string>& recovery_phrase);
+};
+
+class WootzIsWalletCreatedFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.isWalletCreated", WOOTZ_IS_WALLET_CREATED)
+ protected:
+  ~WootzIsWalletCreatedFunction() override {}
+  ResponseAction Run() override;
+};
+
+class WootzUnlockWalletFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.unlockWallet", WOOTZ_UNLOCK_WALLET)
+ protected:
+  ~WootzUnlockWalletFunction() override {}
+  ResponseAction Run() override;
+ private:
+  void OnUnlocked(bool success);
+};
+
+class WootzLockWalletFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.lockWallet", WOOTZ_LOCK_WALLET)
+ protected:
+  ~WootzLockWalletFunction() override {}
+  ResponseAction Run() override;
+};
+
+class WootzIsLockedFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.isLocked", WOOTZ_IS_LOCKED)
+ protected:
+  ~WootzIsLockedFunction() override {}
+  ResponseAction Run() override;
+ private:
+  void OnIsLocked(bool is_locked);
+};
+
+class WootzGetAllAccountsFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.getAllAccounts", WOOTZ_GET_ALL_ACCOUNTS)
+ protected:
+  ~WootzGetAllAccountsFunction() override {}
+  ResponseAction Run() override;
+
+ private:
+  void OnGetAllAccounts(wootz_wallet::mojom::AllAccountsInfoPtr all_accounts_info);
+  
+  base::WeakPtrFactory<WootzGetAllAccountsFunction> weak_factory_{this};
+};
+
+class WootzSignMessageFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("wootz.signMessage", WOOTZ_SIGN_MESSAGE)
+  
+  static void NotifyExtensionOfPendingRequest(content::BrowserContext* context);
+
+ private:
+  ~WootzSignMessageFunction() override {}
+  ResponseAction Run() override;
+  static void OnGetPendingRequests(
+      content::BrowserContext* context,
+      std::vector<wootz_wallet::mojom::SignMessageRequestPtr> requests);
+};
 // background service api
 class WootzSetJobFunction : public ExtensionFunction {
  public:

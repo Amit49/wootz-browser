@@ -145,6 +145,8 @@ public class WootzAppBackgroundService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "Error in onDestroy", e);
         }
+        ForegroundServiceUtils.getInstance().stopForeground(this, 
+                NotificationManager.IMPORTANCE_NONE);
         super.onDestroy();
     }
     @Override
